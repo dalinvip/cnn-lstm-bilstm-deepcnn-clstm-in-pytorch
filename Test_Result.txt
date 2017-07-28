@@ -1,0 +1,3 @@
+model snapshot\2017-07-28_19-50-00\snapshot_steps500.pt
+Evaluation - loss: 1.574433  acc: 27.2398%(602/2210) 
+
