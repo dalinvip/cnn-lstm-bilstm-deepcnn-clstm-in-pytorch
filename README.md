@@ -1,5 +1,5 @@
 ## Introduction
-* Themotional classification tasks that apply multiple neural network
+* The sentiment classification tasks that apply multiple neural network
 * the repository is being updated......
 ## Requirement
 * python 3
@@ -84,8 +84,11 @@
 
 ## Word Embedding Memo 
 - the word embedding saved in the folder of word2vec, but now is empty, because of it is to big,so if you want to use word embedding,you can to download word2vce or glove, then saved in the folder of word2vec,and make the option of word_Embedding to True and modifiy the name in the demo.
+
 - in the demo,I used following......
-    `if args.embed_dim == 100:
+   
+
+-  `if args.embed_dim == 100:
         path = "./word2vec/glove.6B.100d.txt"
     elif args.embed_dim == 200:
         path = "./word2vec/glove.6B.200d.txt"
@@ -111,6 +114,7 @@
 
 ## File Memo
 - Parameters.txt  --------> the file is being used to save all parameters values.
+
 - Test_Result.txt --------> the file is being used to save the result of test,in the demo,save a model and test a model immediately,and int the end of training, will calculate the best result value.
 ## Reference 
 
