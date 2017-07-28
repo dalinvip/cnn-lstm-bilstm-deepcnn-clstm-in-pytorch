@@ -82,7 +82,7 @@
  
 -  -test                 -------->train or test
 
-##Word Embedding Memo 
+## Word Embedding Memo 
 - the word embedding saved in the folder of word2vec, but now is empty, because of it is to big,so if you want to use word embedding,you can to download word2vce or glove, then saved in the folder of word2vec,and make the option of word_Embedding to True and modifiy the name in the demo.
 - in the demo,I used following......
     `if args.embed_dim == 100:
