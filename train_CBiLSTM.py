@@ -28,11 +28,12 @@ def train(train_iter, dev_iter, test_iter, model, args):
             model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
             if feature.size(1) != args.batch_size:
                 model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
+
             logit = model(feature)
             # target values >=0   <=C - 1 (C = args.class_num)
             loss = F.cross_entropy(logit, target)
             loss.backward()
-            # utils.clip_grad_norm(model.parameters(), 1e-4)
+            utils.clip_grad_norm(model.parameters(), 1e-4)
             optimizer.step()
 
             steps += 1
@@ -53,6 +54,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
                 if not os.path.isdir(args.save_dir): os.makedirs(args.save_dir)
                 save_prefix = os.path.join(args.save_dir, 'snapshot')
                 save_path = '{}_steps{}.pt'.format(save_prefix, steps)
+                # print("model", model)
                 torch.save(model, save_path)
                 test_eval(test_iter, model, save_path, args)
                 model_count += 1

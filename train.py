@@ -3,46 +3,37 @@ import sys
 import torch
 import torch.autograd as autograd
 import torch.nn.functional as F
-import torch.nn.utils as utils
-torch.manual_seed(2322)
+
+
 def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:
         model.cuda()
 
+    # optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-    # optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
 
     steps = 0
     model_count = 0
     model.train()
     for epoch in range(1, args.epochs+1):
-        print("## 第{} 轮迭代，共计迭代 {} 次 ！##".format(epoch, args.epochs))
         for batch in train_iter:
-            feature, target = batch.text, batch.label.data.sub_(1)
-            target =autograd.Variable(target)
+            feature, target = batch.text, batch.label
+            feature.data.t_(), target.data.sub_(1)  # batch first, index align
             if args.cuda:
-                feature, target = feature.cuda(), target.cuda()
+                feature, target = feature.cuda(), feature.cuda()
 
             optimizer.zero_grad()
-            model.zero_grad()
-            model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
-            if feature.size(1) != args.batch_size:
-                model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
             logit = model(feature)
-            # target values >=0   <=C - 1 (C = args.class_num)
             loss = F.cross_entropy(logit, target)
             loss.backward()
-            # utils.clip_grad_norm(model.parameters(), 1e-4)
             optimizer.step()
 
             steps += 1
             if steps % args.log_interval == 0:
-                train_size = len(train_iter.dataset)
                 corrects = (torch.max(logit, 1)[1].view(target.size()).data == target.data).sum()
                 accuracy = float(corrects)/batch.batch_size * 100.0
                 sys.stdout.write(
-                    '\rBatch[{}/{}] - loss: {:.6f}  acc: {:.4f}%({}/{})'.format(steps,
-                                                                            train_size,
+                    '\rBatch[{}] - loss: {:.6f}  acc: {:.4f}%({}/{})'.format(steps, 
                                                                              loss.data[0], 
                                                                              accuracy,
                                                                              corrects,
@@ -64,11 +55,11 @@ def eval(data_iter, model, args):
     model.eval()
     corrects, avg_loss = 0, 0
     for batch in data_iter:
-        feature, target = batch.text, batch.label.data.sub_(1)
-        target = autograd.Variable(target)
+        feature, target = batch.text, batch.label
+        feature.data.t_(), target.data.sub_(1)  # batch first, index align
         if args.cuda:
-            feature, target = feature.cuda(), target.cuda()
-        model.hidden = model.init_hidden(args.lstm_num_layers, batch.batch_size)
+            feature, target = feature.cuda(), feature.cuda()
+
         logit = model(feature)
         loss = F.cross_entropy(logit, target, size_average=False)
 
@@ -90,12 +81,11 @@ def test_eval(data_iter, model, save_path, args):
     model.eval()
     corrects, avg_loss = 0, 0
     for batch in data_iter:
-        feature, target = batch.text, batch.label.data.sub_(1)
-        target = autograd.Variable(target)
+        feature, target = batch.text, batch.label
+        feature.data.t_(), target.data.sub_(1)  # batch first, index align
         if args.cuda:
             feature, target = feature.cuda(), target.cuda()
 
-        model.hidden = model.init_hidden(args.lstm_num_layers, batch.batch_size)
         logit = model(feature)
         loss = F.cross_entropy(logit, target, size_average=False)
 

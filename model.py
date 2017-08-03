@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
-torch.manual_seed(123)
+
 class  CNN_Text(nn.Module):
     
     def __init__(self, args):
@@ -18,11 +18,10 @@ class  CNN_Text(nn.Module):
         Ks = args.kernel_sizes
 
         self.embed = nn.Embedding(V, D)
-        if args.word_Embedding:
-            pretrained_weight = np.array(args.pretrained_weight)
-            self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
-            # fixed the word embedding
-            self.embed.weight.requires_grad = True
+        # print("aaaaaaaa", self.embed.weight)
+        pretrained_weight = np.array(args.pretrained_weight)
+        self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
+        # print("bbbbbbbb", self.embed.weight)
 
         self.convs1 = [nn.Conv2d(Ci, Co, (K, D)) for K in Ks]
         '''
@@ -40,9 +39,14 @@ class  CNN_Text(nn.Module):
 
 
     def forward(self, x):
+        # print("aa", x)
         x = self.embed(x) # (N,W,D)
+        # print("embed", x)
+        
         if self.args.static:
             x = Variable(x.data)
+        # print("var", x)
+
         x = x.unsqueeze(1) # (N,Ci,W,D)
         x = [F.relu(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
         x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x] #[(N,Co), ...]*len(Ks)
