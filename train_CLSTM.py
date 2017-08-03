@@ -15,24 +15,37 @@ def train(train_iter, dev_iter, test_iter, model, args):
     steps = 0
     model_count = 0
     model.train()
+    # loss_function = torch.nn.NLLLoss()
     for epoch in range(1, args.epochs+1):
-        print("## 第{} 轮迭代，共计迭代 {} 次 ！##".format(epoch, args.epochs))
+        # print("train_iter", train_iter)
         for batch in train_iter:
+            # print("batch", batch)
             feature, target = batch.text, batch.label.data.sub_(1)
+            # feature, target = batch.text, batch.label
+            # print("batch text", batch.text)
+            # feature.data.t_()
+            # target.data.sub_(1)  # batch first, index align
+            # target.data.sub_(1)
             target =autograd.Variable(target)
             if args.cuda:
                 feature, target = feature.cuda(), target.cuda()
+            # print("Feature", feature)
 
             optimizer.zero_grad()
-            model.zero_grad()
-            model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
+            # model.zero_grad()
+            model.hidden = model.init_hidden(args.batch_size)
+            if len(feature) == args.batch_size:
+                feature = feature.data.t_()
             if feature.size(1) != args.batch_size:
-                model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
+                model.hidden = model.init_hidden(feature.size(1))
+                # print("wwwwwww", feature.size())
+                # continue
             logit = model(feature)
+            # print("eeeeeeeee {} {}".format(logit, target))
             # target values >=0   <=C - 1 (C = args.class_num)
             loss = F.cross_entropy(logit, target)
             loss.backward()
-            # utils.clip_grad_norm(model.parameters(), 1e-4)
+            utils.clip_grad_norm(model.parameters(), 1e-4)
             optimizer.step()
 
             steps += 1
@@ -53,6 +66,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
                 if not os.path.isdir(args.save_dir): os.makedirs(args.save_dir)
                 save_prefix = os.path.join(args.save_dir, 'snapshot')
                 save_path = '{}_steps{}.pt'.format(save_prefix, steps)
+                # print("model", model)
                 torch.save(model, save_path)
                 test_eval(test_iter, model, save_path, args)
                 model_count += 1
@@ -65,10 +79,12 @@ def eval(data_iter, model, args):
     corrects, avg_loss = 0, 0
     for batch in data_iter:
         feature, target = batch.text, batch.label.data.sub_(1)
+        # feature.data.t_()
+        # target.data.sub_(1)  # batch first, index align
         target = autograd.Variable(target)
         if args.cuda:
             feature, target = feature.cuda(), target.cuda()
-        model.hidden = model.init_hidden(args.lstm_num_layers, batch.batch_size)
+        model.hidden = model.init_hidden(batch.batch_size)
         logit = model(feature)
         loss = F.cross_entropy(logit, target, size_average=False)
 
@@ -91,11 +107,13 @@ def test_eval(data_iter, model, save_path, args):
     corrects, avg_loss = 0, 0
     for batch in data_iter:
         feature, target = batch.text, batch.label.data.sub_(1)
+        # feature.data.t_()
+        # target.data.sub_(1)  # batch first, index align
         target = autograd.Variable(target)
         if args.cuda:
             feature, target = feature.cuda(), target.cuda()
 
-        model.hidden = model.init_hidden(args.lstm_num_layers, batch.batch_size)
+        model.hidden = model.init_hidden(batch.batch_size)
         logit = model(feature)
         loss = F.cross_entropy(logit, target, size_average=False)
 

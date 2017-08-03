@@ -2,7 +2,7 @@
 #
 # import torch
 # import numpy as np
-#
+
 # a = torch.ones(5)
 # b = a.numpy()
 # print(a)
@@ -10,7 +10,7 @@
 # a.add_(2)
 # print(a)
 # print(b)
-#
+
 #
 # a = np.ones(5)
 # b = torch.from_numpy(a)
@@ -19,14 +19,14 @@
 # np.add(a,1,out=a)
 # print(a)
 # print(b)
-#
+
 # x = torch.Tensor([1,2])
 # y = torch.Tensor([2,3])
 # if torch.cuda.is_available():
 #     x = x.cuda()
 #     y = y.cuda()
 #     print( x + y )
-#
+
 # from torch.autograd import Variable
 # x = Variable(torch.ones(2,2),requires_grad = True)
 # print("x", x)
@@ -37,7 +37,7 @@
 # out = z.mean()
 # out.backward()
 # x.grad
-#
+
 # import torch
 # x = torch.Tensor([1.0])
 # xx = x.cuda()
@@ -46,7 +46,7 @@
 # # CUDNN TEST
 # from torch.backends import cudnn
 # print(cudnn.is_acceptable(xx))
-#
+
 # import torch
 #
 # def test1():
@@ -62,8 +62,8 @@
 # if __name__ == '__main__':
 #     test1() # -> [2, 3]
 #     # test2() # -> [0, 3]
-#
-#
+
+
 # from theano import function, config, shared, sandbox
 # import theano.tensor as T
 # import numpy
@@ -119,7 +119,7 @@
 # B = linalg.inv(A)
 # print("逆矩阵")
 # print(B)
-#
+
 # # A转置矩阵
 # C = A.T
 # print("转置矩阵")
@@ -135,14 +135,14 @@
 # N = linalg.det(A)
 # print("行列式值")
 # print(N)
+#
 
 
-
-# 输入A矩阵，得出A矩阵的三次方
-# import numpy as np
-# import torch
-# import scipy as sp
-# from numpy import linalg
+#输入A矩阵，得出A矩阵的三次方
+import numpy as np
+import torch
+import scipy as sp
+from numpy import linalg
 # A=[]
 # print('输入矩阵维度')
 # x1=input()
@@ -466,32 +466,26 @@
 # print(b.size())
 
 
-# import torch
-# t= torch.Tensor([[1,2],[3,4]])
-# print(t)
-# a = torch.gather(t, 1, torch.LongTensor([[0,0],[1,0]]))
-# print(a)
-# t= torch.Tensor([[1,2],[3,4]])
-# b = torch.gather(t, 0, torch.LongTensor([[0,1],[1,0]]))
-# print(b)
-# t= torch.Tensor([[1,2],[3,4]])
-# c = torch.gather(t, 1, torch.LongTensor([[0,0],[0,0]]))
-# print(c)
-# t= torch.Tensor([[1,2],[3,4]])
-# d = torch.gather(t, 0, torch.LongTensor([[0,0],[0,0]]))
-# print(d)
-
-
 import torch
-import torch.nn as nn
-import torch.autograd as autograd
-m = nn.BatchNorm1d(100)
-# Without Learnable Parameters
-m = nn.BatchNorm1d(100, affine=False)
-input = autograd.Variable(torch.randn(20, 100))
-print(input)
-output = m(input)
-print(output)
+t= torch.Tensor([[1,2],[3,4]])
+print(t)
+a = torch.gather(t, 1, torch.LongTensor([[0,0],[1,0]]))
+print(a)
+t= torch.Tensor([[1,2],[3,4]])
+b = torch.gather(t, 0, torch.LongTensor([[0,1],[1,0]]))
+print(b)
+t= torch.Tensor([[1,2],[3,4]])
+c = torch.gather(t, 1, torch.LongTensor([[0,0],[0,0]]))
+print(c)
+t= torch.Tensor([[1,2],[3,4]])
+d = torch.gather(t, 0, torch.LongTensor([[0,0],[0,0]]))
+print(d)
+
+
+
+
+
+
 
 
 

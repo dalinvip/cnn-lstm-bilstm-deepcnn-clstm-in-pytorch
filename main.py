@@ -16,8 +16,6 @@ import model_BiLSTM
 import model_BiLSTM_1
 import model_CNN_LSTM
 import model_CLSTM
-import model_CBiLSTM
-import model_CNN_BiLSTM
 import train
 import train_CNN
 import train_DeepCNN
@@ -26,11 +24,9 @@ import train_BiLSTM
 import train_BiLSTM_1
 import train_CNN_LSTM
 import train_CLSTM
-import train_CNN_BiLSTM
-import train_CBiLSTM
 import mydatasets
-import mydatasets_self_five
 import mydatasets_self_two
+import mydatasets_self_five
 import multiprocessing as mu
 import shutil
 import numpy as np
@@ -53,33 +49,32 @@ parser.add_argument('-lr', type=float, default=0.001, help='initial learning rat
 parser.add_argument('-epochs', type=int, default=256, help='number of epochs for train [default: 256]')
 parser.add_argument('-batch-size', type=int, default=64, help='batch size for training [default: 64]')
 parser.add_argument('-log-interval',  type=int, default=1,   help='how many steps to wait before logging training status [default: 1]')
-parser.add_argument('-test-interval', type=int, default=5, help='how many steps to wait before testing [default: 100]')
-parser.add_argument('-save-interval', type=int, default=5, help='how many steps to wait before saving [default:500]')
+parser.add_argument('-test-interval', type=int, default=100, help='how many steps to wait before testing [default: 100]')
+parser.add_argument('-save-interval', type=int, default=500, help='how many steps to wait before saving [default:500]')
 parser.add_argument('-save-dir', type=str, default='snapshot', help='where to save the snapshot')
 # data 
 parser.add_argument('-shuffle', action='store_true', default=False, help='shuffle the data every epoch' )
+# model
+parser.add_argument('-dropout', type=float, default=0.5, help='the probability for dropout [default: 0.5]')
+parser.add_argument('-max-norm', type=float, default=3.0, help='l2 constraint of parameters [default: 3.0]')
+parser.add_argument('-embed-dim', type=int, default=300, help='number of embedding dimension [default: 128]')
+parser.add_argument('-kernel-num', type=int, default=100, help='number of each kind of kernel')
+parser.add_argument('-kernel-sizes', type=str, default='3,4,5', help='comma-separated kernel size to use for convolution')
+parser.add_argument('-static', action='store_true', default=False, help='fix the embedding')
 # task select
 parser.add_argument('-FIVE_CLASS_TASK', action='store_true', default=True, help='whether to execute five-classification-task')
 parser.add_argument('-TWO_CLASS_TASK', action='store_true', default=False, help='whether to execute two-classification-task')
-# model
-parser.add_argument('-dropout', type=float, default=0.4, help='the probability for dropout [default: 0.5]')
-parser.add_argument('-max-norm', type=float, default=5, help='l2 constraint of parameters [default: 3.0]')
-parser.add_argument('-embed-dim', type=int, default=300, help='number of embedding dimension [default: 128]')
-parser.add_argument('-kernel-num', type=int, default=300, help='number of each kind of kernel')
-parser.add_argument('-kernel-sizes', type=str, default='3,4,5,6,7', help='comma-separated kernel size to use for convolution')
-parser.add_argument('-static', action='store_true', default=False, help='fix the embedding')
-parser.add_argument('-CNN', action='store_true', default=False, help='whether to use CNN model')
+# neural networks
+parser.add_argument('-CNN', action='store_true', default=True, help='whether to use CNN model')
 parser.add_argument('-DEEP_CNN', action='store_true', default=False, help='whether to use Depp CNN model')
 parser.add_argument('-LSTM', action='store_true', default=False, help='whether to use LSTM model')
 parser.add_argument('-BiLSTM', action='store_true', default=False, help='whether to use Bi-LSTM model')
 parser.add_argument('-BiLSTM_1', action='store_true', default=False, help='whether to use Bi-LSTM_1 model')
 parser.add_argument('-CNN_LSTM', action='store_true', default=False, help='whether to use CNN_LSTM model')
-parser.add_argument('-CNN_BiLSTM', action='store_true', default=False, help='whether to use CNN_BiLSTM model')
 parser.add_argument('-CLSTM', action='store_true', default=False, help='whether to use CLSTM model')
-parser.add_argument('-CBiLSTM', action='store_true', default=True, help='whether to use CBiLSTM model')
+# word embedding
 parser.add_argument('-word_Embedding', action='store_true', default=False, help='whether to load word embedding')
-parser.add_argument('-lstm-hidden-dim', type=int, default=200, help='the number of embedding dimension in LSTM hidden layer')
-parser.add_argument('-lstm-num-layers', type=int, default=2, help='the number of embedding dimension in LSTM hidden layer')
+parser.add_argument('-lstm-hidden-dim', type=int, default=300, help='the number of embedding dimension in LSTM hidden layer')
 # device
 parser.add_argument('-device', type=int, default=-1, help='device to use for iterate data, -1 mean cpu [default: -1]')
 parser.add_argument('-no_cuda', action='store_true', default=False, help='disable the gpu')
@@ -95,12 +90,12 @@ args = parser.parse_args()
 
 # load SST dataset
 def sst(text_field, label_field,  **kargs):
-    print("SST")
     train_data, dev_data, test_data = sstdatasets.SST.splits(text_field, label_field, fine_grained=True)
-    print("len(train_data) {} ".format(len(train_data)))
     text_field.build_vocab(train_data, dev_data, test_data)
+    # text_field
     label_field.build_vocab(train_data, dev_data, test_data)
-    train_iter, dev_iter, test_iter = data.BucketIterator.splits(
+    # train_iter, dev_iter, test_iter = data.BucketIterator.splits(
+    train_iter, dev_iter, test_iter = data.Iterator.splits(
                                         (train_data, dev_data, test_data),
                                         batch_sizes=(args.batch_size, 
                                                      len(dev_data), 
@@ -109,11 +104,9 @@ def sst(text_field, label_field,  **kargs):
     return train_iter, dev_iter, test_iter 
 
 
-
 # load two-classification data
 def mrs_two(text_field, label_field,  **kargs):
     train_data, dev_data, test_data = mydatasets_self_two.MR.splits(text_field, label_field)
-    print("len(train_data) {} ".format(len(train_data)))
     text_field.build_vocab(train_data)
     label_field.build_vocab(train_data)
     train_iter, dev_iter, test_iter = data.Iterator.splits(
@@ -127,7 +120,6 @@ def mrs_two(text_field, label_field,  **kargs):
 # load five-classification data
 def mrs_five(text_field, label_field,  **kargs):
     train_data, dev_data, test_data = mydatasets_self_five.MR.splits(text_field, label_field)
-    print("len(train_data) {} ".format(len(train_data)))
     text_field.build_vocab(train_data)
     label_field.build_vocab(train_data)
     train_iter, dev_iter, test_iter = data.Iterator.splits(
@@ -151,12 +143,38 @@ def mr(text_field, label_field, **kargs):
     return train_iter, dev_iter
 
 
-# load word embedding
+def load_mydata_vecs(path, vocab):
+    word_vecs = {}
+    with open(path, encoding="utf-8") as f:
+        lines = f.readlines()[1:]
+        for line in lines:
+            values = line.split(" ")
+            word = values[0]
+            vector = []
+            for count, val in enumerate(values):
+                if count == 0:
+                    continue
+                if len(val) > 1:  # word vectors maybe have some " " can not float
+                    vector.append(float(val))
+                # vector.append(float(val))
+            word_vecs[word] = vector
+    return word_vecs
+
+
+def add_mydata_unknown_words(word_vecs, vocab,  k=100):
+    mydata_list_word2vec = []
+    for word in vocab:
+        mydata_list_word2vec.append(word_vecs[word])
+    return mydata_list_word2vec
+
 def load_my_vecs(path, vocab):
     word_vecs = {}
     with open(path, encoding="utf-8") as f:
         lines = f.readlines()[1:]
         for line in lines:
+            # tab split
+            # values = line.split("   ")
+            # " "split
             values = line.split(" ")
             word = values[0]
             if word in vocab:  #whehter to judge if in vocab
@@ -164,22 +182,30 @@ def load_my_vecs(path, vocab):
                 for count, val in enumerate(values):
                     if count == 0:
                         continue
+                    # if len(val) > 1:  # word vectors maybe have some " " can not float
                     vector.append(float(val))
+                    # vector.append(float(val))
                 word_vecs[word] = vector
     return word_vecs
 
-# solve unknown by avg word embedding
+
 def add_unknown_words_by_avg(word_vecs, vocab, k=100):
     # solve unknown words inplaced by zero list
     word_vecs_numpy = []
     for word in vocab:
         if word in word_vecs:
+            # print(len(word_vecs[word]))
+            # if len(word_vecs[word]) < k:
+            #     continue
             word_vecs_numpy.append(word_vecs[word])
     print(len(word_vecs_numpy))
     col = []
     for i in range(k):
         sum = 0.0
+        # for j in range(10000):
+        # print(int(len(word_vecs_numpy) / 4))
         for j in range(int(len(word_vecs_numpy) / 4)):
+            # print(i,j,word_vecs_numpy[j][i])
             sum += word_vecs_numpy[j][i]
             sum = round(sum, 6)
         col.append(sum)
@@ -193,6 +219,7 @@ def add_unknown_words_by_avg(word_vecs, vocab, k=100):
     oov = 0
     iov = 0
     for word in vocab:
+        # if word not in word_vecs and vocab[word] >= min_df:
         if word not in word_vecs:
             # word_vecs[word] = np.random.uniform(-0.25, 0.25, k).tolist()
             # word_vecs[word] = [0.0] * k
@@ -206,17 +233,41 @@ def add_unknown_words_by_avg(word_vecs, vocab, k=100):
     print("iov count", iov)
     return list_word2vec
 
-# solve unknown word by uniform(-0.25,0.25)
+def add_unknown_words_by_dataset(word_vecs, vocab, dataset_word_vecs, k=100):
+    list_word2vec = []
+    oov = 0
+    oovdataset = 0
+    iov = 0
+    for word in vocab:
+        # if word not in word_vecs and vocab[word] >= min_df:
+        if word not in word_vecs:
+            oov += 1
+            if word in dataset_word_vecs:
+                word_vecs[word] = dataset_word_vecs[word]
+                list_word2vec.append(word_vecs[word])
+            else:
+                oovdataset += 1
+                word_vecs[word] = [0.0] * k
+                list_word2vec.append(word_vecs[word])
+        else:
+            iov += 1
+            # if len(word_vecs[word]) < k:
+            #     continue
+            list_word2vec.append(word_vecs[word])
+    print("oov count", oov)
+    print("oovdataset count", oovdataset)
+    print("iov count", iov)
+    return list_word2vec
+
 def add_unknown_words_by_uniform(word_vecs, vocab, k=100):
     list_word2vec = []
     oov = 0
     iov = 0
-    uniform = np.random.uniform(-0.25, 0.25, k).round(6).tolist()
     for word in vocab:
+        # if word not in word_vecs and vocab[word] >= min_df:
         if word not in word_vecs:
             oov += 1
-            # word_vecs[word] = np.random.uniform(-0.25, 0.25, k).round(6).tolist()
-            word_vecs[word] = uniform
+            word_vecs[word] = np.random.uniform(-0.25, 0.25, k).round(6).tolist()
             list_word2vec.append(word_vecs[word])
         else:
             iov += 1
@@ -225,10 +276,12 @@ def add_unknown_words_by_uniform(word_vecs, vocab, k=100):
     print("iov count", iov)
     return list_word2vec
 
+
 # load data
 print("\nLoading data...")
 text_field = data.Field(lower=True)
 label_field = data.Field(sequential=False)
+
 if args.FIVE_CLASS_TASK:
     print("Executing 5 Classification Task......")
     train_iter, dev_iter, test_iter = mrs_five(text_field, label_field, device=-1, repeat=False)
@@ -236,29 +289,36 @@ elif args.TWO_CLASS_TASK:
     print("Executing 2 Classification Task......")
     train_iter, dev_iter, test_iter = mrs_two(text_field, label_field, device=-1, repeat=False)
 
-
-
 # load word2vec
 if args.word_Embedding:
+    # path = './word2vec/w2v103100-en.100d.txt'
     if args.embed_dim == 100:
         path = "./word2vec/glove.6B.100d.txt"
     elif args.embed_dim == 200:
         path = "./word2vec/glove.6B.200d.txt"
     elif args.embed_dim == 300:
         path = "./word2vec/glove.6B.300d.txt"
+    # dataset_path = "./word2vec/fine-vectors.300d.txt"
+    # print("solving dataset word2vec...")
+    # dataset_word_vecs = load_mydata_vecs(dataset_path, text_field.vocab.itos)
+    # print("num words already in dataset_word_vecs: " + str(len(dataset_word_vecs)))
+    # dataset_word_vecs = add_mydata_unknown_words(dataset_word_vecs, text_field.vocab.itos, k=args.embed_dim)
+    # print("solved dataset word2vec")
     print("loading word2vec vectors...")
     word_vecs = load_my_vecs(path, text_field.vocab.itos)
     print("word2vec loaded!")
     print("num words already in word2vec: " + str(len(word_vecs)))
     print("loading unknown word2vec and convert to list...")
-    word_vecs = add_unknown_words_by_avg(word_vecs, text_field.vocab.itos, k=args.embed_dim)
-    # word_vecs = add_unknown_words_by_uniform(word_vecs, text_field.vocab.itos, k=args.embed_dim)
+    # word_vecs = add_unknown_words_by_avg(word_vecs, text_field.vocab.itos, k=args.embed_dim)
+    word_vecs = add_unknown_words_by_uniform(word_vecs, text_field.vocab.itos, k=args.embed_dim)
+    # word_vecs = add_unknown_words_by_dataset(word_vecs, text_field.vocab.itos, dataset_word_vecs, k=args.embed_dim)
     print("unknown word2vec loaded ! and converted to list...")
 
 
 # update args and print
 args.embed_num = len(text_field.vocab)
 args.class_num = len(label_field.vocab) - 1
+# args.cuda = (not args.no_cuda) and torch.cuda.is_available(); del args.no_cuda
 args.cuda = (args.no_cuda) and torch.cuda.is_available(); del args.no_cuda
 args.kernel_sizes = [int(k) for k in args.kernel_sizes.split(',')]
 # save file
@@ -302,12 +362,6 @@ if args.snapshot is None:
     elif args.CLSTM:
         print("loading CLSTM model......")
         model = model_CLSTM.CLSTM(args)
-    elif args.CBiLSTM:
-        print("loading CBiLSTM model......")
-        model = model_CBiLSTM.CBiLSTM(args)
-    elif args.CNN_BiLSTM:
-        print("loading CNN_BiLSTM model......")
-        model = model_CNN_BiLSTM.CNN_BiLSTM(args)
     print(model)
 else:
     print('\nLoading model from [%s]...' % args.snapshot)
@@ -330,7 +384,7 @@ elif args.test:
         print("\nSorry. The test dataset doesn't  exist.\n")
 else:
     print("\n cpu_count \n", mu.cpu_count())
-    torch.set_num_threads(5)
+    torch.set_num_threads(4)
     if os.path.exists("./Test_Result.txt"):
         os.remove("./Test_Result.txt")
     if args.CNN:
@@ -354,12 +408,6 @@ else:
     elif args.CLSTM:
         print("CLSTM training start......")
         model_count = train_CLSTM.train(train_iter, dev_iter, test_iter, model, args)
-    elif args.CBiLSTM:
-        print("CBiLSTM training start......")
-        model_count = train_CBiLSTM.train(train_iter, dev_iter, test_iter, model, args)
-    elif args.CNN_BiLSTM:
-        print("CNN_BiLSTM training start......")
-        model_count = train_CNN_BiLSTM.train(train_iter, dev_iter, test_iter, model, args)
     print("Model_count", model_count)
     resultlist = []
     if os.path.exists("./Test_Result.txt"):
@@ -376,4 +424,5 @@ else:
         shutil.copy("./Test_Result.txt", "./snapshot/" + mulu + "/Test_Result.txt")
         shutil.copy("./Parameters.txt", "./snapshot/" + mulu + "/Parameters.txt")
 
+    
 

@@ -40,11 +40,18 @@ class  CNN_Text(nn.Module):
 
 
     def forward(self, x):
+        # print("aa", x)
         x = self.embed(x) # (N,W,D)
+        # print("embed", x)
+        # print(self)
         if self.args.static:
             x = Variable(x.data)
+        # print("var", x)
+
         x = x.unsqueeze(1) # (N,Ci,W,D)
+        # print("qqqqq", x.size())
         x = [F.relu(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
+        # print("ddd", x[0].size())
         x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x] #[(N,Co), ...]*len(Ks)
         x = torch.cat(x, 1)
         '''

@@ -39,15 +39,16 @@ class SST(data.ZipDataset):
             with open(path) as f:
                 for line in f:
                     if line[-2] == '0':
-                        examples += [data.Example.fromlist([line[:line.find('|')], 'very negative'], fields=fields)]
+                        examples += [data.Example.fromlist([line[:line.find('|')], 'negative'], fields=fields)]
                     elif line[-2] == '1':
                         examples += [data.Example.fromlist([line[:line.find('|')], 'negative'], fields=fields)]
                     elif line[-2] == '2':
-                        examples += [data.Example.fromlist([line[:line.find('|')], 'neutral'], fields=fields)]
+                        continue
+                        # examples += [data.Example.fromlist([line[:line.find('|')], 'neutral'], fields=fields)]
                     elif line[-2] == '3':
                         examples += [data.Example.fromlist([line[:line.find('|')], 'positive'], fields=fields)]
                     else:
-                        examples += [data.Example.fromlist([line[:line.find('|')], 'very positive'], fields=fields)]
+                        examples += [data.Example.fromlist([line[:line.find('|')], 'positive'], fields=fields)]
         super(SST, self).__init__(examples, fields, **kwargs)
 
     @classmethod

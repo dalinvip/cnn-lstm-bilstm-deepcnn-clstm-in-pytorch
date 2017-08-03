@@ -17,7 +17,6 @@ def train(train_iter, dev_iter, test_iter, model, args):
     model_count = 0
     model.train()
     for epoch in range(1, args.epochs+1):
-        print("## 第{} 轮迭代，共计迭代 {} 次 ！##".format(epoch, args.epochs))
         for batch in train_iter:
             feature, target = batch.text, batch.label
             feature.data.t_(), target.data.sub_(1)  # batch first, index align
@@ -26,7 +25,10 @@ def train(train_iter, dev_iter, test_iter, model, args):
 
             optimizer.zero_grad()
 
+            # model.hidden = model.init_hidden()
+            # print(feature)
             logit = model(feature)
+            # print(logit)
             loss = F.cross_entropy(logit, target)
             loss.backward()
             utils.clip_grad_norm(model.parameters(), 1e-4)
@@ -50,6 +52,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
                 if not os.path.isdir(args.save_dir): os.makedirs(args.save_dir)
                 save_prefix = os.path.join(args.save_dir, 'snapshot')
                 save_path = '{}_steps{}.pt'.format(save_prefix, steps)
+                # print("model", model)
                 torch.save(model, save_path)
                 test_eval(test_iter, model, save_path, args)
                 model_count += 1
