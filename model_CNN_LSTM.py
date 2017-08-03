@@ -12,6 +12,7 @@ class  CNN_LSTM(nn.Module):
         super(CNN_LSTM, self).__init__()
         self.args = args
         self.hidden_dim = args.lstm_hidden_dim
+        self.num_layers = args.lstm_num_layers
         V = args.embed_num
         D = args.embed_dim
         C = args.class_num
@@ -29,22 +30,23 @@ class  CNN_LSTM(nn.Module):
         self.dropout = nn.Dropout(args.dropout)
 
         # LSTM
-        self.lstm = nn.LSTM(D, self.hidden_dim, dropout=args.dropout)
-        self.hidden = self.init_hidden(args.batch_size)
+        self.lstm = nn.LSTM(D, self.hidden_dim, dropout=args.dropout, num_layers=self.num_layers)
+        self.hidden = self.init_hidden(self.num_layers, args.batch_size)
 
         # linear
         L = len(Ks) * Co + self.hidden_dim
         self.hidden2label1 = nn.Linear(L, L // 2)
         self.hidden2label2 = nn.Linear(L // 2, C)
 
-    def init_hidden(self, batch_size):
+    def init_hidden(self, num_layers, batch_size):
         # the first is the hidden h
         # the second is the cell  c
-        return (Variable(torch.zeros(1, batch_size, self.hidden_dim)),
-                 Variable(torch.zeros(1, batch_size, self.hidden_dim)))
+        return (Variable(torch.zeros(1 * num_layers, batch_size, self.hidden_dim)),
+                 Variable(torch.zeros(1 * num_layers, batch_size, self.hidden_dim)))
 
 
     def forward(self, x):
+        # print("fffff",x)
         embed = self.embed(x)
 
         # CNN
@@ -58,17 +60,15 @@ class  CNN_LSTM(nn.Module):
 
         # LSTM
         lstm_x = embed.view(len(x), embed.size(1), -1)
-        # print("sssss", lstm_x.size())
         lstm_out, self.hidden = self.lstm(lstm_x, self.hidden)
         lstm_out = torch.transpose(lstm_out, 0, 1)
         lstm_out = torch.transpose(lstm_out, 1, 2)
-        lstm_out = F.tanh(lstm_out)
+        # lstm_out = F.tanh(lstm_out)
         lstm_out = F.max_pool1d(lstm_out, lstm_out.size(2)).squeeze(2)
 
         # CNN and LSTM cat
         cnn_x = torch.transpose(cnn_x, 0, 1)
         lstm_out = torch.transpose(lstm_out, 0, 1)
-        # print("wwwwwwww {} {}".format(cnn_x.size(), lstm_out.size())) # wwwwwwww torch.Size([300, 64]) torch.Size([200, 64])
         cnn_lstm_out = torch.cat((cnn_x, lstm_out), 0)
         cnn_lstm_out = torch.transpose(cnn_lstm_out, 0, 1)
 
