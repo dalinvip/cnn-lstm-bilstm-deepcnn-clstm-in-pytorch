@@ -482,20 +482,22 @@
 # print(d)
 
 
-import torch
-import torch.nn as nn
-import torch.autograd as autograd
-m = nn.BatchNorm1d(100)
-# Without Learnable Parameters
-m = nn.BatchNorm1d(100, affine=False)
-input = autograd.Variable(torch.randn(20, 100))
-print(input)
-output = m(input)
-print(output)
+# import torch
+# import torch.nn as nn
+# import torch.autograd as autograd
+# m = nn.BatchNorm1d(100)
+# # Without Learnable Parameters
+# m = nn.BatchNorm1d(100, affine=False)
+# input = autograd.Variable(torch.randn(20, 100))
+# print(input)
+# output = m(input)
+# print(output)
+#
 
 
-
-
+# flaf =True
+# if flaf:
+#     print()
 
 
 

@@ -93,8 +93,7 @@ class MR(TarDataset):
         super(MR, self).__init__(examples, fields, **kwargs)
 
     @classmethod
-    def splits(cls, text_field, label_field, dev_ratio=.1, shuffle=True ,root='.',
-               train='raw.clean.train', validation='raw.clean.dev', test='raw.clean.test', **kwargs):
+    def splits(cls, path, train, dev, test, text_field, label_field, dev_ratio=.1, shuffle=True ,root='.', **kwargs):
         """Create dataset objects for splits of the MR dataset.
 
         Arguments:
@@ -110,12 +109,12 @@ class MR(TarDataset):
                 Dataset.
         """
         # path = cls.download_or_unzip(root)
-        path = "./data/"
-        # print(path + train)
-        # print(path + validation)
-        # print(path + test)
+        # path = "./data/"
+        print(path + train)
+        print(path + dev)
+        print(path + test)
         examples_train = cls(text_field, label_field, path=path, file=train, **kwargs).examples
-        examples_dev = cls(text_field, label_field, path=path, file=validation, **kwargs).examples
+        examples_dev = cls(text_field, label_field, path=path, file=dev, **kwargs).examples
         examples_test = cls(text_field, label_field, path=path, file=test, **kwargs).examples
         if shuffle:
             random.shuffle(examples_train)

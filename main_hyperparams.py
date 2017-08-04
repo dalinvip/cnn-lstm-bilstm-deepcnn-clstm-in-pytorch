@@ -34,6 +34,7 @@ import mydatasets_self_two
 import multiprocessing as mu
 import shutil
 import numpy as np
+import hyperparams
 # solve encoding
 from imp import reload
 import sys
@@ -45,51 +46,53 @@ if sys.getdefaultencoding() != defaultencoding:
 # random seed
 torch.manual_seed(121)
 
-
-
 parser = argparse.ArgumentParser(description='CNN text classificer')
 # learning
-parser.add_argument('-lr', type=float, default=0.001, help='initial learning rate [default: 0.001]')
-parser.add_argument('-epochs', type=int, default=256, help='number of epochs for train [default: 256]')
-parser.add_argument('-batch-size', type=int, default=16, help='batch size for training [default: 64]')
-parser.add_argument('-log-interval',  type=int, default=1,   help='how many steps to wait before logging training status [default: 1]')
-parser.add_argument('-test-interval', type=int, default=100, help='how many steps to wait before testing [default: 100]')
-parser.add_argument('-save-interval', type=int, default=300, help='how many steps to wait before saving [default:500]')
-parser.add_argument('-save-dir', type=str, default='snapshot', help='where to save the snapshot')
-# data 
-parser.add_argument('-shuffle', action='store_true', default=False, help='shuffle the data every epoch' )
+parser.add_argument('-lr', type=float, default=hyperparams.learning_rate, help='initial learning rate [default: 0.001]')
+parser.add_argument('-epochs', type=int, default=hyperparams.epochs, help='number of epochs for train [default: 256]')
+parser.add_argument('-batch-size', type=int, default=hyperparams.batch_size, help='batch size for training [default: 64]')
+parser.add_argument('-log-interval',  type=int, default=hyperparams.log_interval,   help='how many steps to wait before logging training status [default: 1]')
+parser.add_argument('-test-interval', type=int, default=hyperparams.test_interval, help='how many steps to wait before testing [default: 100]')
+parser.add_argument('-save-interval', type=int, default=hyperparams.save_interval, help='how many steps to wait before saving [default:500]')
+parser.add_argument('-save-dir', type=str, default=hyperparams.save_dir, help='where to save the snapshot')
+# data
+parser.add_argument('-datafile_path', type=str, default=hyperparams.datafile_path, help='datafile path')
+parser.add_argument('-name_trainfile', type=str, default=hyperparams.name_trainfile, help='train file name')
+parser.add_argument('-name_devfile', type=str, default=hyperparams.name_devfile, help='dev file name')
+parser.add_argument('-name_testfile', type=str, default=hyperparams.name_testfile, help='test file name')
+parser.add_argument('-shuffle', action='store_true', default=hyperparams.shuffle, help='shuffle the data every epoch' )
 # task select
-parser.add_argument('-FIVE_CLASS_TASK', action='store_true', default=True, help='whether to execute five-classification-task')
-parser.add_argument('-TWO_CLASS_TASK', action='store_true', default=False, help='whether to execute two-classification-task')
+parser.add_argument('-FIVE_CLASS_TASK', action='store_true', default=hyperparams.FIVE_CLASS_TASK, help='whether to execute five-classification-task')
+parser.add_argument('-TWO_CLASS_TASK', action='store_true', default=hyperparams.TWO_CLASS_TASK, help='whether to execute two-classification-task')
 # model
-parser.add_argument('-dropout', type=float, default=0.1, help='the probability for dropout [default: 0.5]')
-parser.add_argument('-max-norm', type=float, default=5, help='l2 constraint of parameters [default: 3.0]')
-parser.add_argument('-embed-dim', type=int, default=300, help='number of embedding dimension [default: 128]')
-parser.add_argument('-kernel-num', type=int, default=300, help='number of each kind of kernel')
-parser.add_argument('-kernel-sizes', type=str, default='3,4,5', help='comma-separated kernel size to use for convolution')
-parser.add_argument('-static', action='store_true', default=False, help='fix the embedding')
-parser.add_argument('-CNN', action='store_true', default=False, help='whether to use CNN model')
-parser.add_argument('-DEEP_CNN', action='store_true', default=False, help='whether to use Depp CNN model')
-parser.add_argument('-LSTM', action='store_true', default=False, help='whether to use LSTM model')
-parser.add_argument('-BiLSTM', action='store_true', default=False, help='whether to use Bi-LSTM model')
-parser.add_argument('-BiLSTM_1', action='store_true', default=True, help='whether to use Bi-LSTM_1 model')
-parser.add_argument('-CNN_LSTM', action='store_true', default=False, help='whether to use CNN_LSTM model')
-parser.add_argument('-CNN_BiLSTM', action='store_true', default=False, help='whether to use CNN_BiLSTM model')
-parser.add_argument('-CLSTM', action='store_true', default=False, help='whether to use CLSTM model')
-parser.add_argument('-CBiLSTM', action='store_true', default=False, help='whether to use CBiLSTM model')
-parser.add_argument('-word_Embedding', action='store_true', default=True, help='whether to load word embedding')
-parser.add_argument('-lstm-hidden-dim', type=int, default=200, help='the number of embedding dimension in LSTM hidden layer')
-parser.add_argument('-lstm-num-layers', type=int, default=1, help='the number of embedding dimension in LSTM hidden layer')
+parser.add_argument('-dropout', type=float, default=hyperparams.dropout, help='the probability for dropout [default: 0.5]')
+parser.add_argument('-max-norm', type=float, default=hyperparams.max_norm, help='l2 constraint of parameters [default: 3.0]')
+parser.add_argument('-embed-dim', type=int, default=hyperparams.embed_dim, help='number of embedding dimension [default: 128]')
+parser.add_argument('-kernel-num', type=int, default=hyperparams.kernel_num, help='number of each kind of kernel')
+parser.add_argument('-kernel-sizes', type=str, default=hyperparams.kernel_sizes, help='comma-separated kernel size to use for convolution')
+parser.add_argument('-static', action='store_true', default=hyperparams.static, help='fix the embedding')
+parser.add_argument('-CNN', action='store_true', default=hyperparams.CNN, help='whether to use CNN model')
+parser.add_argument('-DEEP_CNN', action='store_true', default=hyperparams.DEEP_CNN, help='whether to use Depp CNN model')
+parser.add_argument('-LSTM', action='store_true', default=hyperparams.LSTM, help='whether to use LSTM model')
+parser.add_argument('-BiLSTM', action='store_true', default=hyperparams.BiLSTM, help='whether to use Bi-LSTM model')
+parser.add_argument('-BiLSTM_1', action='store_true', default=hyperparams.BiLSTM_1, help='whether to use Bi-LSTM_1 model')
+parser.add_argument('-CNN_LSTM', action='store_true', default=hyperparams.CNN_LSTM, help='whether to use CNN_LSTM model')
+parser.add_argument('-CNN_BiLSTM', action='store_true', default=hyperparams.CNN_BiLSTM, help='whether to use CNN_BiLSTM model')
+parser.add_argument('-CLSTM', action='store_true', default=hyperparams.CLSTM, help='whether to use CLSTM model')
+parser.add_argument('-CBiLSTM', action='store_true', default=hyperparams.CBiLSTM, help='whether to use CBiLSTM model')
+parser.add_argument('-word_Embedding', action='store_true', default=hyperparams.word_Embedding, help='whether to load word embedding')
+parser.add_argument('-lstm-hidden-dim', type=int, default=hyperparams.lstm_hidden_dim, help='the number of embedding dimension in LSTM hidden layer')
+parser.add_argument('-lstm-num-layers', type=int, default=hyperparams.lstm_num_layers, help='the number of embedding dimension in LSTM hidden layer')
 # device
-parser.add_argument('-device', type=int, default=-1, help='device to use for iterate data, -1 mean cpu [default: -1]')
-parser.add_argument('-no_cuda', action='store_true', default=False, help='disable the gpu')
+parser.add_argument('-device', type=int, default=hyperparams.device, help='device to use for iterate data, -1 mean cpu [default: -1]')
+parser.add_argument('-no_cuda', action='store_true', default=hyperparams.no_cuda, help='disable the gpu')
 # option
-parser.add_argument('-snapshot', type=str, default=None, help='filename of model snapshot [default: None]')
+parser.add_argument('-snapshot', type=str, default=hyperparams.snapshot, help='filename of model snapshot [default: None]')
 # parser.add_argument('-snapshot', type=str, default="./snapshot/2017-07-13_07-26-41/snapshot_steps155000.pt", help='filename of model snapshot [default: None]')
-parser.add_argument('-predict', type=str, default=None, help='predict the sentence given')
+parser.add_argument('-predict', type=str, default=hyperparams.predict, help='predict the sentence given')
 # parser.add_argument('-predict', type=str, default="I love you so much， and I love you forever ", help='predict the sentence given')
 # parser.add_argument('-predict', type=str, default="I hate you  and I hate you so sad, I am crying ", help='predict the sentence given')
-parser.add_argument('-test', action='store_true', default=False, help='train or test')
+parser.add_argument('-test', action='store_true', default=hyperparams.test, help='train or test')
 args = parser.parse_args()
 
 
@@ -111,8 +114,8 @@ def sst(text_field, label_field,  **kargs):
 
 
 # load two-classification data
-def mrs_two(text_field, label_field,  **kargs):
-    train_data, dev_data, test_data = mydatasets_self_two.MR.splits(text_field, label_field)
+def mrs_two(path, train_name, dev_name, test_name, text_field, label_field, **kargs):
+    train_data, dev_data, test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name, test_name, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
     text_field.build_vocab(train_data)
     label_field.build_vocab(train_data)
@@ -125,8 +128,8 @@ def mrs_two(text_field, label_field,  **kargs):
     return train_iter, dev_iter, test_iter
 
 # load five-classification data
-def mrs_five(text_field, label_field,  **kargs):
-    train_data, dev_data, test_data = mydatasets_self_five.MR.splits(text_field, label_field)
+def mrs_five(path, train_name, dev_name, test_name, text_field, label_field, **kargs):
+    train_data, dev_data, test_data = mydatasets_self_five.MR.splits(path, train_name, dev_name, test_name, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
     text_field.build_vocab(train_data)
     label_field.build_vocab(train_data)
@@ -231,10 +234,12 @@ text_field = data.Field(lower=True)
 label_field = data.Field(sequential=False)
 if args.FIVE_CLASS_TASK:
     print("Executing 5 Classification Task......")
-    train_iter, dev_iter, test_iter = mrs_five(text_field, label_field, device=-1, repeat=False)
+    train_iter, dev_iter, test_iter = mrs_five(args.datafile_path, args.name_trainfile,
+                                               args.name_devfile, args.name_testfile, text_field, label_field, device=-1, repeat=False)
 elif args.TWO_CLASS_TASK:
     print("Executing 2 Classification Task......")
-    train_iter, dev_iter, test_iter = mrs_two(text_field, label_field, device=-1, repeat=False)
+    train_iter, dev_iter, test_iter = mrs_two(args.datafile_path, args.name_trainfile,
+                                              args.name_devfile, args.name_testfile, text_field, label_field, device=-1, repeat=False)
 
 
 

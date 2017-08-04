@@ -33,7 +33,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
             loss = F.cross_entropy(logit, target)
             loss.backward()
             # utils.clip_grad_norm(model.parameters(), max_norm=5)
-            utils.clip_grad_norm(model.parameters(), 1e-4)
+            # utils.clip_grad_norm(model.parameters(), 1e-4)
             optimizer.step()
 
             steps += 1
@@ -55,6 +55,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
                 save_prefix = os.path.join(args.save_dir, 'snapshot')
                 save_path = '{}_steps{}.pt'.format(save_prefix, steps)
                 torch.save(model, save_path)
+                test_eval(test_iter, model, save_path, args)
                 test_eval(test_iter, model, save_path, args)
                 model_count += 1
                 print("model_count \n", model_count)
