@@ -499,7 +499,16 @@
 # if flaf:
 #     print()
 
-
+# ex = ["john", "love", "marry"]
+# a = []
+# print(ex[1][1])
+# print(len(ex))
+# print(len(ex[1]))
+# for i in range(len(ex)):
+#     for j in range(len(ex[i])):
+#         a += ex[i][j]
+# print(a)
+#
 
 
 

@@ -16,8 +16,11 @@ import model_BiLSTM
 import model_BiLSTM_1
 import model_CNN_LSTM
 import model_CLSTM
+import model_GRU
 import model_CBiLSTM
+import model_CGRU
 import model_CNN_BiLSTM
+import model_BiGRU
 import train
 import train_CNN
 import train_DeepCNN
@@ -26,8 +29,11 @@ import train_BiLSTM
 import train_BiLSTM_1
 import train_CNN_LSTM
 import train_CLSTM
+import train_GRU
+import train_CGRU
 import train_CNN_BiLSTM
 import train_CBiLSTM
+import train_BiGRU
 import mydatasets
 import mydatasets_self_five
 import mydatasets_self_two
@@ -46,7 +52,7 @@ if sys.getdefaultencoding() != defaultencoding:
 # random seed
 torch.manual_seed(121)
 
-parser = argparse.ArgumentParser(description='CNN text classificer')
+parser = argparse.ArgumentParser(description="text classification")
 # learning
 parser.add_argument('-lr', type=float, default=hyperparams.learning_rate, help='initial learning rate [default: 0.001]')
 parser.add_argument('-epochs', type=int, default=hyperparams.epochs, help='number of epochs for train [default: 256]')
@@ -60,6 +66,8 @@ parser.add_argument('-datafile_path', type=str, default=hyperparams.datafile_pat
 parser.add_argument('-name_trainfile', type=str, default=hyperparams.name_trainfile, help='train file name')
 parser.add_argument('-name_devfile', type=str, default=hyperparams.name_devfile, help='dev file name')
 parser.add_argument('-name_testfile', type=str, default=hyperparams.name_testfile, help='test file name')
+parser.add_argument('-word_data', action='store_true', default=hyperparams.word_data, help='whether to use CNN model')
+parser.add_argument('-char_data', action='store_true', default=hyperparams.char_data, help='whether to use CNN model')
 parser.add_argument('-shuffle', action='store_true', default=hyperparams.shuffle, help='shuffle the data every epoch' )
 # task select
 parser.add_argument('-FIVE_CLASS_TASK', action='store_true', default=hyperparams.FIVE_CLASS_TASK, help='whether to execute five-classification-task')
@@ -74,12 +82,15 @@ parser.add_argument('-static', action='store_true', default=hyperparams.static, 
 parser.add_argument('-CNN', action='store_true', default=hyperparams.CNN, help='whether to use CNN model')
 parser.add_argument('-DEEP_CNN', action='store_true', default=hyperparams.DEEP_CNN, help='whether to use Depp CNN model')
 parser.add_argument('-LSTM', action='store_true', default=hyperparams.LSTM, help='whether to use LSTM model')
+parser.add_argument('-GRU', action='store_true', default=hyperparams.GRU, help='whether to use GRU model')
 parser.add_argument('-BiLSTM', action='store_true', default=hyperparams.BiLSTM, help='whether to use Bi-LSTM model')
 parser.add_argument('-BiLSTM_1', action='store_true', default=hyperparams.BiLSTM_1, help='whether to use Bi-LSTM_1 model')
 parser.add_argument('-CNN_LSTM', action='store_true', default=hyperparams.CNN_LSTM, help='whether to use CNN_LSTM model')
 parser.add_argument('-CNN_BiLSTM', action='store_true', default=hyperparams.CNN_BiLSTM, help='whether to use CNN_BiLSTM model')
 parser.add_argument('-CLSTM', action='store_true', default=hyperparams.CLSTM, help='whether to use CLSTM model')
 parser.add_argument('-CBiLSTM', action='store_true', default=hyperparams.CBiLSTM, help='whether to use CBiLSTM model')
+parser.add_argument('-CGRU', action='store_true', default=hyperparams.CGRU, help='whether to use CGRU model')
+parser.add_argument('-BiGRU', action='store_true', default=hyperparams.BiGRU, help='whether to use BiGRU model')
 parser.add_argument('-word_Embedding', action='store_true', default=hyperparams.word_Embedding, help='whether to load word embedding')
 parser.add_argument('-lstm-hidden-dim', type=int, default=hyperparams.lstm_hidden_dim, help='the number of embedding dimension in LSTM hidden layer')
 parser.add_argument('-lstm-num-layers', type=int, default=hyperparams.lstm_num_layers, help='the number of embedding dimension in LSTM hidden layer')
@@ -114,8 +125,8 @@ def sst(text_field, label_field,  **kargs):
 
 
 # load two-classification data
-def mrs_two(path, train_name, dev_name, test_name, text_field, label_field, **kargs):
-    train_data, dev_data, test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name, test_name, text_field, label_field)
+def mrs_two(path, train_name, dev_name, test_name, char_data, text_field, label_field, **kargs):
+    train_data, dev_data, test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name, test_name, char_data, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
     text_field.build_vocab(train_data)
     label_field.build_vocab(train_data)
@@ -128,8 +139,8 @@ def mrs_two(path, train_name, dev_name, test_name, text_field, label_field, **ka
     return train_iter, dev_iter, test_iter
 
 # load five-classification data
-def mrs_five(path, train_name, dev_name, test_name, text_field, label_field, **kargs):
-    train_data, dev_data, test_data = mydatasets_self_five.MR.splits(path, train_name, dev_name, test_name, text_field, label_field)
+def mrs_five(path, train_name, dev_name, test_name, char_data, text_field, label_field, **kargs):
+    train_data, dev_data, test_data = mydatasets_self_five.MR.splits(path, train_name, dev_name, test_name, char_data, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
     text_field.build_vocab(train_data)
     label_field.build_vocab(train_data)
@@ -214,12 +225,12 @@ def add_unknown_words_by_uniform(word_vecs, vocab, k=100):
     list_word2vec = []
     oov = 0
     iov = 0
-    uniform = np.random.uniform(-0.25, 0.25, k).round(6).tolist()
+    # uniform = np.random.uniform(-0.25, 0.25, k).round(6).tolist()
     for word in vocab:
         if word not in word_vecs:
             oov += 1
-            # word_vecs[word] = np.random.uniform(-0.25, 0.25, k).round(6).tolist()
-            word_vecs[word] = uniform
+            word_vecs[word] = np.random.uniform(-0.25, 0.25, k).round(6).tolist()
+            # word_vecs[word] = uniform
             list_word2vec.append(word_vecs[word])
         else:
             iov += 1
@@ -235,11 +246,11 @@ label_field = data.Field(sequential=False)
 if args.FIVE_CLASS_TASK:
     print("Executing 5 Classification Task......")
     train_iter, dev_iter, test_iter = mrs_five(args.datafile_path, args.name_trainfile,
-                                               args.name_devfile, args.name_testfile, text_field, label_field, device=-1, repeat=False)
+                                               args.name_devfile, args.name_testfile, args.char_data, text_field, label_field, device=-1, repeat=False)
 elif args.TWO_CLASS_TASK:
     print("Executing 2 Classification Task......")
     train_iter, dev_iter, test_iter = mrs_two(args.datafile_path, args.name_trainfile,
-                                              args.name_devfile, args.name_testfile, text_field, label_field, device=-1, repeat=False)
+                                              args.name_devfile, args.name_testfile, args.char_data, text_field, label_field, device=-1, repeat=False)
 
 
 
@@ -252,12 +263,13 @@ if args.word_Embedding:
     elif args.embed_dim == 300:
         path = "./word2vec/glove.6B.300d.txt"
     print("loading word2vec vectors...")
+    print("len(text_field.vocab.itos)", len(text_field.vocab.itos))
     word_vecs = load_my_vecs(path, text_field.vocab.itos)
     print("word2vec loaded!")
     print("num words already in word2vec: " + str(len(word_vecs)))
     print("loading unknown word2vec and convert to list...")
-    word_vecs = add_unknown_words_by_avg(word_vecs, text_field.vocab.itos, k=args.embed_dim)
-    # word_vecs = add_unknown_words_by_uniform(word_vecs, text_field.vocab.itos, k=args.embed_dim)
+    # word_vecs = add_unknown_words_by_avg(word_vecs, text_field.vocab.itos, k=args.embed_dim)
+    word_vecs = add_unknown_words_by_uniform(word_vecs, text_field.vocab.itos, k=args.embed_dim)
     print("unknown word2vec loaded ! and converted to list...")
 
 
@@ -295,6 +307,9 @@ if args.snapshot is None:
     elif args.LSTM:
         print("loading LSTM model......")
         model = model_LSTM.LSTM(args)
+    elif args.GRU:
+        print("loading GRU model......")
+        model = model_GRU.GRU(args)
     elif args.BiLSTM:
         print("loading BiLSTM model......")
         model = model_BiLSTM.BiLSTM(args)
@@ -310,9 +325,15 @@ if args.snapshot is None:
     elif args.CBiLSTM:
         print("loading CBiLSTM model......")
         model = model_CBiLSTM.CBiLSTM(args)
+    elif args.CGRU:
+        print("loading CGRU model......")
+        model = model_CGRU.CGRU(args)
     elif args.CNN_BiLSTM:
         print("loading CNN_BiLSTM model......")
         model = model_CNN_BiLSTM.CNN_BiLSTM(args)
+    elif args.BiGRU:
+        print("loading BiGRU model......")
+        model = model_BiGRU.BiGRU(args)
     print(model)
 else:
     print('\nLoading model from [%s]...' % args.snapshot)
@@ -347,6 +368,9 @@ else:
     elif args.LSTM:
         print("LSTM training start......")
         model_count = train_LSTM.train(train_iter, dev_iter, test_iter, model, args)
+    elif args.GRU:
+        print("GRU training start......")
+        model_count = train_GRU.train(train_iter, dev_iter, test_iter, model, args)
     elif args.BiLSTM:
         print("BiLSTM training start......")
         model_count = train_BiLSTM.train(train_iter, dev_iter, test_iter, model, args)
@@ -362,9 +386,15 @@ else:
     elif args.CBiLSTM:
         print("CBiLSTM training start......")
         model_count = train_CBiLSTM.train(train_iter, dev_iter, test_iter, model, args)
+    elif args.CGRU:
+        print("CGRU training start......")
+        model_count = train_CGRU.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CNN_BiLSTM:
         print("CNN_BiLSTM training start......")
         model_count = train_CNN_BiLSTM.train(train_iter, dev_iter, test_iter, model, args)
+    elif args.BiGRU:
+        print("BiGRU training start......")
+        model_count = train_BiGRU.train(train_iter, dev_iter, test_iter, model, args)
     print("Model_count", model_count)
     resultlist = []
     if os.path.exists("./Test_Result.txt"):

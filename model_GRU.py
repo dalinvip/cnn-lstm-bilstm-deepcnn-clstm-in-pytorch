@@ -5,10 +5,10 @@ from torch.autograd import Variable
 import numpy as np
 torch.manual_seed(123)
 
-class  LSTM(nn.Module):
+class  GRU(nn.Module):
     
     def __init__(self, args):
-        super(LSTM, self).__init__()
+        super(GRU, self).__init__()
         self.args = args
         # print(args)
 
@@ -23,8 +23,8 @@ class  LSTM(nn.Module):
         if args.word_Embedding:
             pretrained_weight = np.array(args.pretrained_weight)
             self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
-        # lstm
-        self.lstm = nn.LSTM(D, self.hidden_dim, dropout=args.dropout, num_layers=self.num_layers)
+        # gru
+        self.gru = nn.GRU(D, self.hidden_dim, dropout=args.dropout, num_layers=self.num_layers)
         # linear
         self.hidden2label = nn.Linear(self.hidden_dim, C)
         # hidden
@@ -33,18 +33,13 @@ class  LSTM(nn.Module):
         self.dropout = nn.Dropout(args.dropout)
 
     def init_hidden(self, num_layers, batch_size):
-        # the first is the hidden h
-        # the second is the cell  c
-        # return (Variable(torch.zeros(1, batch_size, self.hidden_dim)),
-        #          Variable(torch.zeros(1, batch_size, self.hidden_dim)))
-        return (Variable(torch.randn(1 * num_layers, batch_size, self.hidden_dim)),
-                 Variable(torch.randn(1 * num_layers, batch_size, self.hidden_dim)))
+        return Variable(torch.zeros(num_layers, batch_size, self.hidden_dim))
 
-    def forward(self, x):
-        embed = self.embed(x)
-        x = embed.view(len(x), embed.size(1), -1)
+    def forward(self, input, hidden):
+        embed = self.embed(input)
+        input = embed.view(len(input), embed.size(1), -1)
         # lstm
-        lstm_out, self.hidden = self.lstm(x, self.hidden)
+        lstm_out, hidden = self.gru(input, hidden)
         lstm_out = torch.transpose(lstm_out, 0, 1)
         lstm_out = torch.transpose(lstm_out, 1, 2)
         # pooling
@@ -53,4 +48,4 @@ class  LSTM(nn.Module):
         # linear
         y = self.hidden2label(lstm_out)
         logit = y
-        return logit
+        return logit, hidden

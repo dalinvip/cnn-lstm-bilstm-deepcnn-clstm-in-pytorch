@@ -40,7 +40,7 @@ class MR(TarDataset):
     def sort_key(ex):
         return len(ex.text)
 
-    def __init__(self, text_field, label_field, path=None, file=None, examples=None, **kwargs):
+    def __init__(self, text_field, label_field, path=None, file=None,examples=None,char_data=None, **kwargs):
         """Create an MR dataset instance given a path and fields.
 
         Arguments:
@@ -78,22 +78,41 @@ class MR(TarDataset):
             path = None if os.path.join(path, file) is None else os.path.join(path, file)
             examples = []
             with open(path) as f:
+                a, b, c, d, e = 0, 0, 0, 0, 0
                 for line in f:
+                    sentence, flag = line.strip().split(' ||| ')
+                    if char_data is True:
+                        sentence = sentence.split(" ")
+                        sentence = MR.char_data(self, sentence)
+                    # print(sentence)
                     if line[-2] == '0':
-                        examples += [data.Example.fromlist([line[:line.find('|')], 'very negative'], fields=fields)]
+                        a += 1
+                        examples += [data.Example.fromlist([sentence, "very negative"], fields=fields)]
                     elif line[-2] == '1':
-                        examples += [data.Example.fromlist([line[:line.find('|')], 'negative'], fields=fields)]
+                        b += 1
+                        examples += [data.Example.fromlist([sentence, 'negative'], fields=fields)]
                     elif line[-2] == '2':
-                        examples += [data.Example.fromlist([line[:line.find('|')], 'neutral'], fields=fields)]
+                        c += 1
+                        examples += [data.Example.fromlist([sentence, 'neutral'], fields=fields)]
                     elif line[-2] == '3':
-                        examples += [data.Example.fromlist([line[:line.find('|')], 'positive'], fields=fields)]
+                        d += 1
+                        examples += [data.Example.fromlist([sentence, 'positive'], fields=fields)]
                     else:
-                        examples += [data.Example.fromlist([line[:line.find('|')], 'very positive'], fields=fields)]
-
+                        e += 1
+                        examples += [data.Example.fromlist([sentence, 'very positive'], fields=fields)]
+                print("a {} b {} c {} d {} e {}".format(a, b, c, d, e))
         super(MR, self).__init__(examples, fields, **kwargs)
 
+    def char_data(self, list):
+        data = []
+        for i in range(len(list)):
+            for j in range(len(list[i])):
+                data += list[i][j]
+        return data
+
+
     @classmethod
-    def splits(cls, path, train, dev, test, text_field, label_field, dev_ratio=.1, shuffle=True ,root='.', **kwargs):
+    def splits(cls, path, train, dev, test, char_data, text_field, label_field, dev_ratio=.1, shuffle=True ,root='.', **kwargs):
         """Create dataset objects for splits of the MR dataset.
 
         Arguments:
@@ -113,9 +132,9 @@ class MR(TarDataset):
         print(path + train)
         print(path + dev)
         print(path + test)
-        examples_train = cls(text_field, label_field, path=path, file=train, **kwargs).examples
-        examples_dev = cls(text_field, label_field, path=path, file=dev, **kwargs).examples
-        examples_test = cls(text_field, label_field, path=path, file=test, **kwargs).examples
+        examples_train = cls(text_field, label_field, path=path, file=train, char_data=char_data, **kwargs).examples
+        examples_dev = cls(text_field, label_field, path=path, file=dev, char_data=char_data, **kwargs).examples
+        examples_test = cls(text_field, label_field, path=path, file=test,char_data=char_data, **kwargs).examples
         if shuffle:
             random.shuffle(examples_train)
             random.shuffle(examples_dev)
