@@ -6,6 +6,8 @@ import torch.nn.functional as F
 import torch.nn.utils as utils
 # torch.manual_seed(16330)
 torch.manual_seed(6163)
+import random
+random.seed(1311)
 
 def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:

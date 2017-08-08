@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
+import random
+random.seed(16781)
 torch.manual_seed(1235)
 class  DEEP_CNN(nn.Module):
     

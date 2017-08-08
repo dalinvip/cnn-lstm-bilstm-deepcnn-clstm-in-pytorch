@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
 import random
+random.seed(1691)
 torch.manual_seed(1123)
 
 class  CGRU(nn.Module):

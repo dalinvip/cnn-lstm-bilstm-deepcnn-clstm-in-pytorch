@@ -5,6 +5,8 @@ import torch.autograd as autograd
 import torch.nn.functional as F
 import torch.nn.utils as utils
 torch.manual_seed(2312)
+import random
+random.seed(13911)
 def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:
         model.cuda()

@@ -13,7 +13,7 @@ import model_CNN
 import model_DeepCNN
 import model_LSTM
 import model_BiLSTM
-import model_BiLSTM_1
+import model_BiLSTM_lexicon
 import model_CNN_LSTM
 import model_CLSTM
 import model_CBiLSTM
@@ -295,7 +295,7 @@ if args.snapshot is None:
         model = model_BiLSTM.BiLSTM(args)
     elif args.BiLSTM_1:
         print("loading BiLSTM_1 model......")
-        model = model_BiLSTM_1.BiLSTM_1(args)
+        model = model_BiLSTM_lexicon.BiLSTM_1(args)
     elif args.CNN_LSTM:
         print("loading CNN_LSTM model......")
         model = model_CNN_LSTM.CNN_LSTM(args)

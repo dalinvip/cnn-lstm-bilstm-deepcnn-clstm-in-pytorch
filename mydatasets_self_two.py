@@ -4,8 +4,10 @@ import random
 import tarfile
 from six.moves import urllib
 from torchtext import data
+import random
+random.seed(13671)
 import torch
-torch.manual_seed(100)
+torch.manual_seed(4756)
 
 class TarDataset(data.Dataset):
     """Defines a Dataset loaded from a downloadable tar archive.
@@ -79,6 +81,7 @@ class MR(TarDataset):
             path = None if os.path.join(path, file) is None else os.path.join(path, file)
             examples = []
             with open(path) as f:
+                a, b = 0, 0
                 for line in f.readlines():
                     sentence, flag = line.strip().split(' ||| ')
                     if char_data is True:
@@ -86,13 +89,18 @@ class MR(TarDataset):
                         sentence = MR.char_data(self, sentence)
                     # print(sentence)
                     if line[-2] == '0':
+                        a += 1
                         examples += [data.Example.fromlist([sentence, 'negative'], fields=fields)]
                     elif line[-2] == '1':
+                        a += 1
                         examples += [data.Example.fromlist([sentence, 'negative'], fields=fields)]
                     elif line[-2] == '3':
+                        b += 1
                         examples += [data.Example.fromlist([sentence, 'positive'], fields=fields)]
                     elif line[-2] == '4':
+                        b += 1
                         examples += [data.Example.fromlist([sentence, 'positive'], fields=fields)]
+                print("a {} b {} ".format(a,b))
                     # else:
                     #     examples += [data.Example.fromlist([line[:line.find('|')], 'positive'], fields=fields)]
 

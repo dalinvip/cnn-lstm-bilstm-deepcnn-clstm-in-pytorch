@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
+import random
+random.seed(1321)
 torch.manual_seed(1233)
 class  BiLSTM(nn.Module):
     

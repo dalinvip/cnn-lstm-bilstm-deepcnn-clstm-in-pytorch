@@ -6,6 +6,8 @@ import torch.nn.functional as F
 import torch.nn.utils as utils
 # torch.manual_seed(16330)
 torch.manual_seed(6143)
+import random
+random.seed(13811)
 
 def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:
@@ -57,7 +59,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
                 save_path = '{}_steps{}.pt'.format(save_prefix, steps)
                 torch.save(model, save_path)
                 test_eval(test_iter, model, save_path, args)
-                test_eval(test_iter, model, save_path, args)
+                # test_eval(test_iter, model, save_path, args)
                 model_count += 1
                 print("model_count \n", model_count)
     return model_count

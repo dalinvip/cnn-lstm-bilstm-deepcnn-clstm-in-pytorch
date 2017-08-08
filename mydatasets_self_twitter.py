@@ -4,8 +4,10 @@ import random
 import tarfile
 from six.moves import urllib
 from torchtext import data
+import random
+random.seed(1371)
 import torch
-torch.manual_seed(100)
+torch.manual_seed(456)
 
 class TarDataset(data.Dataset):
     """Defines a Dataset loaded from a downloadable tar archive.

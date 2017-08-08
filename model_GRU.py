@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
+import random
+random.seed(16719)
 torch.manual_seed(123)
 
 class  GRU(nn.Module):

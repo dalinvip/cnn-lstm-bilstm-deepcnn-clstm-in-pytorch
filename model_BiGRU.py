@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
+import random
+random.seed(161)
 torch.manual_seed(123)
 
 class  BiGRU(nn.Module):
@@ -37,12 +39,14 @@ class  BiGRU(nn.Module):
 
     def forward(self, input, hidden):
         embed = self.embed(input)
+        embed = self.dropout(embed)  # add this reduce the acc
         input = embed.view(len(input), embed.size(1), -1)
         # gru
         gru_out, hidden = self.bigru(input, hidden)
         gru_out = torch.transpose(gru_out, 0, 1)
         gru_out = torch.transpose(gru_out, 1, 2)
         # pooling
+        # gru_out = F.tanh(gru_out)
         gru_out = F.max_pool1d(gru_out, gru_out.size(2)).squeeze(2)
         gru_out = F.tanh(gru_out)
         # linear

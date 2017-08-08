@@ -5,6 +5,7 @@ import torch.autograd as autograd
 import torch.nn.functional as F
 import torch.nn.utils as utils
 import random
+random.seed(1311)
 torch.manual_seed(1234)
 
 def train(train_iter, dev_iter, test_iter, model, args):
@@ -39,7 +40,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
             # utils.clip_grad_norm(model.parameters(), args.max_norm)
             # the up line will make overfitting quickly, however, the line slow the overfitting,
             # so,the speed of overfitting depend on the max_norm size, more big, moe quickly
-            # utils.clip_grad_norm(model.parameters(), max_norm=1e-4)
+            utils.clip_grad_norm(model.parameters(), max_norm=1e-4)
             optimizer.step()
 
             steps += 1
