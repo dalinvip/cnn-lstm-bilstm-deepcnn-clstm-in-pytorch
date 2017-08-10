@@ -358,7 +358,7 @@ if args.word_Embedding:
         # path = "./word2vec/glove.6B.300d.txt"
         path = "./word2vec/glove.sentiment.conj.pretrained.txt"
     print("loading word2vec vectors...")
-    print("len(text_field.vocab.itos)", len(text_field.vocab.itos))
+    # print("len(text_field.vocab.itos)", len(text_field.vocab.itos))
     # print("len(static_text_field.vocab.itos)", len(static_text_field.vocab.itos))
     if args.freq_1_unk == True:
         word_vecs = load_my_vecs_freq1(path, text_field.vocab.itos, text_field.vocab.freqs, pro=0.5)   # has some error in this function

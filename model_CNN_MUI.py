@@ -36,7 +36,8 @@ class  CNN_MUI(nn.Module):
         if args.init_weight:
             print("Initing W .......")
             for conv in self.convs1:
-                init.xavier_normal(conv.weight, gain=np.sqrt(args.init_weight_value))
+                # init.xavier_normal(conv.weight, gain=np.sqrt(args.init_weight_value))
+                init.xavier_normal(conv.weight, gain=args.init_weight_value)
         '''
         self.conv13 = nn.Conv2d(Ci, Co, (3, D))
         self.conv14 = nn.Conv2d(Ci, Co, (4, D))
@@ -53,10 +54,10 @@ class  CNN_MUI(nn.Module):
 
     def forward(self, x):
         x_no_static = self.embed_no_static(x)
-        x_no_static = self.dropout(x_no_static)
+        # x_no_static = self.dropout(x_no_static)
         x_static = self.embed_static(x)
         x_static = Variable(x_static.data)
-        x_static = self.dropout(x_static)
+        # x_static = self.dropout(x_static)
         x = torch.stack([x_static, x_no_static], 1)
         # x = x.unsqueeze(1) # (N,Ci,W,D)
         x = [F.relu(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)

@@ -29,8 +29,11 @@ class  CNN_Text(nn.Module):
             self.embed.weight.requires_grad = True
 
         self.convs1 = [nn.Conv2d(Ci, Co, (K, D)) for K in Ks]
-        for conv in self.convs1:
-            init.xavier_normal(conv.weight, gain=np.sqrt(2.0))
+        if args.init_weight:
+            print("Initing W .......")
+            for conv in self.convs1:
+                # init.xavier_normal(conv.weight, gain=np.sqrt(args.init_weight_value))
+                init.xavier_normal(conv.weight, gain=args.init_weight_value)
 
         '''
         self.conv13 = nn.Conv2d(Ci, Co, (3, D))

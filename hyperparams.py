@@ -1,6 +1,6 @@
 learning_rate = 0.001
 epochs = 256
-batch_size = 64
+batch_size = 16
 log_interval = 1
 test_interval = 100
 save_interval = 200
@@ -13,14 +13,14 @@ word_data = False
 char_data = False
 shuffle = True
 epochs_shuffle = False
-FIVE_CLASS_TASK = True
-TWO_CLASS_TASK = False
+FIVE_CLASS_TASK = False
+TWO_CLASS_TASK = True
 dropout = 0.1
 max_norm = 3
 embed_dim = 300
 kernel_num = 200
 # kernel_sizes = "3,4,"、
-kernel_sizes = "1,2,3"
+kernel_sizes = "3,4,5"
 static = False
 CNN = True
 CNN_MUI = False
@@ -44,10 +44,10 @@ no_cuda = False
 snapshot = None
 predict = None
 test = False
-num_threads = 4
+num_threads = 1
 freq_1_unk = False
 # whether to init w
 init_weight = False
-init_weight_value = 2.0
+init_weight_value = 1
 
 
