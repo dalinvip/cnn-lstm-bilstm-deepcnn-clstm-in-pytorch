@@ -13,17 +13,17 @@ word_data = False
 char_data = False
 shuffle = True
 epochs_shuffle = False
-FIVE_CLASS_TASK = False
-TWO_CLASS_TASK = True
-dropout = 0.5
+FIVE_CLASS_TASK = True
+TWO_CLASS_TASK = False
+dropout = 0.1
 max_norm = 3
 embed_dim = 300
 kernel_num = 200
 # kernel_sizes = "3,4,"、
 kernel_sizes = "1,2,3"
 static = False
-CNN = False
-CNN_MUI = True
+CNN = True
+CNN_MUI = False
 DEEP_CNN = False
 LSTM = False
 GRU = False
@@ -47,7 +47,7 @@ test = False
 num_threads = 4
 freq_1_unk = False
 # whether to init w
-init_weight = True
+init_weight = False
 init_weight_value = 2.0
 
 

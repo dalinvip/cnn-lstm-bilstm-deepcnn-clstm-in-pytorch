@@ -186,6 +186,24 @@ def mrs_five(path, train_name, dev_name, test_name, char_data, text_field, label
                                         **kargs)
     return train_iter, dev_iter, test_iter
 
+def mrs_five_mui(path, train_name, dev_name, test_name, char_data, text_field, label_field, static_text_field, static_label_field, **kargs):
+    train_data, dev_data, test_data = mydatasets_self_five.MR.splits(path, train_name, dev_name, test_name, char_data, text_field, label_field)
+    static_train_data, static_dev_data, static_test_data = mydatasets_self_five.MR.splits(path, train_name, dev_name, test_name, char_data,
+                                                                                         static_text_field, static_label_field)
+    print("len(train_data) {} ".format(len(train_data)))
+    print("len(train_data) {} ".format(len(static_train_data)))
+    text_field.build_vocab(train_data)
+    label_field.build_vocab(train_data)
+    static_text_field.build_vocab(static_train_data, static_dev_data, static_test_data)
+    static_label_field.build_vocab(static_train_data, static_dev_data, static_test_data)
+    train_iter, dev_iter, test_iter = data.Iterator.splits(
+                                        (train_data, dev_data, test_data),
+                                        batch_sizes=(args.batch_size,
+                                                     len(dev_data),
+                                                     len(test_data)),
+                                        **kargs)
+    return train_iter, dev_iter, test_iter
+
 
 # load MR dataset
 def mr(text_field, label_field, **kargs):
@@ -306,8 +324,17 @@ static_text_field = data.Field(lower=True)
 static_label_field = data.Field(sequential=False)
 if args.FIVE_CLASS_TASK:
     print("Executing 5 Classification Task......")
-    train_iter, dev_iter, test_iter = mrs_five(args.datafile_path, args.name_trainfile,
-                                               args.name_devfile, args.name_testfile, args.char_data, text_field, label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle)
+    # train_iter, dev_iter, test_iter = mrs_five(args.datafile_path, args.name_trainfile,
+    #                                            args.name_devfile, args.name_testfile, args.char_data, text_field, label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle)
+    if args.CNN_MUI:
+        train_iter, dev_iter, test_iter = mrs_five_mui(args.datafile_path, args.name_trainfile,
+                                                       args.name_devfile, args.name_testfile, args.char_data, text_field=text_field,
+                                                       label_field=label_field, static_text_field=static_text_field,
+                                                       static_label_field=static_label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle)
+    else:
+        train_iter, dev_iter, test_iter = mrs_five(args.datafile_path, args.name_trainfile,
+                                                   args.name_devfile, args.name_testfile, args.char_data, text_field,
+                                                   label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle)
 elif args.TWO_CLASS_TASK:
     print("Executing 2 Classification Task......")
     if args.CNN_MUI:
@@ -332,7 +359,7 @@ if args.word_Embedding:
         path = "./word2vec/glove.sentiment.conj.pretrained.txt"
     print("loading word2vec vectors...")
     print("len(text_field.vocab.itos)", len(text_field.vocab.itos))
-    print("len(static_text_field.vocab.itos)", len(static_text_field.vocab.itos))
+    # print("len(static_text_field.vocab.itos)", len(static_text_field.vocab.itos))
     if args.freq_1_unk == True:
         word_vecs = load_my_vecs_freq1(path, text_field.vocab.itos, text_field.vocab.freqs, pro=0.5)   # has some error in this function
     else:
