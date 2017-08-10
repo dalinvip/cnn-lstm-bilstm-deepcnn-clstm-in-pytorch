@@ -549,6 +549,42 @@
 # EMBEDDING_DIM = 6
 # HIDDEN_DIM = 6
 
-import numpy as np
-a = np.random.uniform(0, 1, 1).round(2)
-print(a)
+# import numpy as np
+# a = np.random.uniform(0, 1, 1).round(2)
+# print(a)
+
+
+#
+#
+# class a:
+#     def b(self):
+#         print("b")
+#     def c(self):
+#         a.b()
+
+
+class tt:
+    def fa(self):
+        return 'aa'
+    def fb(self):
+        return fa()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

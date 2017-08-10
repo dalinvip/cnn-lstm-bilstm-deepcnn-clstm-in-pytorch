@@ -3,9 +3,10 @@ import sys
 import torch
 import torch.autograd as autograd
 import torch.nn.functional as F
+import shutil
+import random
 import torch.nn.utils as utils
 torch.manual_seed(2312)
-import random
 random.seed(7311)
 def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:
@@ -142,6 +143,7 @@ def test_eval(data_iter, model, save_path, args):
                                                                        size))
     file.write("\n")
     file.close()
+    shutil.copy("./Test_Result.txt", "./snapshot/" + args.mulu + "/Test_Result.txt")
 
 
 

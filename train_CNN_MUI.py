@@ -3,38 +3,46 @@ import sys
 import torch
 import torch.autograd as autograd
 import torch.nn.functional as F
+import torch.nn.utils as utils
 import shutil
-
+import random
+torch.manual_seed(533)
+random.seed(5311)
 
 def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:
         model.cuda()
 
-    # optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    # optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
 
     steps = 0
     model_count = 0
     model.train()
     for epoch in range(1, args.epochs+1):
+        print("## 第{} 轮迭代，共计迭代 {} 次 ！##".format(epoch, args.epochs))
         for batch in train_iter:
             feature, target = batch.text, batch.label
             feature.data.t_(), target.data.sub_(1)  # batch first, index align
             if args.cuda:
-                feature, target = feature.cuda(), feature.cuda()
+                feature, target = feature.cuda(), target.cuda()
 
             optimizer.zero_grad()
+
             logit = model(feature)
             loss = F.cross_entropy(logit, target)
             loss.backward()
+            utils.clip_grad_norm(model.parameters(), 1e-4)
             optimizer.step()
 
             steps += 1
             if steps % args.log_interval == 0:
+                train_size = len(train_iter.dataset)
                 corrects = (torch.max(logit, 1)[1].view(target.size()).data == target.data).sum()
                 accuracy = float(corrects)/batch.batch_size * 100.0
                 sys.stdout.write(
-                    '\rBatch[{}] - loss: {:.6f}  acc: {:.4f}%({}/{})'.format(steps, 
+                    '\rBatch[{}/{}] - loss: {:.6f}  acc: {:.4f}%({}/{})'.format(steps,
+                                                                            train_size,
                                                                              loss.data[0], 
                                                                              accuracy,
                                                                              corrects,

@@ -5,6 +5,7 @@ import torch.autograd as autograd
 import torch.nn.functional as F
 import torch.nn.utils as utils
 import random
+import shutil
 random.seed(1311)
 torch.manual_seed(1234)
 
@@ -133,6 +134,7 @@ def test_eval(data_iter, model, save_path, args):
                                                                        size))
     file.write("\n")
     file.close()
+    shutil.copy("./Test_Result.txt", "./snapshot/" + args.mulu + "/Test_Result.txt")
 
 
 

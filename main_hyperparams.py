@@ -22,6 +22,7 @@ import model_CGRU
 import model_CNN_BiLSTM
 import model_BiGRU
 import model_CNN_BiGRU
+import model_CNN_MUI
 import train
 import train_CNN
 import train_DeepCNN
@@ -36,6 +37,7 @@ import train_CNN_BiLSTM
 import train_CBiLSTM
 import train_BiGRU
 import train_CNN_BiGRU
+import train_CNN_MUI
 import mydatasets
 import mydatasets_self_five
 import mydatasets_self_two
@@ -79,6 +81,8 @@ parser.add_argument('-freq_1_unk', action='store_true', default=hyperparams.freq
 parser.add_argument('-FIVE_CLASS_TASK', action='store_true', default=hyperparams.FIVE_CLASS_TASK, help='whether to execute five-classification-task')
 parser.add_argument('-TWO_CLASS_TASK', action='store_true', default=hyperparams.TWO_CLASS_TASK, help='whether to execute two-classification-task')
 # model
+parser.add_argument('-init_weight', action='store_true', default=hyperparams.init_weight, help='init w')
+parser.add_argument('-init_weight_value', type=float, default=hyperparams.init_weight_value, help='value of init w')
 parser.add_argument('-dropout', type=float, default=hyperparams.dropout, help='the probability for dropout [default: 0.5]')
 parser.add_argument('-max-norm', type=float, default=hyperparams.max_norm, help='l2 constraint of parameters [default: 3.0]')
 parser.add_argument('-embed-dim', type=int, default=hyperparams.embed_dim, help='number of embedding dimension [default: 128]')
@@ -86,6 +90,7 @@ parser.add_argument('-kernel-num', type=int, default=hyperparams.kernel_num, hel
 parser.add_argument('-kernel-sizes', type=str, default=hyperparams.kernel_sizes, help='comma-separated kernel size to use for convolution')
 parser.add_argument('-static', action='store_true', default=hyperparams.static, help='fix the embedding')
 parser.add_argument('-CNN', action='store_true', default=hyperparams.CNN, help='whether to use CNN model')
+parser.add_argument('-CNN_MUI', action='store_true', default=hyperparams.CNN_MUI, help='whether to use CNN mui_channel model')
 parser.add_argument('-DEEP_CNN', action='store_true', default=hyperparams.DEEP_CNN, help='whether to use Depp CNN model')
 parser.add_argument('-LSTM', action='store_true', default=hyperparams.LSTM, help='whether to use LSTM model')
 parser.add_argument('-GRU', action='store_true', default=hyperparams.GRU, help='whether to use GRU model')
@@ -146,6 +151,26 @@ def mrs_two(path, train_name, dev_name, test_name, char_data, text_field, label_
                                                      len(test_data)),
                                         **kargs)
     return train_iter, dev_iter, test_iter
+
+def mrs_two_mui(path, train_name, dev_name, test_name, char_data, text_field, label_field, static_text_field, static_label_field, **kargs):
+    train_data, dev_data, test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name, test_name, char_data, text_field, label_field)
+    static_train_data, static_dev_data, static_test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name, test_name, char_data,
+                                                                                         static_text_field, static_label_field)
+    print("len(train_data) {} ".format(len(train_data)))
+    print("len(train_data) {} ".format(len(static_train_data)))
+    text_field.build_vocab(train_data)
+    label_field.build_vocab(train_data)
+    static_text_field.build_vocab(static_train_data, static_dev_data, static_test_data)
+    static_label_field.build_vocab(static_train_data, static_dev_data, static_test_data)
+    train_iter, dev_iter, test_iter = data.Iterator.splits(
+                                        (train_data, dev_data, test_data),
+                                        batch_sizes=(args.batch_size,
+                                                     len(dev_data),
+                                                     len(test_data)),
+                                        **kargs)
+    return train_iter, dev_iter, test_iter
+
+
 
 # load five-classification data
 def mrs_five(path, train_name, dev_name, test_name, char_data, text_field, label_field, **kargs):
@@ -277,15 +302,23 @@ def add_unknown_words_by_uniform(word_vecs, vocab, k=100):
 print("\nLoading data...")
 text_field = data.Field(lower=True)
 label_field = data.Field(sequential=False)
+static_text_field = data.Field(lower=True)
+static_label_field = data.Field(sequential=False)
 if args.FIVE_CLASS_TASK:
     print("Executing 5 Classification Task......")
     train_iter, dev_iter, test_iter = mrs_five(args.datafile_path, args.name_trainfile,
                                                args.name_devfile, args.name_testfile, args.char_data, text_field, label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle)
 elif args.TWO_CLASS_TASK:
     print("Executing 2 Classification Task......")
-    train_iter, dev_iter, test_iter = mrs_two(args.datafile_path, args.name_trainfile,
-                                              args.name_devfile, args.name_testfile, args.char_data, text_field, label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle)
-
+    if args.CNN_MUI:
+        train_iter, dev_iter, test_iter = mrs_two_mui(args.datafile_path, args.name_trainfile,
+                                                      args.name_devfile, args.name_testfile, args.char_data, text_field=text_field,
+                                                      label_field=label_field, static_text_field=static_text_field,
+                                                      static_label_field=static_label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle)
+    else:
+        train_iter, dev_iter, test_iter = mrs_two(args.datafile_path, args.name_trainfile,
+                                                  args.name_devfile, args.name_testfile, args.char_data, text_field,
+                                                  label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle)
 
 
 # load word2vec
@@ -299,35 +332,50 @@ if args.word_Embedding:
         path = "./word2vec/glove.sentiment.conj.pretrained.txt"
     print("loading word2vec vectors...")
     print("len(text_field.vocab.itos)", len(text_field.vocab.itos))
+    print("len(static_text_field.vocab.itos)", len(static_text_field.vocab.itos))
     if args.freq_1_unk == True:
-        word_vecs = load_my_vecs_freq1(path, text_field.vocab.itos, text_field.vocab.freqs, pro=0.5)
+        word_vecs = load_my_vecs_freq1(path, text_field.vocab.itos, text_field.vocab.freqs, pro=0.5)   # has some error in this function
     else:
         word_vecs = load_my_vecs(path, text_field.vocab.itos)
+        if args.CNN_MUI:
+            static_word_vecs = load_my_vecs(path, static_text_field.vocab.itos)
     print("word2vec loaded!")
     print("num words already in word2vec: " + str(len(word_vecs)))
     print("loading unknown word2vec and convert to list...")
     if args.char_data:
         print("loading unknown word by rand......")
         word_vecs = add_unknown_words_by_uniform(word_vecs, text_field.vocab.itos, k=args.embed_dim)
+        if args.CNN_MUI:
+            static_word_vecs = add_unknown_words_by_uniform(static_word_vecs, static_text_field.vocab.itos, k=args.embed_dim)
     else:
         print("loading unknown word by avg......")
         # word_vecs = add_unknown_words_by_uniform(word_vecs, text_field.vocab.itos, k=args.embed_dim)
         word_vecs = add_unknown_words_by_avg(word_vecs, text_field.vocab.itos, k=args.embed_dim)
+        if args.CNN_MUI:
+            static_word_vecs = add_unknown_words_by_avg(static_word_vecs, static_text_field.vocab.itos, k=args.embed_dim)
     print("unknown word2vec loaded ! and converted to list...")
 
 
 # update args and print
 args.embed_num = len(text_field.vocab)
 args.class_num = len(label_field.vocab) - 1
+if args.CNN_MUI:
+    args.embed_num_mui = len(static_text_field.vocab)
 args.cuda = (args.no_cuda) and torch.cuda.is_available(); del args.no_cuda
 args.kernel_sizes = [int(k) for k in args.kernel_sizes.split(',')]
 # save file
 mulu = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+args.mulu = mulu
 args.save_dir = os.path.join(args.save_dir, mulu)
+if not os.path.isdir(args.save_dir):
+    os.makedirs(args.save_dir)
+shutil.copy("./Parameters.txt", "./snapshot/" + mulu + "/Parameters.txt")
 
 # load word2vec
 if args.word_Embedding:
     args.pretrained_weight = word_vecs
+    if args.CNN_MUI:
+        args.pretrained_weight_static = static_word_vecs
 
 print("\nParameters:")
 if os.path.exists("./Parameters.txt"):
@@ -337,6 +385,7 @@ for attr, value in sorted(args.__dict__.items()):
     print("\t{}={}".format(attr.upper(), value))
     file.write("\t{}={}\n".format(attr.upper(), value))
 file.close()
+
 
 
 # model
@@ -380,6 +429,9 @@ if args.snapshot is None:
     elif args.CNN_BiGRU:
         print("loading CNN_BiGRU model......")
         model = model_CNN_BiGRU.CNN_BiGRU(args)
+    elif args.CNN_MUI:
+        print("loading CNN_MUI model......")
+        model = model_CNN_MUI.CNN_MUI(args)
     print(model)
 else:
     print('\nLoading model from [%s]...' % args.snapshot)
@@ -444,6 +496,9 @@ else:
     elif args.CNN_BiGRU:
         print("CNN_BiGRU training start......")
         model_count = train_CNN_BiGRU.train(train_iter, dev_iter, test_iter, model, args)
+    elif args.CNN_MUI:
+        print("CNN_MUI training start......")
+        model_count = train_CNN_MUI.train(train_iter, dev_iter, test_iter, model, args)
     print("Model_count", model_count)
     resultlist = []
     if os.path.exists("./Test_Result.txt"):
@@ -458,6 +513,6 @@ else:
         file.write("\n")
         file.close()
         shutil.copy("./Test_Result.txt", "./snapshot/" + mulu + "/Test_Result.txt")
-        shutil.copy("./Parameters.txt", "./snapshot/" + mulu + "/Parameters.txt")
+        # shutil.copy("./Parameters.txt", "./snapshot/" + mulu + "/Parameters.txt")
 
 

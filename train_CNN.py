@@ -4,6 +4,7 @@ import torch
 import torch.autograd as autograd
 import torch.nn.functional as F
 import torch.nn.utils as utils
+import shutil
 torch.manual_seed(533)
 import random
 random.seed(5311)
@@ -115,12 +116,10 @@ def test_eval(data_iter, model, save_path, args):
     else:
         file = open("./Test_Result.txt", "w")
     file.write("model " + save_path + "\n")
-    file.write("Evaluation - loss: {:.6f}  acc: {:.4f}%({}/{}) \n".format(avg_loss,
-                                                                       accuracy,
-                                                                       corrects,
-                                                                       size))
+    file.write("Evaluation - loss: {:.6f}  acc: {:.4f}%({}/{}) \n".format(avg_loss, accuracy, corrects, size))
     file.write("\n")
     file.close()
+    shutil.copy("./Test_Result.txt", "./snapshot/" + args.mulu + "/Test_Result.txt")
 
 
 

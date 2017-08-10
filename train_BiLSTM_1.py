@@ -7,6 +7,7 @@ import torch.nn.utils as utils
 # torch.manual_seed(16330)
 torch.manual_seed(6143)
 import random
+import shutil
 random.seed(13811)
 
 def train(train_iter, dev_iter, test_iter, model, args):
@@ -130,6 +131,7 @@ def test_eval(data_iter, model, save_path, args):
                                                                        size))
     file.write("\n")
     file.close()
+    shutil.copy("./Test_Result.txt", "./snapshot/" + args.mulu + "/Test_Result.txt")
 
 
 

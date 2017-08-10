@@ -1,6 +1,6 @@
 learning_rate = 0.001
-epochs = 10
-batch_size = 16
+epochs = 256
+batch_size = 64
 log_interval = 1
 test_interval = 100
 save_interval = 200
@@ -15,13 +15,15 @@ shuffle = True
 epochs_shuffle = False
 FIVE_CLASS_TASK = False
 TWO_CLASS_TASK = True
-dropout = 0.6
+dropout = 0.5
 max_norm = 3
 embed_dim = 300
 kernel_num = 200
-kernel_sizes = "3,4,5,6,7"
+# kernel_sizes = "3,4,"、
+kernel_sizes = "1,2,3"
 static = False
 CNN = False
+CNN_MUI = True
 DEEP_CNN = False
 LSTM = False
 GRU = False
@@ -32,7 +34,7 @@ CNN_BiLSTM = False
 CLSTM = False
 CBiLSTM = False
 CGRU = False
-BiGRU = True
+BiGRU = False
 CNN_BiGRU = False
 word_Embedding = True
 lstm_hidden_dim = 150
@@ -44,5 +46,8 @@ predict = None
 test = False
 num_threads = 4
 freq_1_unk = False
+# whether to init w
+init_weight = True
+init_weight_value = 2.0
 
 
