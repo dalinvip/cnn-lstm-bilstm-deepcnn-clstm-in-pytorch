@@ -14,7 +14,8 @@ def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:
         model.cuda()
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay)
+    # print("optimizer {} ".format(optimizer))
     # optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
 
     steps = 0
@@ -37,7 +38,9 @@ def train(train_iter, dev_iter, test_iter, model, args):
             # target values >=0   <=C - 1 (C = args.class_num)
             loss = F.cross_entropy(logit, target)
             loss.backward()
-            # utils.clip_grad_norm(model.parameters(), max_norm=1e-4)
+            if args.init_clip_max_norm is not None:
+                # print("aaaa {} ".format(args.init_clip_max_norm))
+                utils.clip_grad_norm(model.parameters(), max_norm=args.init_clip_max_norm)
             optimizer.step()
 
             steps += 1

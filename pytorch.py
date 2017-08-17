@@ -563,19 +563,25 @@
 #         a.b()
 
 
-class tt:
-    def fa(self):
-        return 'aa'
-    def fb(self):
-        return fa()
+# class tt:
+#     def fa(self):
+#         return 'aa'
+#     def fb(self):
+#         return fa()
+#
 
 
+# import numpy as np
+# a = np.sqrt(2)
+# print(a)
+# b = np.sqrt(2.0)
+# print(b)
+#
 
 
-
-
-
-
+import torch
+print(torch.cuda.is_available())
+# True
 
 
 

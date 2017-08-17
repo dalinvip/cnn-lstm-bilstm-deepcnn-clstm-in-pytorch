@@ -27,13 +27,17 @@ class  CNN_Text(nn.Module):
             self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
             # fixed the word embedding
             self.embed.weight.requires_grad = True
+        print("dddd {} ".format(self.embed.weight.data.size()))
 
         self.convs1 = [nn.Conv2d(Ci, Co, (K, D)) for K in Ks]
+        # for con in self.convs1:
+            # print("PP {} ".format(con.weight))
         if args.init_weight:
             print("Initing W .......")
             for conv in self.convs1:
-                # init.xavier_normal(conv.weight, gain=np.sqrt(args.init_weight_value))
-                init.xavier_normal(conv.weight, gain=args.init_weight_value)
+                init.xavier_normal(conv.weight, gain=np.sqrt(args.init_weight_value))
+                # init.xavier_normal(conv.weight, gain=args.init_weight_value)
+                # print("QQ {} ".format(conv.weight))
 
         '''
         self.conv13 = nn.Conv2d(Ci, Co, (3, D))

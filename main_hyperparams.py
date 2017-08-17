@@ -23,6 +23,7 @@ import model_CNN_BiLSTM
 import model_BiGRU
 import model_CNN_BiGRU
 import model_CNN_MUI
+import model_BiLSTM_1
 import train
 import train_CNN
 import train_DeepCNN
@@ -83,6 +84,8 @@ parser.add_argument('-TWO_CLASS_TASK', action='store_true', default=hyperparams.
 # model
 parser.add_argument('-init_weight', action='store_true', default=hyperparams.init_weight, help='init w')
 parser.add_argument('-init_weight_value', type=float, default=hyperparams.init_weight_value, help='value of init w')
+parser.add_argument('-init_weight_decay', type=float, default=hyperparams.weight_decay, help='value of init L2 weight_decay')
+parser.add_argument('-init_clip_max_norm', type=float, default=hyperparams.clip_max_norm, help='value of init clip_max_norm')
 parser.add_argument('-dropout', type=float, default=hyperparams.dropout, help='the probability for dropout [default: 0.5]')
 parser.add_argument('-max-norm', type=float, default=hyperparams.max_norm, help='l2 constraint of parameters [default: 3.0]')
 parser.add_argument('-embed-dim', type=int, default=hyperparams.embed_dim, help='number of embedding dimension [default: 128]')
@@ -269,13 +272,15 @@ def add_unknown_words_by_avg(word_vecs, vocab, k=100):
     col = []
     for i in range(k):
         sum = 0.0
-        for j in range(int(len(word_vecs_numpy) / 4)):
+        # for j in range(int(len(word_vecs_numpy) / 4)):
+        for j in range(int(len(word_vecs_numpy))):
             sum += word_vecs_numpy[j][i]
             sum = round(sum, 6)
         col.append(sum)
     zero = []
     for m in range(k):
-        avg = col[m] / (len(col) * 5)
+        # avg = col[m] / (len(col) * 5)
+        avg = col[m] / (len(word_vecs_numpy))
         avg = round(avg, 6)
         zero.append(float(avg))
 
@@ -380,6 +385,7 @@ if args.word_Embedding:
         word_vecs = add_unknown_words_by_avg(word_vecs, text_field.vocab.itos, k=args.embed_dim)
         if args.CNN_MUI:
             static_word_vecs = add_unknown_words_by_avg(static_word_vecs, static_text_field.vocab.itos, k=args.embed_dim)
+        print("len(word_vecs) {} ".format(len(word_vecs)))
     print("unknown word2vec loaded ! and converted to list...")
 
 
@@ -409,7 +415,8 @@ if os.path.exists("./Parameters.txt"):
     os.remove("./Parameters.txt")
 file = open("Parameters.txt", "a")
 for attr, value in sorted(args.__dict__.items()):
-    print("\t{}={}".format(attr.upper(), value))
+    if attr.upper() != "PRETRAINED_WEIGHT":
+        print("\t{}={}".format(attr.upper(), value))
     file.write("\t{}={}\n".format(attr.upper(), value))
 file.close()
 
@@ -434,7 +441,8 @@ if args.snapshot is None:
         model = model_BiLSTM.BiLSTM(args)
     elif args.BiLSTM_1:
         print("loading BiLSTM_1 model......")
-        model = model_BiLSTM_lexicon.BiLSTM_1(args)
+        # model = model_BiLSTM_lexicon.BiLSTM_1(args)
+        model = model_BiLSTM_1.BiLSTM_1(args)
     elif args.CNN_LSTM:
         print("loading CNN_LSTM model......")
         model = model_CNN_LSTM.CNN_LSTM(args)
