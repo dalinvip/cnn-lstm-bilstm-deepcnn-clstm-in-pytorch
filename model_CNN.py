@@ -1,13 +1,13 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from babel.messages.frontend import init_catalog
 from torch.autograd import Variable
 import numpy as np
 import random
 import torch.nn.init as init
-random.seed(1771)
-torch.manual_seed(123)
+import hyperparams
+torch.manual_seed(hyperparams.seed_num)
+random.seed(hyperparams.seed_num)
 class  CNN_Text(nn.Module):
     
     def __init__(self, args):
@@ -21,7 +21,12 @@ class  CNN_Text(nn.Module):
         Co = args.kernel_num
         Ks = args.kernel_sizes
 
-        self.embed = nn.Embedding(V, D)
+        if args.max_norm is not None:
+            print("max_norm = {} ".format(args.max_norm))
+            self.embed = nn.Embedding(V, D, max_norm=args.max_norm)
+        else:
+            print("max_norm = {} ".format(args.max_norm))
+            self.embed = nn.Embedding(V, D)
         if args.word_Embedding:
             pretrained_weight = np.array(args.pretrained_weight)
             self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
@@ -29,15 +34,18 @@ class  CNN_Text(nn.Module):
             self.embed.weight.requires_grad = True
         print("dddd {} ".format(self.embed.weight.data.size()))
 
-        self.convs1 = [nn.Conv2d(Ci, Co, (K, D)) for K in Ks]
+        self.convs1 = [nn.Conv2d(Ci, Co, (K, D), bias=True) for K in Ks]
         # for con in self.convs1:
             # print("PP {} ".format(con.weight))
         if args.init_weight:
             print("Initing W .......")
             for conv in self.convs1:
                 init.xavier_normal(conv.weight, gain=np.sqrt(args.init_weight_value))
+                init.uniform(conv.bias, a=0, b=0)
+                # init.constant(conv.bias, val=0)
                 # init.xavier_normal(conv.weight, gain=args.init_weight_value)
                 # print("QQ {} ".format(conv.weight))
+                # print("QQ {} ".format(conv.bias))
 
         '''
         self.conv13 = nn.Conv2d(Ci, Co, (3, D))

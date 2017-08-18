@@ -34,6 +34,7 @@ import mydatasets_self_two
 import multiprocessing as mu
 import shutil
 import numpy as np
+import random
 # solve encoding
 from imp import reload
 import sys
@@ -43,7 +44,9 @@ if sys.getdefaultencoding() != defaultencoding:
     sys.setdefaultencoding(defaultencoding)
 
 # random seed
-torch.manual_seed(121)
+import hyperparams
+torch.manual_seed(hyperparams.seed_num)
+random.seed(hyperparams.seed_num)
 
 
 

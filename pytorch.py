@@ -579,12 +579,13 @@
 #
 
 
-import torch
-print(torch.cuda.is_available())
-# True
+# import torch
+# print(torch.cuda.is_available())
+# # True
+#
 
 
-
+print(2.2e-05 == 0.000022)
 
 
 

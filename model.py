@@ -3,7 +3,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
-
+import random
+import hyperparams
+torch.manual_seed(hyperparams.seed_num)
+random.seed(hyperparams.seed_num)
 class  CNN_Text(nn.Module):
     
     def __init__(self, args):

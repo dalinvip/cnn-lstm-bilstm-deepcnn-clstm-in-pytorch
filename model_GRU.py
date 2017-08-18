@@ -4,8 +4,9 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
 import random
-random.seed(16719)
-torch.manual_seed(123)
+import hyperparams
+torch.manual_seed(hyperparams.seed_num)
+random.seed(hyperparams.seed_num)
 
 class  GRU(nn.Module):
     

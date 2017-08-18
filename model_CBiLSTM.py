@@ -4,9 +4,9 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
 import random
-import random
-random.seed(1641)
-torch.manual_seed(1163)
+import hyperparams
+torch.manual_seed(hyperparams.seed_num)
+random.seed(hyperparams.seed_num)
 
 class  CBiLSTM(nn.Module):
     

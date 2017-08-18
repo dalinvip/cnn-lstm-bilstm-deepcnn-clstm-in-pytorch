@@ -4,8 +4,9 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
 import random
-random.seed(1321)
-torch.manual_seed(1233)
+import hyperparams
+torch.manual_seed(hyperparams.seed_num)
+random.seed(hyperparams.seed_num)
 class  BiLSTM(nn.Module):
     
     def __init__(self, args):

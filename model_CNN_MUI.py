@@ -5,8 +5,9 @@ from torch.autograd import Variable
 import numpy as np
 import random
 import torch.nn.init as init
-random.seed(1771)
-torch.manual_seed(123)
+import hyperparams
+torch.manual_seed(hyperparams.seed_num)
+random.seed(hyperparams.seed_num)
 class  CNN_MUI(nn.Module):
     
     def __init__(self, args):

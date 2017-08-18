@@ -5,9 +5,10 @@ import torch.autograd as autograd
 import torch.nn.functional as F
 import shutil
 import torch.nn.utils as utils
-torch.manual_seed(2322)
 import random
-random.seed(1319)
+import hyperparams
+torch.manual_seed(hyperparams.seed_num)
+random.seed(hyperparams.seed_num)
 def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:
         model.cuda()
@@ -127,6 +128,9 @@ def test_eval(data_iter, model, save_path, args):
     file.write("\n")
     file.close()
     shutil.copy("./Test_Result.txt", "./snapshot/" + args.mulu + "/Test_Result.txt")
+    # whether to delete the model after test acc so that to save space
+    if os.path.isfile(save_path) and args.rm_model is True:
+        os.remove(save_path)
 
 
 

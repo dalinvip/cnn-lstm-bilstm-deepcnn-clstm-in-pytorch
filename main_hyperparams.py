@@ -56,8 +56,8 @@ if sys.getdefaultencoding() != defaultencoding:
     sys.setdefaultencoding(defaultencoding)
 
 # random seed
-torch.manual_seed(121)
-random.seed(151)
+torch.manual_seed(hyperparams.seed_num)
+random.seed(hyperparams.seed_num)
 
 parser = argparse.ArgumentParser(description="text classification")
 # learning
@@ -82,10 +82,12 @@ parser.add_argument('-freq_1_unk', action='store_true', default=hyperparams.freq
 parser.add_argument('-FIVE_CLASS_TASK', action='store_true', default=hyperparams.FIVE_CLASS_TASK, help='whether to execute five-classification-task')
 parser.add_argument('-TWO_CLASS_TASK', action='store_true', default=hyperparams.TWO_CLASS_TASK, help='whether to execute two-classification-task')
 # model
+parser.add_argument('-rm_model', action='store_true', default=hyperparams.rm_model, help='whether to delete the model after test acc so that to save space')
 parser.add_argument('-init_weight', action='store_true', default=hyperparams.init_weight, help='init w')
 parser.add_argument('-init_weight_value', type=float, default=hyperparams.init_weight_value, help='value of init w')
 parser.add_argument('-init_weight_decay', type=float, default=hyperparams.weight_decay, help='value of init L2 weight_decay')
 parser.add_argument('-init_clip_max_norm', type=float, default=hyperparams.clip_max_norm, help='value of init clip_max_norm')
+parser.add_argument('-seed_num', type=float, default=hyperparams.seed_num, help='value of init seed number')
 parser.add_argument('-dropout', type=float, default=hyperparams.dropout, help='the probability for dropout [default: 0.5]')
 parser.add_argument('-max-norm', type=float, default=hyperparams.max_norm, help='l2 constraint of parameters [default: 3.0]')
 parser.add_argument('-embed-dim', type=int, default=hyperparams.embed_dim, help='number of embedding dimension [default: 128]')
@@ -107,6 +109,7 @@ parser.add_argument('-CGRU', action='store_true', default=hyperparams.CGRU, help
 parser.add_argument('-BiGRU', action='store_true', default=hyperparams.BiGRU, help='whether to use BiGRU model')
 parser.add_argument('-CNN_BiGRU', action='store_true', default=hyperparams.CNN_BiGRU, help='whether to use CNN_BiGRU model')
 parser.add_argument('-word_Embedding', action='store_true', default=hyperparams.word_Embedding, help='whether to load word embedding')
+parser.add_argument('-word_Embedding_Path', type=str, default=hyperparams.word_Embedding_Path, help='filename of model snapshot [default: None]')
 parser.add_argument('-lstm-hidden-dim', type=int, default=hyperparams.lstm_hidden_dim, help='the number of embedding dimension in LSTM hidden layer')
 parser.add_argument('-lstm-num-layers', type=int, default=hyperparams.lstm_num_layers, help='the number of embedding dimension in LSTM hidden layer')
 # nums of threads
@@ -355,13 +358,9 @@ elif args.TWO_CLASS_TASK:
 
 # load word2vec
 if args.word_Embedding:
-    if args.embed_dim == 100:
-        path = "./word2vec/glove.6B.100d.txt"
-    elif args.embed_dim == 200:
-        path = "./word2vec/glove.6B.200d.txt"
-    elif args.embed_dim == 300:
-        # path = "./word2vec/glove.6B.300d.txt"
-        path = "./word2vec/glove.sentiment.conj.pretrained.txt"
+    if args.embed_dim is not None:
+        print("word_Embedding_Path {} ".format(args.word_Embedding_Path))
+        path = args.word_Embedding_Path
     print("loading word2vec vectors...")
     # print("len(text_field.vocab.itos)", len(text_field.vocab.itos))
     # print("len(static_text_field.vocab.itos)", len(static_text_field.vocab.itos))

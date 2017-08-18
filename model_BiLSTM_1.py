@@ -5,9 +5,9 @@ from torch.autograd import Variable
 import numpy as np
 import random
 import torch.nn.init as init
-
-random.seed(1141)
-torch.manual_seed(1233)
+import hyperparams
+torch.manual_seed(hyperparams.seed_num)
+random.seed(hyperparams.seed_num)
 
 
 class BiLSTM_1(nn.Module):
