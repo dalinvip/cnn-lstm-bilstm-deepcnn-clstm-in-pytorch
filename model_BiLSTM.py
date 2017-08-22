@@ -13,6 +13,7 @@ class  BiLSTM(nn.Module):
         super(BiLSTM, self).__init__()
         self.args = args
         self.hidden_dim = args.lstm_hidden_dim
+        self.num_layers = args.lstm_num_layers
         V = args.embed_num
         D = args.embed_dim
         C = args.class_num
@@ -26,16 +27,14 @@ class  BiLSTM(nn.Module):
 
         self.hidden2label1 = nn.Linear(self.hidden_dim, self.hidden_dim // 2)
         self.hidden2label2 = nn.Linear(self.hidden_dim // 2, C)
-        self.hidden = self.init_hidden(args.batch_size)
+        self.hidden = self.init_hidden(self.num_layers, args.batch_size)
         # self.dropout = nn.Dropout(args.dropout)
 
-    def init_hidden(self, batch_size):
+    def init_hidden(self, num_layers, batch_size):
         # the first is the hidden h
         # the second is the cell  c
-        # return (Variable(torch.zeros(2, batch_size, self.hidden_dim // 2)),
-        #          Variable(torch.zeros(2, batch_size, self.hidden_dim // 2)))
-        return (Variable(torch.randn(2, batch_size, self.hidden_dim // 2)),
-                 Variable(torch.randn(2, batch_size, self.hidden_dim // 2)))
+        return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim // 2)),
+                Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim // 2)))
 
     def forward(self, x):
         embed = self.embed(x)

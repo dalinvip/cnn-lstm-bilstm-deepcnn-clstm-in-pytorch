@@ -13,7 +13,6 @@ import model_CNN
 import model_DeepCNN
 import model_LSTM
 import model_BiLSTM
-import model_BiLSTM_lexicon
 import model_CNN_LSTM
 import model_CLSTM
 import model_GRU
@@ -24,21 +23,8 @@ import model_BiGRU
 import model_CNN_BiGRU
 import model_CNN_MUI
 import model_BiLSTM_1
-import train
-import train_CNN
-import train_DeepCNN
-import train_LSTM
-import train_BiLSTM
-import train_BiLSTM_1
-import train_CNN_LSTM
-import train_CLSTM
-import train_GRU
-import train_CGRU
-import train_CNN_BiLSTM
-import train_CBiLSTM
-import train_BiGRU
-import train_CNN_BiGRU
-import train_CNN_MUI
+import train_ALL_CNN
+import train_ALL_LSTM
 import mydatasets
 import mydatasets_self_five
 import mydatasets_self_two
@@ -81,11 +67,19 @@ parser.add_argument('-freq_1_unk', action='store_true', default=hyperparams.freq
 # task select
 parser.add_argument('-FIVE_CLASS_TASK', action='store_true', default=hyperparams.FIVE_CLASS_TASK, help='whether to execute five-classification-task')
 parser.add_argument('-TWO_CLASS_TASK', action='store_true', default=hyperparams.TWO_CLASS_TASK, help='whether to execute two-classification-task')
+# optim select
+parser.add_argument('-Adam', action='store_true', default=hyperparams.Adam, help='whether to select Adam to train')
+parser.add_argument('-SGD', action='store_true', default=hyperparams.SGD, help='whether to select SGD to train')
+parser.add_argument('-Adadelta', action='store_true', default=hyperparams.Adadelta, help='whether to select Adadelta to train')
 # model
 parser.add_argument('-rm_model', action='store_true', default=hyperparams.rm_model, help='whether to delete the model after test acc so that to save space')
+parser.add_argument('-batch_normalizations', action='store_true', default=hyperparams.batch_normalizations, help='whether to use batch normalizations')
+parser.add_argument('-batch_norm_affine', action='store_true', default=hyperparams.batch_norm_affine, help='whether to use  batch_norm_affine')
+parser.add_argument('-bath_norm_momentum', type=float, default=hyperparams.bath_norm_momentum, help='value of momentum in batch_norm')
 parser.add_argument('-init_weight', action='store_true', default=hyperparams.init_weight, help='init w')
 parser.add_argument('-init_weight_value', type=float, default=hyperparams.init_weight_value, help='value of init w')
 parser.add_argument('-init_weight_decay', type=float, default=hyperparams.weight_decay, help='value of init L2 weight_decay')
+parser.add_argument('-momentum_value', type=float, default=hyperparams.optim_momentum_value, help='value of momentum in SGD')
 parser.add_argument('-init_clip_max_norm', type=float, default=hyperparams.clip_max_norm, help='value of init clip_max_norm')
 parser.add_argument('-seed_num', type=float, default=hyperparams.seed_num, help='value of init seed number')
 parser.add_argument('-dropout', type=float, default=hyperparams.dropout, help='the probability for dropout [default: 0.5]')
@@ -108,10 +102,12 @@ parser.add_argument('-CBiLSTM', action='store_true', default=hyperparams.CBiLSTM
 parser.add_argument('-CGRU', action='store_true', default=hyperparams.CGRU, help='whether to use CGRU model')
 parser.add_argument('-BiGRU', action='store_true', default=hyperparams.BiGRU, help='whether to use BiGRU model')
 parser.add_argument('-CNN_BiGRU', action='store_true', default=hyperparams.CNN_BiGRU, help='whether to use CNN_BiGRU model')
+parser.add_argument('-wide_conv', action='store_true', default=hyperparams.wide_conv, help='whether to use wide conv')
 parser.add_argument('-word_Embedding', action='store_true', default=hyperparams.word_Embedding, help='whether to load word embedding')
 parser.add_argument('-word_Embedding_Path', type=str, default=hyperparams.word_Embedding_Path, help='filename of model snapshot [default: None]')
 parser.add_argument('-lstm-hidden-dim', type=int, default=hyperparams.lstm_hidden_dim, help='the number of embedding dimension in LSTM hidden layer')
 parser.add_argument('-lstm-num-layers', type=int, default=hyperparams.lstm_num_layers, help='the number of embedding dimension in LSTM hidden layer')
+parser.add_argument('-min_freq', type=int, default=hyperparams.min_freq, help='min freq to include during built the vocab')
 # nums of threads
 parser.add_argument('-num_threads', type=int, default=hyperparams.num_threads, help='the num of threads')
 # device
@@ -148,7 +144,7 @@ def sst(text_field, label_field,  **kargs):
 def mrs_two(path, train_name, dev_name, test_name, char_data, text_field, label_field, **kargs):
     train_data, dev_data, test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name, test_name, char_data, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
-    text_field.build_vocab(train_data)
+    text_field.build_vocab(train_data, min_freq=args.min_freq)
     label_field.build_vocab(train_data)
     train_iter, dev_iter, test_iter = data.Iterator.splits(
                                         (train_data, dev_data, test_data),
@@ -164,9 +160,9 @@ def mrs_two_mui(path, train_name, dev_name, test_name, char_data, text_field, la
                                                                                          static_text_field, static_label_field)
     print("len(train_data) {} ".format(len(train_data)))
     print("len(train_data) {} ".format(len(static_train_data)))
-    text_field.build_vocab(train_data)
+    text_field.build_vocab(train_data, min_freq=args.min_freq)
     label_field.build_vocab(train_data)
-    static_text_field.build_vocab(static_train_data, static_dev_data, static_test_data)
+    static_text_field.build_vocab(static_train_data, static_dev_data, static_test_data, min_freq=args.min_freq)
     static_label_field.build_vocab(static_train_data, static_dev_data, static_test_data)
     train_iter, dev_iter, test_iter = data.Iterator.splits(
                                         (train_data, dev_data, test_data),
@@ -182,7 +178,7 @@ def mrs_two_mui(path, train_name, dev_name, test_name, char_data, text_field, la
 def mrs_five(path, train_name, dev_name, test_name, char_data, text_field, label_field, **kargs):
     train_data, dev_data, test_data = mydatasets_self_five.MR.splits(path, train_name, dev_name, test_name, char_data, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
-    text_field.build_vocab(train_data)
+    text_field.build_vocab(train_data, min_freq=args.min_freq)
     label_field.build_vocab(train_data)
     train_iter, dev_iter, test_iter = data.Iterator.splits(
                                         (train_data, dev_data, test_data),
@@ -198,9 +194,9 @@ def mrs_five_mui(path, train_name, dev_name, test_name, char_data, text_field, l
                                                                                          static_text_field, static_label_field)
     print("len(train_data) {} ".format(len(train_data)))
     print("len(train_data) {} ".format(len(static_train_data)))
-    text_field.build_vocab(train_data)
+    text_field.build_vocab(train_data, min_freq=args.min_freq)
     label_field.build_vocab(train_data)
-    static_text_field.build_vocab(static_train_data, static_dev_data, static_test_data)
+    static_text_field.build_vocab(static_train_data, static_dev_data, static_test_data, min_freq=args.min_freq)
     static_label_field.build_vocab(static_train_data, static_dev_data, static_test_data)
     train_iter, dev_iter, test_iter = data.Iterator.splits(
                                         (train_data, dev_data, test_data),
@@ -214,7 +210,7 @@ def mrs_five_mui(path, train_name, dev_name, test_name, char_data, text_field, l
 # load MR dataset
 def mr(text_field, label_field, **kargs):
     train_data, dev_data = mydatasets.MR.splits(text_field, label_field)
-    text_field.build_vocab(train_data, dev_data)
+    text_field.build_vocab(train_data, dev_data, min_freq=args.min_freq)
     label_field.build_vocab(train_data, dev_data)
     train_iter, dev_iter = data.Iterator.splits(
                                 (train_data, dev_data), 
@@ -401,7 +397,6 @@ args.mulu = mulu
 args.save_dir = os.path.join(args.save_dir, mulu)
 if not os.path.isdir(args.save_dir):
     os.makedirs(args.save_dir)
-shutil.copy("./Parameters.txt", "./snapshot/" + mulu + "/Parameters.txt")
 
 # load word2vec
 if args.word_Embedding:
@@ -414,10 +409,11 @@ if os.path.exists("./Parameters.txt"):
     os.remove("./Parameters.txt")
 file = open("Parameters.txt", "a")
 for attr, value in sorted(args.__dict__.items()):
-    if attr.upper() != "PRETRAINED_WEIGHT":
+    if attr.upper() != "PRETRAINED_WEIGHT" and attr.upper() != "pretrained_weight_static".upper():
         print("\t{}={}".format(attr.upper(), value))
     file.write("\t{}={}\n".format(attr.upper(), value))
 file.close()
+shutil.copy("./Parameters.txt", "./snapshot/" + mulu + "/Parameters.txt")
 
 
 
@@ -478,12 +474,12 @@ else:
 
 # train or predict
 if args.predict is not None:
-    label = train_CNN.predict(args.predict, model, text_field, label_field)
+    label = train_ALL_CNN.predict(args.predict, model, text_field, label_field)
     print('\n[Text]  {}[Label] {}\n'.format(args.predict, label))
 elif args.test:
     try:
         print(test_iter)
-        train.test_eval(test_iter, model, args)
+        train_ALL_CNN.test_eval(test_iter, model, args)
     except Exception as e:
         print("\nSorry. The test dataset doesn't  exist.\n")
 else:
@@ -493,46 +489,46 @@ else:
         os.remove("./Test_Result.txt")
     if args.CNN:
         print("CNN training start......")
-        model_count = train_CNN.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, args)
     elif args.DEEP_CNN:
         print("DEEP_CNN training start......")
-        model_count = train_DeepCNN.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, args)
     elif args.LSTM:
         print("LSTM training start......")
-        model_count = train_LSTM.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.GRU:
         print("GRU training start......")
-        model_count = train_GRU.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.BiLSTM:
         print("BiLSTM training start......")
-        model_count = train_BiLSTM.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.BiLSTM_1:
         print("BiLSTM_1 training start......")
-        model_count = train_BiLSTM_1.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CNN_LSTM:
         print("CNN_LSTM training start......")
-        model_count = train_CNN_LSTM.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CLSTM:
         print("CLSTM training start......")
-        model_count = train_CLSTM.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CBiLSTM:
         print("CBiLSTM training start......")
-        model_count = train_CBiLSTM.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CGRU:
         print("CGRU training start......")
-        model_count = train_CGRU.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CNN_BiLSTM:
         print("CNN_BiLSTM training start......")
-        model_count = train_CNN_BiLSTM.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.BiGRU:
         print("BiGRU training start......")
-        model_count = train_BiGRU.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CNN_BiGRU:
         print("CNN_BiGRU training start......")
-        model_count = train_CNN_BiGRU.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CNN_MUI:
         print("CNN_MUI training start......")
-        model_count = train_CNN_MUI.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, args)
     print("Model_count", model_count)
     resultlist = []
     if os.path.exists("./Test_Result.txt"):

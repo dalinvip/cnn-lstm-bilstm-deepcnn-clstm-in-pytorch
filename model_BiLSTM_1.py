@@ -37,6 +37,11 @@ class BiLSTM_1(nn.Module):
             init.xavier_normal(self.bilstm.all_weights[0][1], gain=np.sqrt(args.init_weight_value))
             init.xavier_normal(self.bilstm.all_weights[1][0], gain=np.sqrt(args.init_weight_value))
             init.xavier_normal(self.bilstm.all_weights[1][1], gain=np.sqrt(args.init_weight_value))
+            # print("eeeeeeeeeeeeeeeeeeeeeeee")
+            # fan_in, fan_out = BiLSTM_1.calculate_fan_in_and_fan_out(self.bilstm.all_weights[1][1])
+            # print(" in {} out {} ".format(fan_in, fan_out))
+            # std = np.sqrt(args.init_weight_value) * np.sqrt(2.0 / (fan_in + fan_out))
+            # print("aaaaaaaaaaaaa {} ".format(std))
             # print("self.bilstm.all_weights {} ".format(self.bilstm.all_weights))
             self.bilstm.all_weights[0][3].data[20:40].fill_(1)
             self.bilstm.all_weights[0][3].data[0:20].fill_(0)
@@ -67,6 +72,25 @@ class BiLSTM_1(nn.Module):
         #          Variable(torch.zeros(2, batch_size, self.hidden_dim // 2)))
         return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)),
                 Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)))
+
+    def calculate_fan_in_and_fan_out(tensor):
+        dimensions = tensor.ndimension()
+        if dimensions < 2:
+            raise ValueError("Fan in and fan out can not be computed for tensor with less than 2 dimensions")
+
+        if dimensions == 2:  # Linear
+            fan_in = tensor.size(1)
+            fan_out = tensor.size(0)
+        else:
+            num_input_fmaps = tensor.size(1)
+            num_output_fmaps = tensor.size(0)
+            receptive_field_size = 1
+            if tensor.dim() > 2:
+                receptive_field_size = tensor[0][0].numel()
+            fan_in = num_input_fmaps * receptive_field_size
+            fan_out = num_output_fmaps * receptive_field_size
+
+        return fan_in, fan_out
 
     def forward(self, x):
         embed = self.embed(x)

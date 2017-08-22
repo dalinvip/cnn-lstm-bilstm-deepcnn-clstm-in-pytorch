@@ -38,12 +38,12 @@ class  BiGRU(nn.Module):
     def init_hidden(self, num_layers, batch_size):
         return Variable(torch.zeros(num_layers * 2, batch_size, self.hidden_dim))
 
-    def forward(self, input, hidden):
+    def forward(self, input):
         embed = self.embed(input)
         embed = self.dropout(embed)  # add this reduce the acc
         input = embed.view(len(input), embed.size(1), -1)
         # gru
-        gru_out, hidden = self.bigru(input, hidden)
+        gru_out, hidden = self.bigru(input, self.hidden)
         gru_out = torch.transpose(gru_out, 0, 1)
         gru_out = torch.transpose(gru_out, 1, 2)
         # pooling
@@ -53,4 +53,4 @@ class  BiGRU(nn.Module):
         # linear
         y = self.hidden2label(gru_out)
         logit = y
-        return logit, hidden
+        return logit

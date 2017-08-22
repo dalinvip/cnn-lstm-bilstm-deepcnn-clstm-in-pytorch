@@ -33,19 +33,36 @@ class  CNN_MUI(nn.Module):
             self.embed_no_static.weight.requires_grad = True
             # self.embed_static.weight.requires_grad = False
 
-        self.convs1 = [nn.Conv2d(Ci, Co, (K, D)) for K in Ks]
+        if args.wide_conv is True:
+            print("using wide convolution")
+            self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), stride=(1, 1), padding=(K//2, 0), bias=False) for K in Ks]
+        else:
+            print("using narrow convolution")
+            self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), bias=False) for K in Ks]
+        # self.convs1 = [nn.Conv2d(Ci, D, (K, D), stride=1, padding=(K // 2, 0)) for K in Ks]
+        print(self.convs1)
         if args.init_weight:
             print("Initing W .......")
             for conv in self.convs1:
-                # init.xavier_normal(conv.weight, gain=np.sqrt(args.init_weight_value))
-                init.xavier_normal(conv.weight, gain=args.init_weight_value)
+                init.xavier_normal(conv.weight.data, gain=np.sqrt(args.init_weight_value))
+                # init.constant(conv.bias, 0)
         '''
         self.conv13 = nn.Conv2d(Ci, Co, (3, D))
         self.conv14 = nn.Conv2d(Ci, Co, (4, D))
         self.conv15 = nn.Conv2d(Ci, Co, (5, D))
         '''
         self.dropout = nn.Dropout(args.dropout)
-        self.fc1 = nn.Linear(len(Ks)*Co, C)
+        in_fea = len(Ks) * Co
+        self.fc1 = nn.Linear(in_features=in_fea, out_features=in_fea // 2, bias=False)
+        self.fc2 = nn.Linear(in_features=in_fea // 2, out_features=C, bias=False)
+        if args.batch_normalizations is True:
+            print("using batch_normalizations in the model......")
+            self.convs1_bn = nn.BatchNorm2d(num_features=Co, momentum=args.bath_norm_momentum,
+                                            affine=args.batch_norm_affine)
+            self.fc1_bn = nn.BatchNorm1d(num_features=in_fea//2, momentum=args.bath_norm_momentum,
+                                         affine=args.batch_norm_affine)
+            self.fc2_bn = nn.BatchNorm1d(num_features=C, momentum=args.bath_norm_momentum,
+                                         affine=args.batch_norm_affine)
 
     def conv_and_pool(self, x, conv):
         x = F.relu(conv(x)).squeeze(3) #(N,Co,W)
@@ -61,8 +78,9 @@ class  CNN_MUI(nn.Module):
         # x_static = self.dropout(x_static)
         x = torch.stack([x_static, x_no_static], 1)
         # x = x.unsqueeze(1) # (N,Ci,W,D)
+        x = self.dropout(x)
         x = [F.relu(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
-        x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x] #[(N,Co), ...]*len(Ks)
+        x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x]  # [(N,Co), ...]*len(Ks)
         x = torch.cat(x, 1)
         '''
         x1 = self.conv_and_pool(x,self.conv13) #(N,Co)
@@ -71,5 +89,10 @@ class  CNN_MUI(nn.Module):
         x = torch.cat((x1, x2, x3), 1) # (N,len(Ks)*Co)
         '''
         x = self.dropout(x) # (N,len(Ks)*Co)
-        logit = self.fc1(x) # (N,C)
+        if self.args.batch_normalizations is True:
+            x = self.fc1(F.relu(x))
+            logit = self.fc2(F.relu(x))
+        else:
+            x = self.fc1(F.relu(x))
+            logit = self.fc2(F.relu(x))
         return logit

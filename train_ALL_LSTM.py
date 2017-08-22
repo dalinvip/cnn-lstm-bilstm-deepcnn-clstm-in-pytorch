@@ -4,8 +4,9 @@ import torch
 import torch.autograd as autograd
 import torch.nn.functional as F
 import torch.nn.utils as utils
-import random
 import shutil
+import random
+import train_model_test_eval as model_test_eval
 import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
@@ -14,8 +15,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:
         model.cuda()
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay)
-    # print("optimizer {} ".format(optimizer))
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     # optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
 
     steps = 0
@@ -23,6 +23,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
     model.train()
     for epoch in range(1, args.epochs+1):
         print("## 第{} 轮迭代，共计迭代 {} 次 ！##".format(epoch, args.epochs))
+        # the attr of shuffle in train_iter haved initialed True during data.Iterator.splits()
         for batch in train_iter:
             feature, target = batch.text, batch.label.data.sub_(1)
             target =autograd.Variable(target)
@@ -30,7 +31,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
                 feature, target = feature.cuda(), target.cuda()
 
             optimizer.zero_grad()
-            model.zero_grad()
+            # model.zero_grad()
             model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
             if feature.size(1) != args.batch_size:
                 model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
@@ -38,9 +39,11 @@ def train(train_iter, dev_iter, test_iter, model, args):
             # target values >=0   <=C - 1 (C = args.class_num)
             loss = F.cross_entropy(logit, target)
             loss.backward()
-            if args.init_clip_max_norm is not None:
-                # print("aaaa {} ".format(args.init_clip_max_norm))
-                utils.clip_grad_norm(model.parameters(), max_norm=args.init_clip_max_norm)
+            # prevent grads boom
+            # utils.clip_grad_norm(model.parameters(), args.max_norm)
+            # the up line will make overfitting quickly, however, the line slow the overfitting,
+            # so,the speed of overfitting depend on the max_norm size, more big, moe quickly
+            utils.clip_grad_norm(model.parameters(), max_norm=1e-4)
             optimizer.step()
 
             steps += 1
@@ -56,26 +59,23 @@ def train(train_iter, dev_iter, test_iter, model, args):
                                                                              corrects,
                                                                              batch.batch_size))
             if steps % args.test_interval == 0:
-                eval(dev_iter, model, args)
+                model_test_eval.eval(dev_iter, model, args)
             if steps % args.save_interval == 0:
                 if not os.path.isdir(args.save_dir): os.makedirs(args.save_dir)
                 save_prefix = os.path.join(args.save_dir, 'snapshot')
                 save_path = '{}_steps{}.pt'.format(save_prefix, steps)
                 torch.save(model, save_path)
-                test_eval(test_iter, model, save_path, args)
-                # test_eval(test_iter, model, save_path, args)
                 model_count += 1
-                print("model_count \n", model_count)
+                model_test_eval.test_eval(test_iter, model, save_path, args, model_count)
     return model_count
+
 
 def eval(data_iter, model, args):
     model.eval()
     corrects, avg_loss = 0, 0
     for batch in data_iter:
         feature, target = batch.text, batch.label.data.sub_(1)
-
         target = autograd.Variable(target)
-
         if args.cuda:
             feature, target = feature.cuda(), target.cuda()
         model.hidden = model.init_hidden(args.lstm_num_layers, batch.batch_size)
@@ -87,14 +87,14 @@ def eval(data_iter, model, args):
                      [1].view(target.size()).data == target.data).sum()
 
     size = len(data_iter.dataset)
-    avg_loss = loss.data[0]/size
+    # avg_loss = loss.data[0]/size
+    avg_loss = float(avg_loss)/size
     accuracy = float(corrects)/size * 100.0
     model.train()
-    print('\nEvaluation - loss: {:.6f}  acc: {:.4f}%({}/{}) \n'.format(avg_loss,
-                                                                       accuracy,
-                                                                       corrects,
+    print('\nEvaluation - loss: {:.6f}  acc: {:.4f}%({}/{}) \n'.format(avg_loss, 
+                                                                       accuracy, 
+                                                                       corrects, 
                                                                        size))
-
 
 
 def test_eval(data_iter, model, save_path, args):
@@ -115,7 +115,8 @@ def test_eval(data_iter, model, save_path, args):
                      [1].view(target.size()).data == target.data).sum()
 
     size = len(data_iter.dataset)
-    avg_loss = loss.data[0]/size
+    # avg_loss = loss.data[0]/size
+    avg_loss = float(avg_loss) / size
     accuracy = float(corrects)/size * 100.0
     model.train()
     print('\nEvaluation - loss: {:.6f}  acc: {:.4f}%({}/{}) \n'.format(avg_loss,

@@ -45,7 +45,7 @@ class  CNN_BiLSTM(nn.Module):
         self.dropout = nn.Dropout(args.dropout)
 
 
-    def init_hidden(self,num_layers, batch_size):
+    def init_hidden(self, num_layers, batch_size):
         # the first is the hidden h
         # the second is the cell  c
         return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)),

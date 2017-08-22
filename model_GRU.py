@@ -38,11 +38,11 @@ class  GRU(nn.Module):
     def init_hidden(self, num_layers, batch_size):
         return Variable(torch.zeros(num_layers, batch_size, self.hidden_dim))
 
-    def forward(self, input, hidden):
+    def forward(self, input):
         embed = self.embed(input)
         input = embed.view(len(input), embed.size(1), -1)
         # lstm
-        lstm_out, hidden = self.gru(input, hidden)
+        lstm_out, hidden = self.gru(input, self.hidden)
         lstm_out = torch.transpose(lstm_out, 0, 1)
         lstm_out = torch.transpose(lstm_out, 1, 2)
         # pooling
@@ -51,4 +51,4 @@ class  GRU(nn.Module):
         # linear
         y = self.hidden2label(lstm_out)
         logit = y
-        return logit, hidden
+        return logit
