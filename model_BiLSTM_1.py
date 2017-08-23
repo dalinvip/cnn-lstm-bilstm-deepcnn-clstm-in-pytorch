@@ -19,17 +19,18 @@ class BiLSTM_1(nn.Module):
         V = args.embed_num
         D = args.embed_dim
         C = args.class_num
+        self.dropout = nn.Dropout(args.dropout)
         if args.max_norm is not None:
             print("max_norm = {} ".format(args.max_norm))
             self.embed = nn.Embedding(V, D, max_norm=args.max_norm)
         else:
-            print("max_norm = {} ".format(args.max_norm))
+            print("max_norm = {} |||||".format(args.max_norm))
             self.embed = nn.Embedding(V, D)
         if args.word_Embedding:
             pretrained_weight = np.array(args.pretrained_weight)
             self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
-        self.bilstm = nn.LSTM(D, self.hidden_dim, num_layers=self.num_layers, dropout=args.dropout, bidirectional=True,
-                              bias=True)
+        self.bilstm = nn.LSTM(D, self.hidden_dim, num_layers=self.num_layers, bias=True, bidirectional=True,
+                              dropout=self.args.dropout)
         print(self.bilstm)
         if args.init_weight:
             print("Initing W .......")
@@ -63,7 +64,7 @@ class BiLSTM_1(nn.Module):
         self.hidden2label1 = nn.Linear(self.hidden_dim * 2, self.hidden_dim)
         self.hidden2label2 = nn.Linear(self.hidden_dim, C)
         self.hidden = self.init_hidden(self.num_layers, args.batch_size)
-        self.dropout = nn.Dropout(args.dropout)
+
 
     def init_hidden(self, num_layers, batch_size):
         # the first is the hidden h
@@ -93,14 +94,17 @@ class BiLSTM_1(nn.Module):
         return fan_in, fan_out
 
     def forward(self, x):
-        embed = self.embed(x)
-        x = self.dropout(embed)
+        x = self.embed(x)
+        x = self.dropout(x)
+        # x = x.view(len(x), x.size(1), -1)
         # x = embed.view(len(x), embed.size(1), -1)
         bilstm_out, self.hidden = self.bilstm(x, self.hidden)
 
         bilstm_out = torch.transpose(bilstm_out, 0, 1)
         bilstm_out = torch.transpose(bilstm_out, 1, 2)
-        bilstm_out = F.max_pool1d(bilstm_out, bilstm_out.size(2)).squeeze(2)
+        # bilstm_out = F.max_pool1d(bilstm_out, bilstm_out.size(2)).squeeze(2)
+        bilstm_out = F.max_pool1d(bilstm_out, bilstm_out.size(2))
+        bilstm_out = bilstm_out.squeeze(2)
         bilstm_out = self.hidden2label1(F.tanh(bilstm_out))
         logit = self.hidden2label2(F.tanh(bilstm_out))
         return logit

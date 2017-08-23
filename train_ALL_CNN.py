@@ -7,7 +7,6 @@ import torch.nn.utils as utils
 import torch.optim.lr_scheduler as lr_scheduler
 import shutil
 import random
-import train_model_test_eval as model_test_eval
 import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
@@ -78,20 +77,20 @@ def train(train_iter, dev_iter, test_iter, model, args):
                                                                              corrects,
                                                                              batch.batch_size))
             if steps % args.test_interval == 0:
-                model_test_eval.eval(dev_iter, model, args, scheduler)
+                eval(dev_iter, model, args, scheduler)
             if steps % args.save_interval == 0:
                 if not os.path.isdir(args.save_dir): os.makedirs(args.save_dir)
                 save_prefix = os.path.join(args.save_dir, 'snapshot')
                 save_path = '{}_steps{}.pt'.format(save_prefix, steps)
                 torch.save(model, save_path)
                 model_count += 1
-                model_test_eval.test_eval(test_iter, model, save_path, args, model_count)
+                test_eval(test_iter, model, save_path, args, model_count)
                 # test_eval(test_iter, model, save_path, args, model_count)
                 # print("model_count \n", model_count)
     return model_count
 
 
-def eval(data_iter, model, args):
+def eval(data_iter, model, args, scheduler):
     model.eval()
     corrects, avg_loss = 0, 0
     for batch in data_iter:
@@ -102,6 +101,7 @@ def eval(data_iter, model, args):
 
         logit = model(feature)
         loss = F.cross_entropy(logit, target, size_average=False)
+        # scheduler.step(loss.data[0])
 
         avg_loss += loss.data[0]
         corrects += (torch.max(logit, 1)
@@ -111,9 +111,9 @@ def eval(data_iter, model, args):
     avg_loss = loss.data[0]/size
     accuracy = float(corrects)/size * 100.0
     model.train()
-    print('\nEvaluation - loss: {:.6f}  acc: {:.4f}%({}/{}) \n'.format(avg_loss, 
-                                                                       accuracy, 
-                                                                       corrects, 
+    print('\nEvaluation - loss: {:.6f}  acc: {:.4f}%({}/{}) \n'.format(avg_loss,
+                                                                       accuracy,
+                                                                       corrects,
                                                                        size))
 
 
@@ -123,7 +123,8 @@ def test_eval(data_iter, model, save_path, args, model_count):
     corrects, avg_loss = 0, 0
     for batch in data_iter:
         feature, target = batch.text, batch.label
-        feature.data.t_(), target.data.sub_(1)  # batch first, index align
+        feature.data.t_()
+        target.data.sub_(1)  # batch first, index align
         if args.cuda:
             feature, target = feature.cuda(), target.cuda()
 
@@ -157,19 +158,3 @@ def test_eval(data_iter, model, save_path, args, model_count):
     # whether to delete the model after test acc so that to save space
     if os.path.isfile(save_path) and args.rm_model is True:
         os.remove(save_path)
-
-
-
-
-def predict(text, model, text_field, label_feild):
-    assert isinstance(text, str)
-    model.eval()
-    text = text_field.tokenize(text)
-    text = text_field.preprocess(text)
-    text = [[text_field.vocab.stoi[x] for x in text]]
-    x = text_field.tensor_type(text)
-    x = autograd.Variable(x, volatile=True)
-    print(x)
-    output = model(x)
-    _, predicted = torch.max(output, 1)
-    return label_feild.vocab.itos[predicted.data[0][0]+1]

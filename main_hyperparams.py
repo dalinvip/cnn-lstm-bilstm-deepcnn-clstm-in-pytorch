@@ -25,9 +25,12 @@ import model_CNN_MUI
 import model_BiLSTM_1
 import train_ALL_CNN
 import train_ALL_LSTM
+import train_ALL_LSTM_1
+import train_lstm
 import mydatasets
 import mydatasets_self_five
 import mydatasets_self_two
+import word_embedding_loader as loader
 import multiprocessing as mu
 import shutil
 import numpy as np
@@ -83,6 +86,7 @@ parser.add_argument('-momentum_value', type=float, default=hyperparams.optim_mom
 parser.add_argument('-init_clip_max_norm', type=float, default=hyperparams.clip_max_norm, help='value of init clip_max_norm')
 parser.add_argument('-seed_num', type=float, default=hyperparams.seed_num, help='value of init seed number')
 parser.add_argument('-dropout', type=float, default=hyperparams.dropout, help='the probability for dropout [default: 0.5]')
+parser.add_argument('-dropout_embed', type=float, default=hyperparams.dropout, help='the probability for dropout [default: 0.5]')
 parser.add_argument('-max-norm', type=float, default=hyperparams.max_norm, help='l2 constraint of parameters [default: 3.0]')
 parser.add_argument('-embed-dim', type=int, default=hyperparams.embed_dim, help='number of embedding dimension [default: 128]')
 parser.add_argument('-kernel-num', type=int, default=hyperparams.kernel_num, help='number of each kind of kernel')
@@ -144,8 +148,10 @@ def sst(text_field, label_field,  **kargs):
 def mrs_two(path, train_name, dev_name, test_name, char_data, text_field, label_field, **kargs):
     train_data, dev_data, test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name, test_name, char_data, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
-    text_field.build_vocab(train_data, min_freq=args.min_freq)
-    label_field.build_vocab(train_data)
+    text_field.build_vocab(train_data, dev_data, test_data)
+    label_field.build_vocab(train_data, dev_data, test_data)
+    # text_field.build_vocab(train_data, min_freq=args.min_freq)
+    # label_field.build_vocab(train_data)
     train_iter, dev_iter, test_iter = data.Iterator.splits(
                                         (train_data, dev_data, test_data),
                                         batch_sizes=(args.batch_size,
@@ -354,6 +360,8 @@ elif args.TWO_CLASS_TASK:
 
 # load word2vec
 if args.word_Embedding:
+    # count_words_reset = text_field.vocab.itos
+    # word_vecs = loader.vector_loader(count_words_reset)
     if args.embed_dim is not None:
         print("word_Embedding_Path {} ".format(args.word_Embedding_Path))
         path = args.word_Embedding_Path
@@ -501,10 +509,10 @@ else:
         model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.BiLSTM:
         print("BiLSTM training start......")
-        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
     elif args.BiLSTM_1:
         print("BiLSTM_1 training start......")
-        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CNN_LSTM:
         print("CNN_LSTM training start......")
         model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)

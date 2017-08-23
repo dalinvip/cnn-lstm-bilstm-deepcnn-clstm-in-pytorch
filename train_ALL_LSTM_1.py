@@ -4,7 +4,7 @@ import torch
 import torch.autograd as autograd
 import torch.nn.functional as F
 import torch.nn.utils as utils
-import torch.optim as optim
+import torch.optim.lr_scheduler as lr_scheduler
 import shutil
 import random
 import hyperparams
@@ -15,34 +15,56 @@ def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:
         model.cuda()
 
-    optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-8)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay)
+    # optimizer = torch.optim.SGD(model.parameters(), lr=args.lr,momentum=)
     # optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
+
+    if args.Adam is True:
+        print("Adam Training......")
+        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay)
+    elif args.SGD is True:
+        print("SGD Training.......")
+        optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay,
+                                    momentum=args.momentum_value)
+    elif args.Adadelta is True:
+        print("Adadelta Training.......")
+        optimizer = torch.optim.Adadelta(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay)
+
+    # lambda1 = lambda epoch: epoch // 30
+    # lambda2 = lambda epoch: 0.99 ** epoch
+    # print("lambda1 {} lambda2 {} ".format(lambda1, lambda2))
+    # scheduler = lr_scheduler.LambdaLR(optimizer, lr_lambda=[lambda2])
+
+    # scheduler = lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.9)
+
+    scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, 'min')
 
     steps = 0
     model_count = 0
     model.train()
     for epoch in range(1, args.epochs+1):
-        print("## 第{} 轮迭代，共计迭代 {} 次 ！##".format(epoch, args.epochs))
-        # the attr of shuffle in train_iter haved initialed True during data.Iterator.splits()
+        # print("\n## 第{} 轮迭代，共计迭代 {} 次 ！##\n".format(epoch, args.epochs))
+        # scheduler.step()
+        # print("now lr is {} \n".format(scheduler.get_lr()))
+        # print("now lr is {} \n".format(optimizer.param_groups[0].get("lr")))
         for batch in train_iter:
             feature, target = batch.text, batch.label.data.sub_(1)
-            target =autograd.Variable(target)
+            # feature.data.t_()
+            # target.data.sub_(1)  # batch first, index align
             if args.cuda:
                 feature, target = feature.cuda(), target.cuda()
 
+            target = autograd.Variable(target)  # question 1
             optimizer.zero_grad()
-            # model.zero_grad()
+            model.zero_grad()
             model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
             if feature.size(1) != args.batch_size:
+                # continue
                 model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
             logit = model(feature)
-            # target values >=0   <=C - 1 (C = args.class_num)
             loss = F.cross_entropy(logit, target)
             loss.backward()
-            # prevent grads boom
-            # utils.clip_grad_norm(model.parameters(), args.max_norm)
-            # the up line will make overfitting quickly, however, the line slow the overfitting,
-            # so,the speed of overfitting depend on the max_norm size, more big, moe quickly
             if args.init_clip_max_norm is not None:
                 # print("aaaa {} ".format(args.init_clip_max_norm))
                 utils.clip_grad_norm(model.parameters(), max_norm=args.init_clip_max_norm)
@@ -61,7 +83,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
                                                                              corrects,
                                                                              batch.batch_size))
             if steps % args.test_interval == 0:
-                eval(dev_iter, model, args)
+                eval(dev_iter, model, args, scheduler)
             if steps % args.save_interval == 0:
                 if not os.path.isdir(args.save_dir): os.makedirs(args.save_dir)
                 save_prefix = os.path.join(args.save_dir, 'snapshot')
@@ -69,20 +91,25 @@ def train(train_iter, dev_iter, test_iter, model, args):
                 torch.save(model, save_path)
                 model_count += 1
                 test_eval(test_iter, model, save_path, args, model_count)
+                # test_eval(test_iter, model, save_path, args, model_count)
+                # print("model_count \n", model_count)
     return model_count
 
 
-def eval(data_iter, model, args):
+def eval(data_iter, model, args, scheduler):
     model.eval()
     corrects, avg_loss = 0, 0
     for batch in data_iter:
-        feature, target = batch.text, batch.label
-        feature.data.t_(), target.data.sub_(1)  # batch first, index align
+        feature, target = batch.text, batch.label.data.sub_(1)
+        # feature.data.t_(),\
+        # target.data.sub_(1)  # batch first, index align
+        target = autograd.Variable(target)
         if args.cuda:
             feature, target = feature.cuda(), feature.cuda()
 
         model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
         if feature.size(1) != args.batch_size:
+            # continue
             model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
         logit = model(feature)
         loss = F.cross_entropy(logit, target, size_average=False)
@@ -107,13 +134,16 @@ def test_eval(data_iter, model, save_path, args, model_count):
     model.eval()
     corrects, avg_loss = 0, 0
     for batch in data_iter:
-        feature, target = batch.text, batch.label
-        target.data.sub_(1)  # batch first, index align
+        feature, target = batch.text, batch.label.data.sub_(1)
+        # feature.data.t_()
+        # target.data.sub_(1)  # batch first, index align
+        target = autograd.Variable(target)
         if args.cuda:
             feature, target = feature.cuda(), target.cuda()
 
         model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
         if feature.size(1) != args.batch_size:
+            # continue
             model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
         logit = model(feature)
         loss = F.cross_entropy(logit, target, size_average=False)
