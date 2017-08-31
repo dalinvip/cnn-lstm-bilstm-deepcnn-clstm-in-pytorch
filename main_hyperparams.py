@@ -448,60 +448,60 @@ if args.snapshot is None:
         print("loading CNN model.....")
         model = model_CNN.CNN_Text(args)
         # save model in this time
-        shutil.copy("./model_CNN.py", "./snapshot/" + mulu)
+        shutil.copy("./models/model_CNN.py", "./snapshot/" + mulu)
     elif args.DEEP_CNN:
         print("loading DEEP_CNN model......")
         model = model_DeepCNN.DEEP_CNN(args)
-        shutil.copy("./model_DeepCNN.py", "./snapshot/" + mulu)
+        shutil.copy("./models/model_DeepCNN.py", "./snapshot/" + mulu)
     elif args.LSTM:
         print("loading LSTM model......")
         model = model_LSTM.LSTM(args)
-        shutil.copy("./model_LSTM.py", "./snapshot/" + mulu)
+        shutil.copy("./models/model_LSTM.py", "./snapshot/" + mulu)
     elif args.GRU:
         print("loading GRU model......")
         model = model_GRU.GRU(args)
-        shutil.copy("./model_GRU.py", "./snapshot/" + mulu)
+        shutil.copy("./models/model_GRU.py", "./snapshot/" + mulu)
     elif args.BiLSTM:
         print("loading BiLSTM model......")
         model = model_BiLSTM.BiLSTM(args)
-        shutil.copy("./model_BiLSTM.py", "./snapshot/" + mulu)
+        shutil.copy("./models/model_BiLSTM.py", "./snapshot/" + mulu)
     elif args.BiLSTM_1:
         print("loading BiLSTM_1 model......")
         # model = model_BiLSTM_lexicon.BiLSTM_1(args)
         model = model_BiLSTM_1.BiLSTM_1(args)
-        shutil.copy("./model_BiLSTM_1.py", "./snapshot/" + mulu)
+        shutil.copy("./models/model_BiLSTM_1.py", "./snapshot/" + mulu)
     elif args.CNN_LSTM:
         print("loading CNN_LSTM model......")
         model = model_CNN_LSTM.CNN_LSTM(args)
-        shutil.copy("./model_CNN_LSTM.py", "./snapshot/" + mulu)
+        shutil.copy("./models/model_CNN_LSTM.py", "./snapshot/" + mulu)
     elif args.CLSTM:
         print("loading CLSTM model......")
         model = model_CLSTM.CLSTM(args)
-        shutil.copy("./model_CLSTM.py", "./snapshot/" + mulu)
+        shutil.copy("./models/model_CLSTM.py", "./snapshot/" + mulu)
     elif args.CBiLSTM:
         print("loading CBiLSTM model......")
         model = model_CBiLSTM.CBiLSTM(args)
-        shutil.copy("./model_CBiLSTM.py", "./snapshot/" + mulu)
+        shutil.copy("./models/model_CBiLSTM.py", "./snapshot/" + mulu)
     elif args.CGRU:
         print("loading CGRU model......")
         model = model_CGRU.CGRU(args)
-        shutil.copy("./model_CGRU.py", "./snapshot/" + mulu)
+        shutil.copy("./models/model_CGRU.py", "./snapshot/" + mulu)
     elif args.CNN_BiLSTM:
         print("loading CNN_BiLSTM model......")
         model = model_CNN_BiLSTM.CNN_BiLSTM(args)
-        shutil.copy("./model_CNN_BiLSTM.py", "./snapshot/" + mulu)
+        shutil.copy("./models/model_CNN_BiLSTM.py", "./snapshot/" + mulu)
     elif args.BiGRU:
         print("loading BiGRU model......")
         model = model_BiGRU.BiGRU(args)
-        shutil.copy("./model_BiGRU.py", "./snapshot/" + mulu)
+        shutil.copy("./models/model_BiGRU.py", "./snapshot/" + mulu)
     elif args.CNN_BiGRU:
         print("loading CNN_BiGRU model......")
         model = model_CNN_BiGRU.CNN_BiGRU(args)
-        shutil.copy("./model_CNN_BiGRU.py", "./snapshot/" + mulu)
+        shutil.copy("./models/model_CNN_BiGRU.py", "./snapshot/" + mulu)
     elif args.CNN_MUI:
         print("loading CNN_MUI model......")
         model = model_CNN_MUI.CNN_MUI(args)
-        shutil.copy("./model_CNN_MUI.py", "./snapshot/" + mulu)
+        shutil.copy("./models/model_CNN_MUI.py", "./snapshot/" + mulu)
     print(model)
 else:
     print('\nLoading model from [%s]...' % args.snapshot)
