@@ -84,6 +84,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
                                                                              batch.batch_size))
             if steps % args.test_interval == 0:
                 eval(dev_iter, model, args, scheduler)
+                eval(dev_iter, model, args, scheduler)
             if steps % args.save_interval == 0:
                 if not os.path.isdir(args.save_dir): os.makedirs(args.save_dir)
                 save_prefix = os.path.join(args.save_dir, 'snapshot')

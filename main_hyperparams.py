@@ -8,29 +8,28 @@ import torchtext.datasets as datasets
 from Cython.Shadow import profile
 from sklearn.utils import shuffle
 
-import sstdatasets as sstdatasets
-import model_CNN
-import model_DeepCNN
-import model_LSTM
-import model_BiLSTM
-import model_CNN_LSTM
-import model_CLSTM
-import model_GRU
-import model_CBiLSTM
-import model_CGRU
-import model_CNN_BiLSTM
-import model_BiGRU
-import model_CNN_BiGRU
-import model_CNN_MUI
-import model_BiLSTM_1
+from loaddata import sstdatasets as sstdatasets
+from models import model_CNN
+from models import model_DeepCNN
+from models import model_LSTM
+from models import model_BiLSTM
+from models import model_CNN_LSTM
+from models import model_CLSTM
+from models import model_GRU
+from models import model_CBiLSTM
+from models import model_CGRU
+from models import model_CNN_BiLSTM
+from models import model_BiGRU
+from models import model_CNN_BiGRU
+from models import model_CNN_MUI
+from models import model_BiLSTM_1
 import train_ALL_CNN
 import train_ALL_LSTM
 import train_ALL_LSTM_1
-import train_lstm
-import mydatasets
-import mydatasets_self_five
-import mydatasets_self_two
-import word_embedding_loader as loader
+from loaddata import mydatasets
+from loaddata import mydatasets_self_five
+from loaddata import mydatasets_self_two
+from loaddata import word_embedding_loader as loader
 import multiprocessing as mu
 import shutil
 import numpy as np
@@ -146,12 +145,13 @@ def sst(text_field, label_field,  **kargs):
 
 # load two-classification data
 def mrs_two(path, train_name, dev_name, test_name, char_data, text_field, label_field, **kargs):
-    train_data, dev_data, test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name, test_name, char_data, text_field, label_field)
+    train_data, dev_data, test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name, test_name,
+                                                                    char_data, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
-    text_field.build_vocab(train_data, dev_data, test_data)
-    label_field.build_vocab(train_data, dev_data, test_data)
-    # text_field.build_vocab(train_data, min_freq=args.min_freq)
-    # label_field.build_vocab(train_data)
+    # text_field.build_vocab(train_data, dev_data, test_data)
+    # label_field.build_vocab(train_data, dev_data, test_data)
+    text_field.build_vocab(train_data, min_freq=args.min_freq)
+    label_field.build_vocab(train_data)
     train_iter, dev_iter, test_iter = data.Iterator.splits(
                                         (train_data, dev_data, test_data),
                                         batch_sizes=(args.batch_size,
@@ -161,9 +161,12 @@ def mrs_two(path, train_name, dev_name, test_name, char_data, text_field, label_
     return train_iter, dev_iter, test_iter
 
 def mrs_two_mui(path, train_name, dev_name, test_name, char_data, text_field, label_field, static_text_field, static_label_field, **kargs):
-    train_data, dev_data, test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name, test_name, char_data, text_field, label_field)
-    static_train_data, static_dev_data, static_test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name, test_name, char_data,
-                                                                                         static_text_field, static_label_field)
+    train_data, dev_data, test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name, test_name,
+                                                                    char_data, text_field, label_field)
+    static_train_data, static_dev_data, static_test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name,
+                                                                                         test_name,
+                                                                                         char_data, static_text_field,
+                                                                                         static_label_field)
     print("len(train_data) {} ".format(len(train_data)))
     print("len(train_data) {} ".format(len(static_train_data)))
     text_field.build_vocab(train_data, min_freq=args.min_freq)
@@ -182,7 +185,8 @@ def mrs_two_mui(path, train_name, dev_name, test_name, char_data, text_field, la
 
 # load five-classification data
 def mrs_five(path, train_name, dev_name, test_name, char_data, text_field, label_field, **kargs):
-    train_data, dev_data, test_data = mydatasets_self_five.MR.splits(path, train_name, dev_name, test_name, char_data, text_field, label_field)
+    train_data, dev_data, test_data = mydatasets_self_five.MR.splits(path, train_name, dev_name, test_name,
+                                                                     char_data, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
     text_field.build_vocab(train_data, min_freq=args.min_freq)
     label_field.build_vocab(train_data)
@@ -195,9 +199,13 @@ def mrs_five(path, train_name, dev_name, test_name, char_data, text_field, label
     return train_iter, dev_iter, test_iter
 
 def mrs_five_mui(path, train_name, dev_name, test_name, char_data, text_field, label_field, static_text_field, static_label_field, **kargs):
-    train_data, dev_data, test_data = mydatasets_self_five.MR.splits(path, train_name, dev_name, test_name, char_data, text_field, label_field)
-    static_train_data, static_dev_data, static_test_data = mydatasets_self_five.MR.splits(path, train_name, dev_name, test_name, char_data,
-                                                                                         static_text_field, static_label_field)
+    train_data, dev_data, test_data = mydatasets_self_five.MR.splits(path, train_name, dev_name, test_name,
+                                                                     char_data, text_field, label_field)
+    static_train_data, static_dev_data, static_test_data = mydatasets_self_five.MR.splits(path, train_name, dev_name,
+                                                                                          test_name,
+                                                                                          char_data,
+                                                                                         static_text_field,
+                                                                                          static_label_field)
     print("len(train_data) {} ".format(len(train_data)))
     print("len(train_data) {} ".format(len(static_train_data)))
     text_field.build_vocab(train_data, min_freq=args.min_freq)
@@ -249,14 +257,21 @@ def load_my_vecs_freq1(path, vocab, freqs, pro):
 
 
 # load word embedding
-def load_my_vecs(path, vocab):
+def load_my_vecs(path, vocab, freqs):
     word_vecs = {}
     with open(path, encoding="utf-8") as f:
+        count  = 0
         lines = f.readlines()[1:]
         for line in lines:
             values = line.split(" ")
             word = values[0]
-            if word in vocab:  #whehter to judge if in vocab
+            # word = word.lower()
+            # if word in vocab and freqs[word] != 1:  # whether to judge if in vocab
+            count += 1
+            if word in vocab:  # whether to judge if in vocab
+            # if word in vocab:  # whether to judge if in vocab
+            #     if count % 5 == 0 and freqs[word] == 1:
+            #         continue
                 vector = []
                 for count, val in enumerate(values):
                     if count == 0:
@@ -329,6 +344,7 @@ def add_unknown_words_by_uniform(word_vecs, vocab, k=100):
 # load data
 print("\nLoading data...")
 text_field = data.Field(lower=True)
+# text_field = data.Field(lower=False)
 label_field = data.Field(sequential=False)
 static_text_field = data.Field(lower=True)
 static_label_field = data.Field(sequential=False)
@@ -371,9 +387,9 @@ if args.word_Embedding:
     if args.freq_1_unk == True:
         word_vecs = load_my_vecs_freq1(path, text_field.vocab.itos, text_field.vocab.freqs, pro=0.5)   # has some error in this function
     else:
-        word_vecs = load_my_vecs(path, text_field.vocab.itos)
+        word_vecs = load_my_vecs(path, text_field.vocab.itos, text_field.vocab.freqs)
         if args.CNN_MUI:
-            static_word_vecs = load_my_vecs(path, static_text_field.vocab.itos)
+            static_word_vecs = load_my_vecs(path, static_text_field.vocab.itos, text_field.vocab.freqs)
     print("word2vec loaded!")
     print("num words already in word2vec: " + str(len(word_vecs)))
     print("loading unknown word2vec and convert to list...")
@@ -422,6 +438,7 @@ for attr, value in sorted(args.__dict__.items()):
     file.write("\t{}={}\n".format(attr.upper(), value))
 file.close()
 shutil.copy("./Parameters.txt", "./snapshot/" + mulu + "/Parameters.txt")
+shutil.copy("./hyperparams.py", "./snapshot/" + mulu)
 
 
 
@@ -430,46 +447,61 @@ if args.snapshot is None:
     if args.CNN:
         print("loading CNN model.....")
         model = model_CNN.CNN_Text(args)
+        # save model in this time
+        shutil.copy("./model_CNN.py", "./snapshot/" + mulu)
     elif args.DEEP_CNN:
         print("loading DEEP_CNN model......")
         model = model_DeepCNN.DEEP_CNN(args)
+        shutil.copy("./model_DeepCNN.py", "./snapshot/" + mulu)
     elif args.LSTM:
         print("loading LSTM model......")
         model = model_LSTM.LSTM(args)
+        shutil.copy("./model_LSTM.py", "./snapshot/" + mulu)
     elif args.GRU:
         print("loading GRU model......")
         model = model_GRU.GRU(args)
+        shutil.copy("./model_GRU.py", "./snapshot/" + mulu)
     elif args.BiLSTM:
         print("loading BiLSTM model......")
         model = model_BiLSTM.BiLSTM(args)
+        shutil.copy("./model_BiLSTM.py", "./snapshot/" + mulu)
     elif args.BiLSTM_1:
         print("loading BiLSTM_1 model......")
         # model = model_BiLSTM_lexicon.BiLSTM_1(args)
         model = model_BiLSTM_1.BiLSTM_1(args)
+        shutil.copy("./model_BiLSTM_1.py", "./snapshot/" + mulu)
     elif args.CNN_LSTM:
         print("loading CNN_LSTM model......")
         model = model_CNN_LSTM.CNN_LSTM(args)
+        shutil.copy("./model_CNN_LSTM.py", "./snapshot/" + mulu)
     elif args.CLSTM:
         print("loading CLSTM model......")
         model = model_CLSTM.CLSTM(args)
+        shutil.copy("./model_CLSTM.py", "./snapshot/" + mulu)
     elif args.CBiLSTM:
         print("loading CBiLSTM model......")
         model = model_CBiLSTM.CBiLSTM(args)
+        shutil.copy("./model_CBiLSTM.py", "./snapshot/" + mulu)
     elif args.CGRU:
         print("loading CGRU model......")
         model = model_CGRU.CGRU(args)
+        shutil.copy("./model_CGRU.py", "./snapshot/" + mulu)
     elif args.CNN_BiLSTM:
         print("loading CNN_BiLSTM model......")
         model = model_CNN_BiLSTM.CNN_BiLSTM(args)
+        shutil.copy("./model_CNN_BiLSTM.py", "./snapshot/" + mulu)
     elif args.BiGRU:
         print("loading BiGRU model......")
         model = model_BiGRU.BiGRU(args)
+        shutil.copy("./model_BiGRU.py", "./snapshot/" + mulu)
     elif args.CNN_BiGRU:
         print("loading CNN_BiGRU model......")
         model = model_CNN_BiGRU.CNN_BiGRU(args)
+        shutil.copy("./model_CNN_BiGRU.py", "./snapshot/" + mulu)
     elif args.CNN_MUI:
         print("loading CNN_MUI model......")
         model = model_CNN_MUI.CNN_MUI(args)
+        shutil.copy("./model_CNN_MUI.py", "./snapshot/" + mulu)
     print(model)
 else:
     print('\nLoading model from [%s]...' % args.snapshot)

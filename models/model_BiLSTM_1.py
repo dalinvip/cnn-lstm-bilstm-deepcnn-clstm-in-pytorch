@@ -64,6 +64,7 @@ class BiLSTM_1(nn.Module):
         self.hidden2label1 = nn.Linear(self.hidden_dim * 2, self.hidden_dim)
         self.hidden2label2 = nn.Linear(self.hidden_dim, C)
         self.hidden = self.init_hidden(self.num_layers, args.batch_size)
+        print("self.hidden", self.hidden)
 
 
     def init_hidden(self, num_layers, batch_size):
@@ -73,6 +74,7 @@ class BiLSTM_1(nn.Module):
         #          Variable(torch.zeros(2, batch_size, self.hidden_dim // 2)))
         return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)),
                 Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)))
+        # return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)))
 
     def calculate_fan_in_and_fan_out(tensor):
         dimensions = tensor.ndimension()

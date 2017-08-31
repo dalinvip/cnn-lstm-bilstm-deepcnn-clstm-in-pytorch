@@ -72,6 +72,7 @@ class MR(TarDataset):
             string = re.sub(r"\)", " \) ", string)
             string = re.sub(r"\?", " \? ", string)
             string = re.sub(r"\s{2,}", " ", string)
+
             return string.strip()
 
         text_field.preprocessing = data.Pipeline(clean_str)
@@ -100,7 +101,7 @@ class MR(TarDataset):
                     elif line[-2] == '4':
                         b += 1
                         examples += [data.Example.fromlist([sentence, 'positive'], fields=fields)]
-                print("a {} b {} ".format(a,b))
+                print("a {} b {} ".format(a, b))
                     # else:
                     #     examples += [data.Example.fromlist([line[:line.find('|')], 'positive'], fields=fields)]
 

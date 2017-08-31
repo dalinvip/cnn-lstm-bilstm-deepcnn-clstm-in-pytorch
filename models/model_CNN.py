@@ -23,10 +23,11 @@ class  CNN_Text(nn.Module):
 
         if args.max_norm is not None:
             print("max_norm = {} ".format(args.max_norm))
-            self.embed = nn.Embedding(V, D, max_norm=args.max_norm)
+            self.embed = nn.Embedding(V, D, max_norm=args.max_norm, scale_grad_by_freq=True)
+            # self.embed.weight.data.uniform(-0.1, 0.1)
         else:
             print("max_norm = {} ".format(args.max_norm))
-            self.embed = nn.Embedding(V, D)
+            self.embed = nn.Embedding(V, D, scale_grad_by_freq=True)
         if args.word_Embedding:
             pretrained_weight = np.array(args.pretrained_weight)
             self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
@@ -37,7 +38,7 @@ class  CNN_Text(nn.Module):
         if args.wide_conv is True:
             print("using wide convolution")
             self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), stride=(1, 1),
-                                     padding=(K//2, 0), bias=False) for K in Ks]
+                                     padding=(K//2, 0), dilation=1, bias=True) for K in Ks]
         else:
             print("using narrow convolution")
             self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), bias=True) for K in Ks]
@@ -102,6 +103,8 @@ class  CNN_Text(nn.Module):
         self.conv15 = nn.Conv2d(Ci, Co, (5, D))
         '''
         self.dropout = nn.Dropout(args.dropout)
+        # self.dropout = nn.Dropout2d(args.dropout)
+        # self.dropout = nn.AlphaDropout(args.dropout)
         in_fea = len(Ks) * Co
         self.fc1 = nn.Linear(in_features=in_fea, out_features=in_fea // 2, bias=True)
         self.fc2 = nn.Linear(in_features=in_fea // 2, out_features=C, bias=True)
@@ -137,16 +140,14 @@ class  CNN_Text(nn.Module):
     def forward(self, x):
         x = self.embed(x)  # (N,W,D)
         x = self.dropout(x)
-        if self.args.static:
-            x = Variable(x.data)
         x = x.unsqueeze(1)  # (N,Ci,W,D)
         if self.args.batch_normalizations is True:
-            x = [F.relu(self.convs1_bn(conv(x))).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
+            x = [self.convs1_bn(F.relu(conv(x))).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
             x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x] #[(N,Co), ...]*len(Ks)
         else:
             x = [F.relu(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
+            # x = [F.tanh(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
             # x = [conv(x).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
-            # x = [F.avg_pool1d(i, i.size(2)) for i in x] #[(N,Co), ...]*len(Ks)
             x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x] #[(N,Co), ...]*len(Ks)
         x = torch.cat(x, 1)
         '''
@@ -157,12 +158,12 @@ class  CNN_Text(nn.Module):
         '''
         x = self.dropout(x)  # (N,len(Ks)*Co)
         if self.args.batch_normalizations is True:
-            # x = self.fc1(F.relu(x))
-            # logit = self.fc2(F.relu(x))
-
             x = self.fc1_bn(self.fc1(x))
-            # x = self.fc1(x)
             logit = self.fc2_bn(self.fc2(F.relu(x)))
+
+            # x = self.fc1_bn(self.fc1(x))
+            # # x = self.fc1(x)
+            # logit = self.fc2_bn(self.fc2(F.relu(x)))
             # logit = self.fc2_bn(self.fc2(F.relu(x)))
 
             # x = self.fc1(x)
@@ -185,6 +186,7 @@ class  CNN_Text(nn.Module):
             # x = self.dropout(x)
             x = self.fc1(x)
             logit = self.fc2(F.relu(x))
+            # logit = self.fc2(F.tanh(x))
 
             # x = self.fc1(x)
             # x = self.dropout(x)
