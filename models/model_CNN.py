@@ -139,13 +139,14 @@ class  CNN_Text(nn.Module):
 
     def forward(self, x):
         x = self.embed(x)  # (N,W,D)
-        x = self.dropout(x)
+        # x = self.dropout(x)
         x = x.unsqueeze(1)  # (N,Ci,W,D)
         if self.args.batch_normalizations is True:
-            x = [self.convs1_bn(F.relu(conv(x))).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
+            x = [self.convs1_bn(F.tanh(conv(x))).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
             x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x] #[(N,Co), ...]*len(Ks)
         else:
-            x = [F.relu(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
+            x = [self.dropout(F.relu(conv(x)).squeeze(3)) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
+            # x = [F.relu(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
             # x = [F.tanh(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
             # x = [conv(x).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
             x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x] #[(N,Co), ...]*len(Ks)
@@ -157,9 +158,10 @@ class  CNN_Text(nn.Module):
         x = torch.cat((x1, x2, x3), 1) # (N,len(Ks)*Co)
         '''
         x = self.dropout(x)  # (N,len(Ks)*Co)
+
         if self.args.batch_normalizations is True:
             x = self.fc1_bn(self.fc1(x))
-            logit = self.fc2_bn(self.fc2(F.relu(x)))
+            logit = self.fc2_bn(self.fc2(F.tanh(x)))
 
             # x = self.fc1_bn(self.fc1(x))
             # # x = self.fc1(x)
@@ -186,6 +188,7 @@ class  CNN_Text(nn.Module):
             # x = self.dropout(x)
             x = self.fc1(x)
             logit = self.fc2(F.relu(x))
+            # logit = F.softmax(logit)
             # logit = self.fc2(F.tanh(x))
 
             # x = self.fc1(x)

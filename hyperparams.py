@@ -7,8 +7,8 @@ learning_rate = 0.001
 epochs = 256
 batch_size = 16
 log_interval = 1
-test_interval = 10000
-save_interval = 100
+test_interval = 100000
+save_interval = 90
 save_dir = "snapshot"
 datafile_path = "./data/"
 name_trainfile = "raw.clean.train"
@@ -29,9 +29,10 @@ kernel_num = 200
 # kernel_sizes = "7,7,7"
 kernel_sizes = "1,2,3,4"
 static = False
-CNN = True
-CNN_MUI = False
+CNN = False
+CNN_MUI = True
 DEEP_CNN = False
+DEEP_CNN_MUI = False
 LSTM = False
 GRU = False
 BiLSTM = False
@@ -57,7 +58,7 @@ batch_norm_affine = False  # default is True
 # min freq to include during built the vocab, default is 1
 min_freq = 1
 # word_Embedding
-word_Embedding = True
+word_Embedding = False
 embed_dim = 300
 word_Embedding_Path = "./word2vec/glove.sentiment.conj.pretrained.txt"
 # word_Embedding_Path = "./word2vec/glove.semeval.conj.pretrained.txt"
@@ -78,7 +79,7 @@ init_weight_value = 2.0
 weight_decay = 1e-8   # default value is zero in Adam SGD
 # weight_decay = 0   # default value is zero in Adam SGD
 # random seed
-seed_num = 222
+seed_num = 233
 # whether to delete the model after test acc so that to save space
 rm_model = True
 

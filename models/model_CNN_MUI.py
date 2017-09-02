@@ -8,10 +8,23 @@ import torch.nn.init as init
 import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
+
+"""
+Description:
+the model is a mulit-channel CNNS model, 
+the model use two external word embedding, and then,
+one of word embedding built from train/dev/test dataset,
+and it be used to no-fine-tune,other one built from only
+train dataset,and be used to fine-tune.
+
+my idea,even if the word embedding built from train/dev/test dataset, 
+whether can use fine-tune, in others words, whether can fine-tune with
+two external word embedding?
+"""
 class  CNN_MUI(nn.Module):
     
     def __init__(self, args):
-        super(CNN_MUI,self).__init__()
+        super(CNN_MUI, self).__init__()
         self.args = args
         
         V = args.embed_num
@@ -26,14 +39,16 @@ class  CNN_MUI(nn.Module):
             print("max_norm = {} ".format(args.max_norm))
             self.embed_no_static = nn.Embedding(V, D, max_norm=args.max_norm, scale_grad_by_freq=True)
             self.embed_static = nn.Embedding(V_mui, D, max_norm=args.max_norm, scale_grad_by_freq=True)
+            # self.embed_static = nn.Embedding(V, D, max_norm=args.max_norm, scale_grad_by_freq=True)
         else:
             print("max_norm = {} ".format(args.max_norm))
             self.embed_no_static = nn.Embedding(V, D, scale_grad_by_freq=True)
             self.embed_static = nn.Embedding(V_mui, D, scale_grad_by_freq=True)
+            # self.embed_static = nn.Embedding(V, D, scale_grad_by_freq=True)
         if args.word_Embedding:
             pretrained_weight = np.array(args.pretrained_weight)
-            pretrained_weight_static = np.array(args.pretrained_weight_static)
             self.embed_no_static.weight.data.copy_(torch.from_numpy(pretrained_weight))
+            pretrained_weight_static = np.array(args.pretrained_weight_static)
             self.embed_static.weight.data.copy_(torch.from_numpy(pretrained_weight_static))
             # whether to fixed the word embedding
             self.embed_no_static.weight.requires_grad = True
@@ -81,11 +96,12 @@ class  CNN_MUI(nn.Module):
 
 
     def forward(self, x):
+        # print("aaaaa")
         x_no_static = self.embed_no_static(x)
         # x_no_static = self.dropout(x_no_static)
         x_static = self.embed_static(x)
         # fix the embedding
-        x_static = Variable(x_static.data)
+        # x_static = Variable(x_static.data)
         # x_static = self.dropout(x_static)
         x = torch.stack([x_static, x_no_static], 1)
         # x = x.unsqueeze(1) # (N,Ci,W,D)
