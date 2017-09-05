@@ -71,6 +71,9 @@ class  HighWay_CNN(nn.Module):
         self.gate_layer = nn.Linear(in_features=in_fea, out_features=in_fea, bias=True)
         # self.gate_layer.bias.data.fill_(-1)
 
+        # last liner
+        self.logit_layer = nn.Linear(in_features=in_fea, out_features=C, bias=True)
+
         # whether to use batch normalizations
         if args.batch_normalizations is True:
             print("using batch_normalizations in the model......")
@@ -135,6 +138,8 @@ class  HighWay_CNN(nn.Module):
         # if write like follow ,can run,but not equal the HighWay NetWorks formula
         # gate_input = torch.mul((1 - gate_layer), fc)
         gate_input = torch.mul((1 - gate_layer), x)
-        logit = torch.add(gate_fc_layer, gate_input)
+        highway_output = torch.add(gate_fc_layer, gate_input)
+
+        logit = self.logit_layer(highway_output)
 
         return logit

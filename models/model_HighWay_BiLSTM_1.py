@@ -69,6 +69,10 @@ class HighWay_BiLSTM_1(nn.Module):
         # self.gate_layer = nn.Linear(in_features=self.hidden_dim * 2, out_features=C, bias=True)
         self.gate_layer = nn.Linear(in_features=self.hidden_dim * 2, out_features=self.hidden_dim * 2, bias=True)
 
+        # last liner
+        self.logit_layer = nn.Linear(in_features=self.hidden_dim * 2, out_features=C, bias=True)
+
+
         self.hidden = self.init_hidden(self.num_layers, args.batch_size)
         print("self.hidden", self.hidden)
 
@@ -103,5 +107,8 @@ class HighWay_BiLSTM_1(nn.Module):
         # if write like follow ,can run,but not equal the HighWay NetWorks formula
         # gate_input = torch.mul((1 - gate_layer), hidden2lable)
         gate_input = torch.mul((1 - gate_layer), bilstm_out)
-        logit = torch.add(gate_hidden_layer, gate_input)
+        highway_output = torch.add(gate_hidden_layer, gate_input)
+
+        logit = self.logit_layer(highway_output)
+
         return logit
