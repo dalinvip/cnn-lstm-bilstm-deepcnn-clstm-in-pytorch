@@ -62,7 +62,6 @@ def train(train_iter, dev_iter, test_iter, model, args):
             loss = F.cross_entropy(logit, target)
             loss.backward()
             if args.init_clip_max_norm is not None:
-                # print("aaaa {} ".format(args.init_clip_max_norm))
                 utils.clip_grad_norm(model.parameters(), max_norm=args.init_clip_max_norm)
             optimizer.step()
 

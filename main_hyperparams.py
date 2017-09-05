@@ -10,6 +10,7 @@ from sklearn.utils import shuffle
 
 from loaddata import sstdatasets as sstdatasets
 from models import model_CNN
+from models import model_HighWay_CNN
 from models import model_DeepCNN
 from models import model_LSTM
 from models import model_BiLSTM
@@ -24,6 +25,7 @@ from models import model_CNN_BiGRU
 from models import model_CNN_MUI
 from models import model_DeepCNN_MUI
 from models import model_BiLSTM_1
+from models import model_HighWay_BiLSTM_1
 import train_ALL_CNN
 import train_ALL_LSTM
 import train_ALL_LSTM_1
@@ -93,6 +95,7 @@ parser.add_argument('-kernel-num', type=int, default=hyperparams.kernel_num, hel
 parser.add_argument('-kernel-sizes', type=str, default=hyperparams.kernel_sizes, help='comma-separated kernel size to use for convolution')
 parser.add_argument('-static', action='store_true', default=hyperparams.static, help='fix the embedding')
 parser.add_argument('-CNN', action='store_true', default=hyperparams.CNN, help='whether to use CNN model')
+parser.add_argument('-HighWay_CNN', action='store_true', default=hyperparams.HighWay_CNN, help='whether to use HighWay_CNN model')
 parser.add_argument('-CNN_MUI', action='store_true', default=hyperparams.CNN_MUI, help='whether to use CNN mui_channel model')
 parser.add_argument('-DEEP_CNN', action='store_true', default=hyperparams.DEEP_CNN, help='whether to use Depp CNN model')
 parser.add_argument('-DEEP_CNN_MUI', action='store_true', default=hyperparams.DEEP_CNN_MUI, help='whether to use Depp CNN_MUI model')
@@ -100,6 +103,7 @@ parser.add_argument('-LSTM', action='store_true', default=hyperparams.LSTM, help
 parser.add_argument('-GRU', action='store_true', default=hyperparams.GRU, help='whether to use GRU model')
 parser.add_argument('-BiLSTM', action='store_true', default=hyperparams.BiLSTM, help='whether to use Bi-LSTM model')
 parser.add_argument('-BiLSTM_1', action='store_true', default=hyperparams.BiLSTM_1, help='whether to use Bi-LSTM_1 model')
+parser.add_argument('-HighWay_BiLSTM_1', action='store_true', default=hyperparams.HighWay_BiLSTM_1, help='whether to use HighWay_BiLSTM_1 model')
 parser.add_argument('-CNN_LSTM', action='store_true', default=hyperparams.CNN_LSTM, help='whether to use CNN_LSTM model')
 parser.add_argument('-CNN_BiLSTM', action='store_true', default=hyperparams.CNN_BiLSTM, help='whether to use CNN_BiLSTM model')
 parser.add_argument('-CLSTM', action='store_true', default=hyperparams.CLSTM, help='whether to use CLSTM model')
@@ -508,6 +512,14 @@ if args.snapshot is None:
         print("loading CNN_MUI model......")
         model = model_CNN_MUI.CNN_MUI(args)
         shutil.copy("./models/model_CNN_MUI.py", "./snapshot/" + mulu)
+    elif args.HighWay_CNN is True:
+        print("loading HighWay_CNN model......")
+        model = model_HighWay_CNN.HighWay_CNN(args)
+        shutil.copy("./models/model_HighWay_CNN.py", "./snapshot/" + mulu)
+    elif args.HighWay_BiLSTM_1 is True:
+        print("loading HighWay_BiLSTM_1 model......")
+        model = model_HighWay_BiLSTM_1.HighWay_BiLSTM_1(args)
+        shutil.copy("./models/model_HighWay_BiLSTM_1.py", "./snapshot/" + mulu)
     print(model)
 else:
     print('\nLoading model from [%s]...' % args.snapshot)
@@ -553,31 +565,37 @@ else:
         model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CNN_LSTM:
         print("CNN_LSTM training start......")
-        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CLSTM:
         print("CLSTM training start......")
-        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CBiLSTM:
         print("CBiLSTM training start......")
-        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CGRU:
         print("CGRU training start......")
-        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CNN_BiLSTM:
         print("CNN_BiLSTM training start......")
-        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
     elif args.BiGRU:
         print("BiGRU training start......")
         model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CNN_BiGRU:
         print("CNN_BiGRU training start......")
-        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CNN_MUI:
         print("CNN_MUI training start......")
         model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, args)
     elif args.DEEP_CNN_MUI:
         print("DEEP_CNN_MUI training start......")
         model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, args)
+    elif args.HighWay_CNN is True:
+        print("HighWay_CNN training start......")
+        model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, args)
+    elif args.HighWay_BiLSTM_1 is True:
+        print("HighWay_BiLSTM_1 training start......")
+        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
     print("Model_count", model_count)
     resultlist = []
     if os.path.exists("./Test_Result.txt"):
