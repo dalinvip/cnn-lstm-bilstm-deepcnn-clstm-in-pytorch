@@ -141,6 +141,19 @@ def test_eval(data_iter, model, save_path, args, model_count):
     file.write("model_count {} \n".format(model_count))
     file.write("\n")
     file.close()
+    # calculate the best score in current file
+    resultlist = []
+    if os.path.exists("./Test_Result.txt"):
+        file = open("./Test_Result.txt")
+        for line in file.readlines():
+            if line[:10] == "Evaluation":
+                resultlist.append(float(line[34:41]))
+        result = sorted(resultlist)
+        file.close()
+        file = open("./Test_Result.txt", "a")
+        file.write("\nThe Current Best Result is : " + str(result[len(result) - 1]))
+        file.write("\n")
+        file.close()
     shutil.copy("./Test_Result.txt", "./snapshot/" + args.mulu + "/Test_Result.txt")
     # whether to delete the model after test acc so that to save space
     if os.path.isfile(save_path) and args.rm_model is True:

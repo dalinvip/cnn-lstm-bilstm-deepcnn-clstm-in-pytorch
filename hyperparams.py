@@ -30,7 +30,7 @@ kernel_num = 200
 kernel_sizes = "1,2,3,4"
 static = False
 CNN = False
-HighWay_CNN = True
+HighWay_CNN = False
 CNN_MUI = False
 DEEP_CNN = False
 DEEP_CNN_MUI = False
@@ -38,7 +38,7 @@ LSTM = False
 GRU = False
 BiLSTM = False
 BiLSTM_1 = False
-HighWay_BiLSTM_1 = False
+HighWay_BiLSTM_1 = True
 CNN_LSTM = False
 CNN_BiLSTM = False
 CLSTM = False
@@ -60,7 +60,7 @@ batch_norm_affine = False  # default is True
 # min freq to include during built the vocab, default is 1
 min_freq = 1
 # word_Embedding
-word_Embedding = False
+word_Embedding = True
 embed_dim = 300
 word_Embedding_Path = "./word2vec/glove.sentiment.conj.pretrained.txt"
 # word_Embedding_Path = "./word2vec/glove.semeval.conj.pretrained.txt"

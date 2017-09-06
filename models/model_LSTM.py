@@ -48,6 +48,8 @@ class  LSTM(nn.Module):
         x = embed.view(len(x), embed.size(1), -1)
         # lstm
         lstm_out, self.hidden = self.lstm(x, self.hidden)
+        print(lstm_out)
+        print(self.hidden)
         lstm_out = torch.transpose(lstm_out, 0, 1)
         lstm_out = torch.transpose(lstm_out, 1, 2)
         # pooling

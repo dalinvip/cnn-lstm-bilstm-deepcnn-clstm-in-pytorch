@@ -101,6 +101,7 @@ class BiLSTM_1(nn.Module):
         # x = x.view(len(x), x.size(1), -1)
         # x = embed.view(len(x), embed.size(1), -1)
         bilstm_out, self.hidden = self.bilstm(x, self.hidden)
+        # print(self.hidden)
 
         bilstm_out = torch.transpose(bilstm_out, 0, 1)
         bilstm_out = torch.transpose(bilstm_out, 1, 2)
