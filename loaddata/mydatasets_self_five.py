@@ -36,15 +36,11 @@ class TarDataset(data.Dataset):
 
 class MR(TarDataset):
 
-    # url = 'https://www.cs.cornell.edu/people/pabo/movie-review-data/rt-polaritydata.tar.gz'
-    # filename = 'rt-polaritydata.tar'
-    # dirname = 'rt-polaritydata'
-
     @staticmethod
     def sort_key(ex):
         return len(ex.text)
 
-    def __init__(self, text_field, label_field, path=None, file=None,examples=None,char_data=None, **kwargs):
+    def __init__(self, text_field, label_field, path=None, file=None, examples=None, char_data=None, **kwargs):
         """Create an MR dataset instance given a path and fields.
 
         Arguments:
@@ -73,6 +69,7 @@ class MR(TarDataset):
             string = re.sub(r"\)", " \) ", string)
             string = re.sub(r"\?", " \? ", string)
             string = re.sub(r"\s{2,}", " ", string)
+
             return string.strip()
 
         text_field.preprocessing = data.Pipeline(clean_str)
@@ -89,6 +86,8 @@ class MR(TarDataset):
                         sentence = sentence.split(" ")
                         sentence = MR.char_data(self, sentence)
                     # print(sentence)
+                    # clear string in every sentence
+                    sentence = clean_str(sentence)
                     if line[-2] == '0':
                         a += 1
                         examples += [data.Example.fromlist([sentence, "very negative"], fields=fields)]

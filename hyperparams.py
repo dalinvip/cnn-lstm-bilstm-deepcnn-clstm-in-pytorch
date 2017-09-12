@@ -4,10 +4,10 @@ torch.manual_seed(121)
 random.seed(121)
 
 learning_rate = 0.001
-epochs = 256
+epochs = 500
 batch_size = 16
 log_interval = 1
-test_interval = 100000
+test_interval = 100
 save_interval = 100
 save_dir = "snapshot"
 datafile_path = "./data/"
@@ -20,7 +20,8 @@ shuffle = True
 epochs_shuffle = True
 FIVE_CLASS_TASK = False
 TWO_CLASS_TASK = True
-dropout = 0.6
+dropout = 0.4
+dropout_embed = 0.5
 max_norm = 5
 clip_max_norm = 3
 # clip_max_norm
@@ -29,7 +30,7 @@ kernel_num = 200
 # kernel_sizes = "7,7,7"
 kernel_sizes = "1,2,3,4"
 static = False
-CNN = False
+CNN = True
 HighWay_CNN = False
 CNN_MUI = False
 DEEP_CNN = False
@@ -38,7 +39,7 @@ LSTM = False
 GRU = False
 BiLSTM = False
 BiLSTM_1 = False
-HighWay_BiLSTM_1 = True
+HighWay_BiLSTM_1 = False
 CNN_LSTM = False
 CNN_BiLSTM = False
 CLSTM = False
@@ -64,7 +65,7 @@ word_Embedding = True
 embed_dim = 300
 word_Embedding_Path = "./word2vec/glove.sentiment.conj.pretrained.txt"
 # word_Embedding_Path = "./word2vec/glove.semeval.conj.pretrained.txt"
-# word_Embedding_Path = "./word2vec/w2v103100-en.100d.txt"
+# word_Embedding_Path = "./word.txt"
 lstm_hidden_dim = 300
 lstm_num_layers = 1
 device = -1
@@ -72,11 +73,11 @@ no_cuda = False
 snapshot = None
 predict = None
 test = False
-num_threads = 4
+num_threads = 1
 freq_1_unk = False
 # whether to init w
 init_weight = True
-init_weight_value = 2.0
+init_weight_value = 6.0
 # L2 weight_decay
 weight_decay = 1e-8   # default value is zero in Adam SGD
 # weight_decay = 0   # default value is zero in Adam SGD

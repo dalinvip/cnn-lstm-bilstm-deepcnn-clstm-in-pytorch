@@ -38,7 +38,7 @@ class  CNN_Text(nn.Module):
         if args.wide_conv is True:
             print("using wide convolution")
             self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), stride=(1, 1),
-                                     padding=(K//2, 0), dilation=1, bias=True) for K in Ks]
+                                     padding=(K//2, 0), dilation=1, bias=False) for K in Ks]
         else:
             print("using narrow convolution")
             self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), bias=True) for K in Ks]
@@ -50,64 +50,19 @@ class  CNN_Text(nn.Module):
         if args.init_weight:
             print("Initing W .......")
             for conv in self.convs1:
-                # conv.weight.data.fill_(1)
-                # conv.bias.data.fill_(0)
-
-                # init.xavier_uniform(conv.weight, gain=np.sqrt(2.0))
-                # init.constant(conv.bias, 0.1)  # many prople use it why I has not good
-                # init.uniform(conv.bias, 0.1, 0.1)
-
-                # init.xavier_normal(conv.weight)
-                # init.xavier_normal(conv.bias)
-
-                # n = args.kernel_sizes[0] * args.kernel_sizes[1]
-                # conv.weight.data.normal_(0, np.sqrt(2. / n))
-
-                # print("asasas {}".format(conv.weight.data.__class__))
-
                 init.xavier_normal(conv.weight.data, gain=np.sqrt(args.init_weight_value))
                 fan_in, fan_out = CNN_Text.calculate_fan_in_and_fan_out(conv.weight.data)
                 print(" in {} out {} ".format(fan_in, fan_out))
                 std = np.sqrt(args.init_weight_value) * np.sqrt(2.0 / (fan_in + fan_out))
                 print("aaaaaaaaaaaaa {} ".format(std))
-                init.uniform(conv.bias, 0, 0)
+                # init.uniform(conv.bias, 0, 0)
 
-
-                # init.xavier_uniform(conv.weight.data, gain=np.sqrt(args.init_weight_value))
-                # fan_in, fan_out = CNN_Text.calculate_fan_in_and_fan_out(conv.weight.data)
-                # print(" in {} out {} ".format(fan_in, fan_out))
-                # std = np.sqrt(args.init_weight_value) * np.sqrt(2.0 / (fan_in + fan_out))
-                # a = np.sqrt(3.0) * std
-                # print("aaaaaaaaaaaaa {} ".format(a))
-
-                # if isinstance(conv.weight.data, Variable):
-                #     print("ssssssssssssssssssssssssssssssssss")
-                # else:
-                #     print("eeeeeeeeeeeeeeeeeeeeeeee")
-                #     fan_in, fan_out = CNN_Text.calculate_fan_in_and_fan_out(conv.weight.data)
-                #     print(" in {} out {} ".format(fan_in, fan_out))
-                #     std = np.sqrt(args.init_weight_value) * np.sqrt(2.0 / (fan_in + fan_out))
-                #     print("aaaaaaaaaaaaa {} ".format(std))
-                # init.xavier_normal(conv.weight)
-                # init.xavier_uniform(conv.weight)
-                # init.uniform(conv.bias)
-                # init.constant(conv.bias, val=0)
-                # init.xavier_normal(conv.weight, gain=args.init_weight_value)
-
-                # print("QQ {} ".format(conv.weight))
-                # print("QQ {} ".format(conv.bias))
-
-        '''
-        self.conv13 = nn.Conv2d(Ci, Co, (3, D))
-        self.conv14 = nn.Conv2d(Ci, Co, (4, D))
-        self.conv15 = nn.Conv2d(Ci, Co, (5, D))
-        '''
         self.dropout = nn.Dropout(args.dropout)
-        # self.dropout = nn.Dropout2d(args.dropout)
-        # self.dropout = nn.AlphaDropout(args.dropout)
+        self.dropout_embed = nn.Dropout(args.dropout_embed)
         in_fea = len(Ks) * Co
-        self.fc1 = nn.Linear(in_features=in_fea, out_features=in_fea // 2, bias=True)
-        self.fc2 = nn.Linear(in_features=in_fea // 2, out_features=C, bias=True)
+        # self.fc1 = nn.Linear(in_features=in_fea, out_features=in_fea // 2, bias=True)
+        # self.fc2 = nn.Linear(in_features=in_fea // 2, out_features=C, bias=True)
+        self.fc = nn.Linear(in_features=in_fea, out_features=C, bias=True)
         # whether to use batch normalizations
         if args.batch_normalizations is True:
             print("using batch_normalizations in the model......")
@@ -139,64 +94,22 @@ class  CNN_Text(nn.Module):
 
     def forward(self, x):
         x = self.embed(x)  # (N,W,D)
-        # x = self.dropout(x)
+        x = self.dropout_embed(x)
         x = x.unsqueeze(1)  # (N,Ci,W,D)
         if self.args.batch_normalizations is True:
             x = [self.convs1_bn(F.tanh(conv(x))).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
             x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x] #[(N,Co), ...]*len(Ks)
         else:
-            x = [self.dropout(F.relu(conv(x)).squeeze(3)) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
-            # x = [F.relu(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
+            # x = [self.dropout(F.relu(conv(x)).squeeze(3)) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
+            # x = [self.dropout(F.tanh(conv(x)).squeeze(3)) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
+            x = [F.relu(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
             # x = [F.tanh(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
-            # x = [conv(x).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
             x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x] #[(N,Co), ...]*len(Ks)
         x = torch.cat(x, 1)
-        '''
-        x1 = self.conv_and_pool(x,self.conv13) #(N,Co)
-        x2 = self.conv_and_pool(x,self.conv14) #(N,Co)
-        x3 = self.conv_and_pool(x,self.conv15) #(N,Co)
-        x = torch.cat((x1, x2, x3), 1) # (N,len(Ks)*Co)
-        '''
         x = self.dropout(x)  # (N,len(Ks)*Co)
-
         if self.args.batch_normalizations is True:
             x = self.fc1_bn(self.fc1(x))
             logit = self.fc2_bn(self.fc2(F.tanh(x)))
-
-            # x = self.fc1_bn(self.fc1(x))
-            # # x = self.fc1(x)
-            # logit = self.fc2_bn(self.fc2(F.relu(x)))
-            # logit = self.fc2_bn(self.fc2(F.relu(x)))
-
-            # x = self.fc1(x)
-            # logit = self.fc2(x)
-
-            # x = F.relu(self.fc1_bn(self.fc1(x)))
-            # logit = self.fc2(x)
-
-            # x = F.relu(self.fc1(x))
-            # logit = self.fc2_bn(self.fc2(x))
-
-            # x = F.relu(self.fc1(F.relu(x)))
-            # x= self.fc1(x)
-            # logit = self.fc2(x)
-
         else:
-            # logit = self.fc1(F.tanh(x)) # (N,C)
-
-            # x = self.fc1(F.relu(x))
-            # x = self.dropout(x)
-            x = self.fc1(x)
-            logit = self.fc2(F.relu(x))
-            # logit = F.softmax(logit)
-            # logit = self.fc2(F.tanh(x))
-
-            # x = self.fc1(x)
-            # x = self.dropout(x)
-            # logit = self.fc2(x)
-
-            # x = F.relu(self.fc1(x))
-            # # x = self.fc1(x)
-            # logit = self.fc2(x)
-        # print("self.embed.weight {} ".format(self.embed.weight))
+            logit = self.fc(x)
         return logit

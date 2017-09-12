@@ -27,11 +27,12 @@ from models import model_DeepCNN_MUI
 from models import model_BiLSTM_1
 from models import model_HighWay_BiLSTM_1
 import train_ALL_CNN
+import train_ALL_CNN_1
 import train_ALL_LSTM
-import train_ALL_LSTM_1
 from loaddata import mydatasets
 from loaddata import mydatasets_self_five
 from loaddata import mydatasets_self_two
+from loaddata.load_external_word_embedding import Word_Embedding
 from loaddata import word_embedding_loader as loader
 import multiprocessing as mu
 import shutil
@@ -88,7 +89,7 @@ parser.add_argument('-momentum_value', type=float, default=hyperparams.optim_mom
 parser.add_argument('-init_clip_max_norm', type=float, default=hyperparams.clip_max_norm, help='value of init clip_max_norm')
 parser.add_argument('-seed_num', type=float, default=hyperparams.seed_num, help='value of init seed number')
 parser.add_argument('-dropout', type=float, default=hyperparams.dropout, help='the probability for dropout [default: 0.5]')
-parser.add_argument('-dropout_embed', type=float, default=hyperparams.dropout, help='the probability for dropout [default: 0.5]')
+parser.add_argument('-dropout_embed', type=float, default=hyperparams.dropout_embed, help='the probability for dropout [default: 0.5]')
 parser.add_argument('-max-norm', type=float, default=hyperparams.max_norm, help='l2 constraint of parameters [default: 3.0]')
 parser.add_argument('-embed-dim', type=int, default=hyperparams.embed_dim, help='number of embedding dimension [default: 128]')
 parser.add_argument('-kernel-num', type=int, default=hyperparams.kernel_num, help='number of each kind of kernel')
@@ -132,38 +133,37 @@ parser.add_argument('-test', action='store_true', default=hyperparams.test, help
 args = parser.parse_args()
 
 
-# load SST dataset
-def sst(text_field, label_field,  **kargs):
-    print("SST")
-    train_data, dev_data, test_data = sstdatasets.SST.splits(text_field, label_field, fine_grained=True)
-    print("len(train_data) {} ".format(len(train_data)))
-    text_field.build_vocab(train_data, dev_data, test_data)
-    label_field.build_vocab(train_data, dev_data, test_data)
-    train_iter, dev_iter, test_iter = data.BucketIterator.splits(
-                                        (train_data, dev_data, test_data),
-                                        batch_sizes=(args.batch_size, 
-                                                     len(dev_data), 
-                                                     len(test_data)),
-                                        **kargs)
-    return train_iter, dev_iter, test_iter 
-
-
-
 # load two-classification data
 def mrs_two(path, train_name, dev_name, test_name, char_data, text_field, label_field, **kargs):
     train_data, dev_data, test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name, test_name,
                                                                     char_data, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
+    if os.path.exists("./traindata-has.txt"):
+        os.remove("./traindata-has.txt")
+    files = open("./traindata-has.txt", "w")
+    for i in range(len(train_data)):
+        for word in train_data[i].text:
+            files.write(word)
+            files.write("\n")
     # text_field.build_vocab(train_data, dev_data, test_data)
     # label_field.build_vocab(train_data, dev_data, test_data)
-    text_field.build_vocab(train_data, min_freq=args.min_freq)
-    label_field.build_vocab(train_data)
+    text_field.build_vocab(train_data.text, min_freq=args.min_freq)
+    if os.path.exists("./vocab.has.txt"):
+        os.remove("./vocab.has.txt")
+    file = open("./vocab.has.txt", "w")
+    for word in text_field.vocab.itos:
+        file.write(word)
+        file.write("\n")
+    label_field.build_vocab(train_data.label)
     train_iter, dev_iter, test_iter = data.Iterator.splits(
                                         (train_data, dev_data, test_data),
-                                        batch_sizes=(args.batch_size,
-                                                     len(dev_data),
-                                                     len(test_data)),
+                                        batch_sizes=(args.batch_size, len(dev_data), len(test_data)),
                                         **kargs)
+    # print("aaaaaaaaaaaaaaaa")
+    # train_iter, dev_iter, test_iter = data.Iterator.splits(
+    #                                     (train_data, dev_data, test_data),
+    #                                     batch_sizes=(args.batch_size, args.batch_size, args.batch_size),
+    #                                     **kargs)
     return train_iter, dev_iter, test_iter
 
 def mrs_two_mui(path, train_name, dev_name, test_name, char_data, text_field, label_field, static_text_field, static_label_field, **kargs):
@@ -195,6 +195,12 @@ def mrs_five(path, train_name, dev_name, test_name, char_data, text_field, label
                                                                      char_data, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
     text_field.build_vocab(train_data, min_freq=args.min_freq)
+    if os.path.exists("./vocab.txt"):
+        os.remove("./vocab.txt")
+    file = open("./vocab.txt", "w")
+    for word in text_field.vocab.itos:
+        file.write(word)
+        file.write("\n")
     label_field.build_vocab(train_data)
     train_iter, dev_iter, test_iter = data.Iterator.splits(
                                         (train_data, dev_data, test_data),
@@ -239,113 +245,6 @@ def mr(text_field, label_field, **kargs):
     return train_iter, dev_iter
 
 
-# load word embedding
-def load_my_vecs_freq1(path, vocab, freqs, pro):
-    word_vecs = {}
-    with open(path, encoding="utf-8") as f:
-        freq = 0
-        lines = f.readlines()[1:]
-        for line in lines:
-            values = line.split(" ")
-            word = values[0]
-            if word in vocab:  #whehter to judge if in vocab
-                if freqs[word] == 1:
-                    a = np.random.uniform(0, 1, 1).round(2)
-                    if pro < a:
-                        continue
-                vector = []
-                for count, val in enumerate(values):
-                    if count == 0:
-                        continue
-                    vector.append(float(val))
-                word_vecs[word] = vector
-    return word_vecs
-
-
-# load word embedding
-def load_my_vecs(path, vocab, freqs):
-    word_vecs = {}
-    with open(path, encoding="utf-8") as f:
-        count  = 0
-        lines = f.readlines()[1:]
-        for line in lines:
-            values = line.split(" ")
-            word = values[0]
-            # word = word.lower()
-            # if word in vocab and freqs[word] != 1:  # whether to judge if in vocab
-            count += 1
-            if word in vocab:  # whether to judge if in vocab
-            # if word in vocab:  # whether to judge if in vocab
-            #     if count % 5 == 0 and freqs[word] == 1:
-            #         continue
-                vector = []
-                for count, val in enumerate(values):
-                    if count == 0:
-                        continue
-                    vector.append(float(val))
-                word_vecs[word] = vector
-    return word_vecs
-
-
-# solve unknown by avg word embedding
-def add_unknown_words_by_avg(word_vecs, vocab, k=100):
-    # solve unknown words inplaced by zero list
-    word_vecs_numpy = []
-    for word in vocab:
-        if word in word_vecs:
-            word_vecs_numpy.append(word_vecs[word])
-    print(len(word_vecs_numpy))
-    col = []
-    for i in range(k):
-        sum = 0.0
-        # for j in range(int(len(word_vecs_numpy) / 4)):
-        for j in range(int(len(word_vecs_numpy))):
-            sum += word_vecs_numpy[j][i]
-            sum = round(sum, 6)
-        col.append(sum)
-    zero = []
-    for m in range(k):
-        # avg = col[m] / (len(col) * 5)
-        avg = col[m] / (len(word_vecs_numpy))
-        avg = round(avg, 6)
-        zero.append(float(avg))
-
-    list_word2vec = []
-    oov = 0
-    iov = 0
-    for word in vocab:
-        if word not in word_vecs:
-            # word_vecs[word] = np.random.uniform(-0.25, 0.25, k).tolist()
-            # word_vecs[word] = [0.0] * k
-            oov += 1
-            word_vecs[word] = zero
-            list_word2vec.append(word_vecs[word])
-        else:
-            iov += 1
-            list_word2vec.append(word_vecs[word])
-    print("oov count", oov)
-    print("iov count", iov)
-    return list_word2vec
-
-# solve unknown word by uniform(-0.25,0.25)
-def add_unknown_words_by_uniform(word_vecs, vocab, k=100):
-    list_word2vec = []
-    oov = 0
-    iov = 0
-    # uniform = np.random.uniform(-0.25, 0.25, k).round(6).tolist()
-    for word in vocab:
-        if word not in word_vecs:
-            oov += 1
-            word_vecs[word] = np.random.uniform(-0.25, 0.25, k).round(6).tolist()
-            # word_vecs[word] = np.random.uniform(-0.1, 0.1, k).round(6).tolist()
-            # word_vecs[word] = uniform
-            list_word2vec.append(word_vecs[word])
-        else:
-            iov += 1
-            list_word2vec.append(word_vecs[word])
-    print("oov count", oov)
-    print("iov count", iov)
-    return list_word2vec
 
 # load data
 print("\nLoading data...")
@@ -380,36 +279,41 @@ elif args.TWO_CLASS_TASK:
                                                   label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle)
 
 
+
+
+# handle external word embedding to file for convenience
+# from loaddata.handle_wordEmbedding2File import WordEmbedding2File
+# wordembedding = WordEmbedding2File(wordEmbedding_path="./word2vec/glove.sentiment.conj.pretrained.txt",
+#                                    vocab=text_field.vocab.itos, k_dim=300)
+# wordembedding.handle()
+
 # load word2vec
 if args.word_Embedding:
-    # count_words_reset = text_field.vocab.itos
-    # word_vecs = loader.vector_loader(count_words_reset)
+    word_embedding = Word_Embedding()
     if args.embed_dim is not None:
         print("word_Embedding_Path {} ".format(args.word_Embedding_Path))
         path = args.word_Embedding_Path
     print("loading word2vec vectors...")
-    # print("len(text_field.vocab.itos)", len(text_field.vocab.itos))
-    # print("len(static_text_field.vocab.itos)", len(static_text_field.vocab.itos))
-    if args.freq_1_unk == True:
-        word_vecs = load_my_vecs_freq1(path, text_field.vocab.itos, text_field.vocab.freqs, pro=0.5)   # has some error in this function
+    if args.freq_1_unk is True:
+        word_vecs = word_embedding.load_my_vecs_freq1(path, text_field.vocab.itos, text_field.vocab.freqs, pro=0.5)   # has some error in this function
     else:
-        word_vecs = load_my_vecs(path, text_field.vocab.itos, text_field.vocab.freqs)
+        word_vecs = word_embedding.load_my_vecs(path, text_field.vocab.itos, text_field.vocab.freqs, k=args.embed_dim)
         if args.CNN_MUI is True or args.DEEP_CNN_MUI is True:
-            static_word_vecs = load_my_vecs(path, static_text_field.vocab.itos, text_field.vocab.freqs)
+            static_word_vecs = word_embedding.load_my_vecs(path, static_text_field.vocab.itos, text_field.vocab.freqs, k=args.embed_dim)
     print("word2vec loaded!")
     print("num words already in word2vec: " + str(len(word_vecs)))
     print("loading unknown word2vec and convert to list...")
     if args.char_data:
         print("loading unknown word by rand......")
-        word_vecs = add_unknown_words_by_uniform(word_vecs, text_field.vocab.itos, k=args.embed_dim)
+        word_vecs = word_embedding.add_unknown_words_by_uniform(word_vecs, text_field.vocab.itos, k=args.embed_dim)
         if args.CNN_MUI is True or args.DEEP_CNN_MUI is True:
-            static_word_vecs = add_unknown_words_by_uniform(static_word_vecs, static_text_field.vocab.itos, k=args.embed_dim)
+            static_word_vecs = word_embedding.add_unknown_words_by_uniform(static_word_vecs, static_text_field.vocab.itos, k=args.embed_dim)
     else:
         print("loading unknown word by avg......")
         # word_vecs = add_unknown_words_by_uniform(word_vecs, text_field.vocab.itos, k=args.embed_dim)
-        word_vecs = add_unknown_words_by_avg(word_vecs, text_field.vocab.itos, k=args.embed_dim)
+        word_vecs = word_embedding.add_unknown_words_by_avg(word_vecs, text_field.vocab.itos, k=args.embed_dim)
         if args.CNN_MUI is True or args.DEEP_CNN_MUI is True:
-            static_word_vecs = add_unknown_words_by_avg(static_word_vecs, static_text_field.vocab.itos, k=args.embed_dim)
+            static_word_vecs = word_embedding.add_unknown_words_by_avg(static_word_vecs, static_text_field.vocab.itos, k=args.embed_dim)
         print("len(word_vecs) {} ".format(len(word_vecs)))
     print("unknown word2vec loaded ! and converted to list...")
 
@@ -559,31 +463,31 @@ else:
         model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.BiLSTM:
         print("BiLSTM training start......")
-        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.BiLSTM_1:
         print("BiLSTM_1 training start......")
-        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CNN_LSTM:
         print("CNN_LSTM training start......")
-        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CLSTM:
         print("CLSTM training start......")
-        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CBiLSTM:
         print("CBiLSTM training start......")
-        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CGRU:
         print("CGRU training start......")
-        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CNN_BiLSTM:
         print("CNN_BiLSTM training start......")
-        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.BiGRU:
         print("BiGRU training start......")
         model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CNN_BiGRU:
         print("CNN_BiGRU training start......")
-        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     elif args.CNN_MUI:
         print("CNN_MUI training start......")
         model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, args)
@@ -595,7 +499,7 @@ else:
         model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, args)
     elif args.HighWay_BiLSTM_1 is True:
         print("HighWay_BiLSTM_1 training start......")
-        model_count = train_ALL_LSTM_1.train(train_iter, dev_iter, test_iter, model, args)
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
     print("Model_count", model_count)
     resultlist = []
     if os.path.exists("./Test_Result.txt"):

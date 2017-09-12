@@ -1,7 +1,5 @@
 import re
 import os
-import tarfile
-from six.moves import urllib
 from torchtext import data
 import random
 import torch
@@ -9,50 +7,18 @@ import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
-class TarDataset(data.Dataset):
-    """Defines a Dataset loaded from a downloadable tar archive.
 
-    Attributes:
-        url: URL where the tar archive can be downloaded.
-        filename: Filename of the downloaded tar archive.
-        dirname: Name of the top-level directory within the zip archive that
-            contains the data files.
-    """
+class MR(data.Dataset):
 
-    @classmethod
-    def download_or_unzip(cls, root):
-        path = os.path.join(root, cls.dirname)
-        if not os.path.isdir(path):
-            tpath = os.path.join(root, cls.filename)
-            if not os.path.isfile(tpath):
-                print('downloading')
-                urllib.request.urlretrieve(cls.url, tpath)
-            with tarfile.open(tpath, 'r') as tfile:
-                print('extracting')
-                tfile.extractall(root)
-        return os.path.join(path, '')
-
-
-class MR(TarDataset):
-
-    # url = 'https://www.cs.cornell.edu/people/pabo/movie-review-data/rt-polaritydata.tar.gz'
-    # filename = 'rt-polaritydata.tar'
-    dirname = 'rt-polaritydata'
-
-    @staticmethod
-    def sort_key(ex):
-        return len(ex.text)
-
-    def __init__(self, text_field, label_field, path=None, file=None,examples=None,char_data=None, **kwargs):
-        """Create an MR dataset instance given a path and fields.
-
+    def __init__(self, text_field, label_field, path=None, file=None, examples=None, char_data=None, **kwargs):
+        """
         Arguments:
             text_field: The field that will be used for text data.
             label_field: The field that will be used for label data.
             path: Path to the data file.
             examples: The examples contain all the data.
-            Remaining keyword arguments: Passed to the constructor of
-                data.Dataset.
+            char_data: The char level to solve
+            Remaining keyword arguments: Passed to the constructor of data.Dataset.
         """
         def clean_str(string):
             """
@@ -89,6 +55,8 @@ class MR(TarDataset):
                         sentence = sentence.split(" ")
                         sentence = MR.char_data(self, sentence)
                     # print(sentence)
+                    # clear string in every sentence
+                    sentence = clean_str(sentence)
                     if line[-2] == '0':
                         a += 1
                         examples += [data.Example.fromlist([sentence, 'negative'], fields=fields)]
@@ -102,10 +70,6 @@ class MR(TarDataset):
                         b += 1
                         examples += [data.Example.fromlist([sentence, 'positive'], fields=fields)]
                 print("a {} b {} ".format(a, b))
-                    # else:
-                    #     examples += [data.Example.fromlist([line[:line.find('|')], 'positive'], fields=fields)]
-
-
         super(MR, self).__init__(examples, fields, **kwargs)
 
     def char_data(self, list):
@@ -118,7 +82,6 @@ class MR(TarDataset):
     @classmethod
     def splits(cls, path, train, dev, test, char_data, text_field, label_field, dev_ratio=.1, shuffle=True ,root='.', **kwargs):
         """Create dataset objects for splits of the MR dataset.
-
         Arguments:
             text_field: The field that will be used for the sentence.
             label_field: The field that will be used for label data.
@@ -131,8 +94,6 @@ class MR(TarDataset):
             Remaining keyword arguments: Passed to the splits method of
                 Dataset.
         """
-        # path = cls.download_or_unzip(root)
-        # path = "./data/"
         print(path + train)
         print(path + dev)
         print(path + test)
@@ -140,6 +101,7 @@ class MR(TarDataset):
         examples_dev = cls(text_field, label_field, path=path, file=dev, char_data=char_data, **kwargs).examples
         examples_test = cls(text_field, label_field, path=path, file=test, char_data=char_data, **kwargs).examples
         if shuffle:
+            print("shuffle data examples......")
             random.shuffle(examples_train)
             random.shuffle(examples_dev)
             random.shuffle(examples_test)
