@@ -8,7 +8,6 @@ import torchtext.datasets as datasets
 from Cython.Shadow import profile
 from sklearn.utils import shuffle
 
-from loaddata import sstdatasets as sstdatasets
 from models import model_CNN
 from models import model_HighWay_CNN
 from models import model_DeepCNN
