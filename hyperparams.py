@@ -7,8 +7,8 @@ learning_rate = 0.001
 epochs = 500
 batch_size = 16
 log_interval = 1
-test_interval = 100
-save_interval = 100
+test_interval = 10
+save_interval = 10
 save_dir = "snapshot"
 datafile_path = "./data/"
 name_trainfile = "raw.clean.train"
@@ -61,7 +61,7 @@ batch_norm_affine = False  # default is True
 # min freq to include during built the vocab, default is 1
 min_freq = 1
 # word_Embedding
-word_Embedding = True
+word_Embedding = False
 embed_dim = 300
 word_Embedding_Path = "./word2vec/glove.sentiment.conj.pretrained.txt"
 # word_Embedding_Path = "./word2vec/glove.semeval.conj.pretrained.txt"
