@@ -246,18 +246,18 @@ if args.FIVE_CLASS_TASK:
         train_iter, dev_iter, test_iter = mrs_five_mui(args.datafile_path, args.name_trainfile,
                                                        args.name_devfile, args.name_testfile, args.char_data, text_field=text_field,
                                                        label_field=label_field, static_text_field=static_text_field,
-                                                       static_label_field=static_label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle)
+                                                       static_label_field=static_label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle, sort=False)
     else:
         train_iter, dev_iter, test_iter = mrs_five(args.datafile_path, args.name_trainfile,
                                                    args.name_devfile, args.name_testfile, args.char_data, text_field,
-                                                   label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle)
+                                                   label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle, sort=False)
 elif args.TWO_CLASS_TASK:
     print("Executing 2 Classification Task......")
     if args.CNN_MUI is True or args.DEEP_CNN_MUI is True:
         train_iter, dev_iter, test_iter = mrs_two_mui(args.datafile_path, args.name_trainfile,
                                                       args.name_devfile, args.name_testfile, args.char_data, text_field=text_field,
                                                       label_field=label_field, static_text_field=static_text_field,
-                                                      static_label_field=static_label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle)
+                                                      static_label_field=static_label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle, sort=False)
     else:
         train_iter, dev_iter, test_iter = mrs_two(args.datafile_path, args.name_trainfile,
                                                   args.name_devfile, args.name_testfile, args.char_data, text_field,
