@@ -7,6 +7,8 @@ import random
 import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
+
+
 class  BiLSTM(nn.Module):
     
     def __init__(self, args):
@@ -33,8 +35,12 @@ class  BiLSTM(nn.Module):
     def init_hidden(self, num_layers, batch_size):
         # the first is the hidden h
         # the second is the cell  c
-        return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim // 2)),
-                Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim // 2)))
+        if self.args.cuda is True:
+            return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim // 2)).cuda(),
+                    Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim // 2)).cuda())
+        else:
+            return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim // 2)),
+                    Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim // 2)))
 
     def forward(self, x):
         embed = self.embed(x)

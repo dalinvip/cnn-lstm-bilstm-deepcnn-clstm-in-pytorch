@@ -11,6 +11,7 @@ import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
+
 def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:
         model.cuda()
@@ -52,7 +53,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
             feature, target = batch.text, batch.label.data.sub_(1)
             # feature.data.t_()
             # target.data.sub_(1)  # batch first, index align
-            if args.cuda:
+            if args.cuda is True:
                 feature, target = feature.cuda(), target.cuda()
 
             target = autograd.Variable(target)  # question 1
@@ -108,6 +109,8 @@ def eval(data_iter, model, args, scheduler):
         # feature.data.t_(),\
         # target.data.sub_(1)  # batch first, index align
         # target = autograd.Variable(target)
+        if args.cuda is True:
+            feature, target = feature.cuda(), target.cuda()
 
         model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
         if feature.size(1) != args.batch_size:
@@ -140,7 +143,7 @@ def test_eval(data_iter, model, save_path, args, model_count):
         # feature.data.t_()
         # target.data.sub_(1)  # batch first, index align
         # target = autograd.Variable(target)
-        if args.cuda:
+        if args.cuda is True:
             feature, target = feature.cuda(), target.cuda()
 
         model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)

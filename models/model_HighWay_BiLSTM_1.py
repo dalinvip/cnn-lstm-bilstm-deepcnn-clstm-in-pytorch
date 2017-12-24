@@ -82,8 +82,12 @@ class HighWay_BiLSTM_1(nn.Module):
         # the second is the cell  c
         # return (Variable(torch.zeros(2, batch_size, self.hidden_dim // 2)),
         #          Variable(torch.zeros(2, batch_size, self.hidden_dim // 2)))
-        return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)),
-                Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)))
+        if self.args.cuda is True:
+            return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)).cuda(),
+                    Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)).cuda())
+        else:
+            return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)),
+                    Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)))
         # return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)))
 
     def forward(self, x):

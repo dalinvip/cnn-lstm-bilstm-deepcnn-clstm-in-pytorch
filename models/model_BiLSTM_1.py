@@ -39,48 +39,20 @@ class BiLSTM_1(nn.Module):
             init.xavier_normal(self.bilstm.all_weights[0][1], gain=np.sqrt(args.init_weight_value))
             init.xavier_normal(self.bilstm.all_weights[1][0], gain=np.sqrt(args.init_weight_value))
             init.xavier_normal(self.bilstm.all_weights[1][1], gain=np.sqrt(args.init_weight_value))
-            # print("eeeeeeeeeeeeeeeeeeeeeeee")
-            # fan_in, fan_out = BiLSTM_1.calculate_fan_in_and_fan_out(self.bilstm.all_weights[1][1])
-            # print(" in {} out {} ".format(fan_in, fan_out))
-            # std = np.sqrt(args.init_weight_value) * np.sqrt(2.0 / (fan_in + fan_out))
-            # print("aaaaaaaaaaaaa {} ".format(std))
-            # print("self.bilstm.all_weights {} ".format(self.bilstm.all_weights))
-            # self.bilstm.all_weights[0][3].data.fill_(0)
-            # self.bilstm.all_weights[0][2].data.fill_(0)
-            # self.bilstm.all_weights[1][3].data.fill_(0)
-            # self.bilstm.all_weights[1][2].data.fill_(0)
-            # self.bilstm.all_weights[0][3].data[20:40].fill_(1)
-            # self.bilstm.all_weights[0][3].data[0:20].fill_(0)
-            # self.bilstm.all_weights[0][3].data[40:80].fill_(0)
-            # # self.bilstm.all_weights[0][3].data[40:].fill_(0)
-            # self.bilstm.all_weights[0][2].data[20:40].fill_(1)
-            # self.bilstm.all_weights[0][2].data[0:20].fill_(0)
-            # self.bilstm.all_weights[0][2].data[40:80].fill_(0)
-            # # self.bilstm.all_weights[0][2].data[40:].fill_(0)
-            # self.bilstm.all_weights[1][3].data[20:40].fill_(1)
-            # self.bilstm.all_weights[1][3].data[0:20].fill_(0)
-            # self.bilstm.all_weights[1][3].data[40:80].fill_(0)
-            # # self.bilstm.all_weights[1][3].data[40:].fill_(0)
-            # self.bilstm.all_weights[1][2].data[20:40].fill_(1)
-            # self.bilstm.all_weights[1][2].data[0:20].fill_(0)
-            # self.bilstm.all_weights[1][2].data[40:80].fill_(0)
-            # # self.bilstm.all_weights[1][2].data[40:].fill_(0)
 
-        # self.hidden2label1 = nn.Linear(self.hidden_dim * 2, self.hidden_dim)
-        # self.hidden2label2 = nn.Linear(self.hidden_dim, C)
         self.hidden2label = nn.Linear(self.hidden_dim * 2, C)
         self.hidden = self.init_hidden(self.num_layers, args.batch_size)
         print("self.hidden", self.hidden)
 
-
     def init_hidden(self, num_layers, batch_size):
         # the first is the hidden h
         # the second is the cell  c
-        # return (Variable(torch.zeros(2, batch_size, self.hidden_dim // 2)),
-        #          Variable(torch.zeros(2, batch_size, self.hidden_dim // 2)))
-        return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)),
-                Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)))
-        # return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)))
+        if self.args.cuda is True:
+            return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)).cuda(),
+                    Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)).cuda())
+        else:
+            return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)),
+                    Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)))
 
     def calculate_fan_in_and_fan_out(tensor):
         dimensions = tensor.ndimension()

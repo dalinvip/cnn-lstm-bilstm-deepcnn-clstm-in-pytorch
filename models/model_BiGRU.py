@@ -8,6 +8,7 @@ import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
+
 class  BiGRU(nn.Module):
     
     def __init__(self, args):
@@ -36,7 +37,10 @@ class  BiGRU(nn.Module):
         self.dropout = nn.Dropout(args.dropout)
 
     def init_hidden(self, num_layers, batch_size):
-        return Variable(torch.zeros(num_layers * 2, batch_size, self.hidden_dim))
+        if self.args.cuda is True:
+            return Variable(torch.zeros(num_layers * 2, batch_size, self.hidden_dim)).cuda()
+        else:
+            return Variable(torch.zeros(num_layers * 2, batch_size, self.hidden_dim))
 
     def forward(self, input):
         embed = self.embed(input)

@@ -16,6 +16,8 @@ random.seed(hyperparams.seed_num)
 def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:
         model.cuda()
+        # torch.cuda.seed()
+        torch.cuda.manual_seed(hyperparams.seed_num)
 
     # optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-8)
     # optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay)
@@ -59,6 +61,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
                 feature, target = feature.cuda(), target.cuda()
 
             optimizer.zero_grad()
+            model.zero_grad()
 
             logit = model(feature)
             loss = F.cross_entropy(logit, target)
@@ -101,10 +104,10 @@ def eval(data_iter, model, args):
         feature, target = batch.text, batch.label
         feature.data.t_(), target.data.sub_(1)  # batch first, index align
         if args.cuda:
-            feature, target = feature.cuda(), feature.cuda()
+            feature, target = feature.cuda(), target.cuda()
 
         logit = model(feature)
-        loss = F.cross_entropy(logit, target, size_average=False)
+        loss = F.cross_entropy(logit, target, size_average=True)
         avg_loss += loss.data[0]
         corrects += (torch.max(logit, 1)[1].view(target.size()).data == target.data).sum()
 
@@ -125,7 +128,7 @@ def test_eval(data_iter, model, save_path, args, model_count):
         feature, target = batch.text, batch.label
         feature.data.t_(), target.data.sub_(1)  # batch first, index align
         if args.cuda:
-            feature, target = feature.cuda(), feature.cuda()
+            feature, target = feature.cuda(), target.cuda()
 
         logit = model(feature)
         loss = F.cross_entropy(logit, target, size_average=False)

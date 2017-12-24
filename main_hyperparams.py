@@ -335,7 +335,9 @@ file.close()
 shutil.copy("./Parameters.txt", "./snapshot/" + mulu + "/Parameters.txt")
 shutil.copy("./hyperparams.py", "./snapshot/" + mulu)
 
-
+if args.cuda is True:
+    torch.cuda.seed()
+    torch.cuda.manual_seed(hyperparams.seed_num)
 
 # model
 if args.snapshot is None:
@@ -417,8 +419,10 @@ else:
     except:
         print("Sorry, This snapshot doesn't exist.")
         exit()
-        
 
+
+if args.cuda is True:
+    model = model.cuda()
 # train or predict
 if args.predict is not None:
     label = train_ALL_CNN.predict(args.predict, model, text_field, label_field)

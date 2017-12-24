@@ -12,6 +12,7 @@ import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
+
 def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:
         model.cuda()
