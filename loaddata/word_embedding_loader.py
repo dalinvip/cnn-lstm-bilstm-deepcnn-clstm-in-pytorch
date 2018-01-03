@@ -1,15 +1,18 @@
 import torch
 import numpy as np
 import random
+import collections
 torch.manual_seed(233)
 random.seed(233)
+
 
 def vector_loader(text_field_words):
     # load word2vec_raw
     # path = 'word_embedding/glove.6B.300d.txt'
     path = 'word2vec/glove.sentiment.conj.pretrained.txt'
     words = []
-    words_dict = {}
+    # words_dict = {}
+    words_dict = collections.OrderedDict()
     file = open(path, 'rt', encoding='utf-8')
     lines = file.readlines()
     t = 300
@@ -64,7 +67,8 @@ def vector_loader_zero(text_field_words):
     # load word2vec_raw
     path = 'word_embedding/glove.6B.300d.txt'
     words = []
-    words_dict = {}
+    # words_dict = {}
+    words_dict = collections.OrderedDict()
     file = open(path, 'rt', encoding='utf-8')
     lines = file.readlines()
     t = 300
@@ -117,7 +121,8 @@ def vector_loader_modify(text_field_words):
     # load word2vec_raw
     path = 'word_embedding/glove.6B.300d.txt'
     words = []
-    words_dict = {}
+    # words_dict = {}
+    words_dict = collections.OrderedDict()
     file = open(path, 'rt', encoding='utf-8')
     lines = file.readlines()
     t = 300

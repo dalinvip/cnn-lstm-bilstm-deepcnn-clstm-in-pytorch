@@ -49,7 +49,7 @@ if sys.getdefaultencoding() != defaultencoding:
 # random seed
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
-
+torch.cuda.manual_seed(233)
 parser = argparse.ArgumentParser(description="text classification")
 # learning
 parser.add_argument('-lr', type=float, default=hyperparams.learning_rate, help='initial learning rate [default: 0.001]')

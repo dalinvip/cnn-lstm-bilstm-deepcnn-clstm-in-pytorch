@@ -1,5 +1,8 @@
 # coding=utf-8
 import numpy as np
+import collections
+
+
 class Word_Embedding():
     def __init__(self):
         print("loading external word embedding")
@@ -10,7 +13,8 @@ class Word_Embedding():
 
     # load word embedding
     def load_my_vecs(self, path, vocab, freqs, k=None):
-        word_vecs = {}
+        # word_vecs = {}
+        word_vecs = collections.OrderedDict()
         with open(path, encoding="utf-8") as f:
             count = 0
             lines = f.readlines()[1:]
@@ -95,7 +99,8 @@ class Word_Embedding():
 
     # load word embedding
     def load_my_vecs_freq1(self, path, vocab, freqs, pro):
-        word_vecs = {}
+        # word_vecs = {}
+        word_vecs = collections.OrderedDict()
         with open(path, encoding="utf-8") as f:
             freq = 0
             lines = f.readlines()[1:]
