@@ -1,13 +1,13 @@
-## Introduction
+﻿## Introduction
 
 * The sentiment classification tasks that apply multiple neural network
 * the repository is being updated......
 
 ## Requirement
 
-* python 3
-* pytorch > 0.1
-* torchtext > 0.1
+* python 3(now demo version is python3.6.3)
+* pytorch > 0.1(now demo version is 0.3)
+* torchtext > 0.1（now demo version is 0.2）
 * numpy
 
 ## Result
