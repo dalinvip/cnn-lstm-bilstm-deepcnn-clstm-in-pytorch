@@ -9,6 +9,10 @@ import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
+"""
+Neural Networks model : Bidirection LSTM
+"""
+
 
 class BiLSTM_1(nn.Module):
     def __init__(self, args):

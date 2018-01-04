@@ -13,7 +13,6 @@ class Word_Embedding():
 
     # load word embedding
     def load_my_vecs(self, path, vocab, freqs, k=None):
-        # word_vecs = {}
         word_vecs = collections.OrderedDict()
         with open(path, encoding="utf-8") as f:
             count = 0
@@ -21,13 +20,8 @@ class Word_Embedding():
             for line in lines:
                 values = line.split(" ")
                 word = values[0]
-                # word = word.lower()
-                # if word in vocab and freqs[word] != 1:  # whether to judge if in vocab
                 count += 1
                 if word in vocab:  # whether to judge if in vocab
-                    # if word in vocab:  # whether to judge if in vocab
-                    #     if count % 5 == 0 and freqs[word] == 1:
-                    #         continue
                     vector = []
                     for count, val in enumerate(values):
                         if count == 0:
@@ -48,14 +42,12 @@ class Word_Embedding():
         col = []
         for i in range(k):
             sum = 0.0
-            # for j in range(int(len(word_vecs_numpy) / 4)):
             for j in range(int(len(word_vecs_numpy))):
                 sum += word_vecs_numpy[j][i]
                 sum = round(sum, 6)
             col.append(sum)
         zero = []
         for m in range(k):
-            # avg = col[m] / (len(col) * 5)
             avg = col[m] / (len(word_vecs_numpy))
             avg = round(avg, 6)
             zero.append(float(avg))
@@ -65,8 +57,6 @@ class Word_Embedding():
         iov = 0
         for word in vocab:
             if word not in word_vecs:
-                # word_vecs[word] = np.random.uniform(-0.25, 0.25, k).tolist()
-                # word_vecs[word] = [0.0] * k
                 oov += 1
                 word_vecs[word] = zero
                 list_word2vec.append(word_vecs[word])
@@ -82,13 +72,10 @@ class Word_Embedding():
         list_word2vec = []
         oov = 0
         iov = 0
-        # uniform = np.random.uniform(-0.25, 0.25, k).round(6).tolist()
         for word in vocab:
             if word not in word_vecs:
                 oov += 1
                 word_vecs[word] = np.random.uniform(-0.25, 0.25, k).round(6).tolist()
-                # word_vecs[word] = np.random.uniform(-0.1, 0.1, k).round(6).tolist()
-                # word_vecs[word] = uniform
                 list_word2vec.append(word_vecs[word])
             else:
                 iov += 1

@@ -98,10 +98,6 @@ def eval(data_iter, model, args, scheduler):
 
         logit = model(feature)
         loss = F.cross_entropy(logit, target, size_average=False)
-        # scheduler.step(loss.data[0])
-        # if args.init_clip_max_norm is not None:
-        #     # print("aaaa {} ".format(args.init_clip_max_norm))
-        #     utils.clip_grad_norm(model.parameters(), max_norm=args.init_clip_max_norm)
 
         avg_loss += loss.data[0]
         corrects += (torch.max(logit, 1)[1].view(target.size()).data == target.data).sum()
@@ -128,10 +124,6 @@ def test_eval(data_iter, model, save_path, args, model_count):
 
         logit = model(feature)
         loss = F.cross_entropy(logit, target, size_average=False)
-        # scheduler.step(loss.data[0])
-        # if args.init_clip_max_norm is not None:
-        #     # print("aaaa {} ".format(args.init_clip_max_norm))
-        #     utils.clip_grad_norm(model.parameters(), max_norm=args.init_clip_max_norm)
 
         avg_loss += loss.data[0]
         corrects += (torch.max(logit, 1)
@@ -139,7 +131,6 @@ def test_eval(data_iter, model, save_path, args, model_count):
 
     size = len(data_iter.dataset)
     avg_loss = loss.data[0]/size
-    # accuracy = float(corrects)/size * 100.0
     accuracy = 100.0 * corrects/size
     model.train()
     print('\nEvaluation - loss: {:.6f}  acc: {:.4f}%({}/{}) \n'.format(avg_loss,

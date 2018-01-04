@@ -9,12 +9,16 @@ import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
-class  LSTM(nn.Module):
+"""
+Neural Networks model : LSTM
+"""
+
+
+class LSTM(nn.Module):
     
     def __init__(self, args):
         super(LSTM, self).__init__()
         self.args = args
-        # print(args)
 
         self.hidden_dim = args.lstm_hidden_dim
         self.num_layers = args.lstm_num_layers
@@ -51,8 +55,6 @@ class  LSTM(nn.Module):
     def init_hidden(self, num_layers, batch_size):
         # the first is the hidden h
         # the second is the cell  c
-        # return (Variable(torch.zeros(1, batch_size, self.hidden_dim)),
-        #          Variable(torch.zeros(1, batch_size, self.hidden_dim)))
         if self.args.cuda is True:
             return (Variable(torch.zeros(1 * num_layers, batch_size, self.hidden_dim)).cuda(),
                     Variable(torch.zeros(1 * num_layers, batch_size, self.hidden_dim)).cuda())

@@ -6,7 +6,6 @@ import torch.nn.functional as F
 import torch.nn.utils as utils
 import torch.optim.lr_scheduler as lr_scheduler
 import shutil
-import re
 import random
 import hyperparams
 torch.manual_seed(hyperparams.seed_num)
@@ -16,7 +15,6 @@ random.seed(hyperparams.seed_num)
 def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:
         model.cuda()
-        # torch.cuda.seed()
         torch.cuda.manual_seed(hyperparams.seed_num)
 
     # optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-8)

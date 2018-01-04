@@ -8,7 +8,22 @@ import torch.nn.init as init
 import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
-class  DEEP_CNN_MUI(nn.Module):
+
+"""
+Description:
+    the model is a mulit-channel DeepCNNS model, 
+    the model use two external word embedding, and then,
+    one of word embedding built from train/dev/test dataset,
+    and it be used to no-fine-tune,other one built from only
+    train dataset,and be used to fine-tune.
+
+    my idea,even if the word embedding built from train/dev/test dataset, 
+    whether can use fine-tune, in others words, whether can fine-tune with
+    two external word embedding.
+"""
+
+
+class DEEP_CNN_MUI(nn.Module):
     
     def __init__(self, args):
         super(DEEP_CNN_MUI, self).__init__()

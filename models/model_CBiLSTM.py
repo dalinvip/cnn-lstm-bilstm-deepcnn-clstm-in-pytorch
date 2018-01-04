@@ -8,6 +8,11 @@ import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
+"""
+    Neural Network: CBiLSTM
+    Detail: The inpout first cross CNN model ,then the output of CNN as the input of BiLSTM
+"""
+
 
 class CBiLSTM(nn.Module):
     

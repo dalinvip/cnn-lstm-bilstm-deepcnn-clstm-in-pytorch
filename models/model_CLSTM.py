@@ -8,7 +8,13 @@ import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
-class  CLSTM(nn.Module):
+"""
+    Neural Network: CLSTM
+    Detail: The input first cross CNN model ,then the output of CNN as the input of LSTM
+"""
+
+
+class CLSTM(nn.Module):
     
     def __init__(self, args):
         super(CLSTM, self).__init__()

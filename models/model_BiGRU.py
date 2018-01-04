@@ -8,22 +8,23 @@ import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
+"""
+Neural Networks model : Bidirection GRU
+"""
 
-class  BiGRU(nn.Module):
+
+class BiGRU(nn.Module):
     
     def __init__(self, args):
         super(BiGRU, self).__init__()
         self.args = args
-        # print(args)
-
         self.hidden_dim = args.lstm_hidden_dim
         self.num_layers = args.lstm_num_layers
         V = args.embed_num
         D = args.embed_dim
         C = args.class_num
-        # self.embed = nn.Embedding(V, D, max_norm=args.max_norm)
         self.embed = nn.Embedding(V, D)
-        # word embedding
+        # pretrained  embedding
         if args.word_Embedding:
             pretrained_weight = np.array(args.pretrained_weight)
             self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
@@ -44,7 +45,7 @@ class  BiGRU(nn.Module):
 
     def forward(self, input):
         embed = self.embed(input)
-        embed = self.dropout(embed)  # add this reduce the acc
+        embed = self.dropout(embed)
         input = embed.view(len(input), embed.size(1), -1)
         # gru
         gru_out, hidden = self.bigru(input, self.hidden)

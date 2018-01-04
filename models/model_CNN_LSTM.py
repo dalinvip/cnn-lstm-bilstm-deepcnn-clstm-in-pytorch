@@ -8,7 +8,13 @@ import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
-class  CNN_LSTM(nn.Module):
+"""
+    Neural Network: CNN_LSTM
+    Detail: the input crosss cnn model and LSTM model independly, then the result of both concat
+"""
+
+
+class CNN_LSTM(nn.Module):
     
     def __init__(self, args):
         super(CNN_LSTM, self).__init__()
@@ -50,9 +56,7 @@ class  CNN_LSTM(nn.Module):
             return (Variable(torch.zeros(1 * num_layers, batch_size, self.hidden_dim)),
                     Variable(torch.zeros(1 * num_layers, batch_size, self.hidden_dim)))
 
-
     def forward(self, x):
-        # print("fffff",x)
         embed = self.embed(x)
 
         # CNN
@@ -69,7 +73,6 @@ class  CNN_LSTM(nn.Module):
         lstm_out, self.hidden = self.lstm(lstm_x, self.hidden)
         lstm_out = torch.transpose(lstm_out, 0, 1)
         lstm_out = torch.transpose(lstm_out, 1, 2)
-        # lstm_out = F.tanh(lstm_out)
         lstm_out = F.max_pool1d(lstm_out, lstm_out.size(2)).squeeze(2)
 
         # CNN and LSTM cat

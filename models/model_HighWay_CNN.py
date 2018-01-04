@@ -8,7 +8,14 @@ import torch.nn.init as init
 import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
-class  HighWay_CNN(nn.Module):
+
+"""
+    Neural Networks model : Highway Networks and CNN
+    Highway Networks : git@github.com:bamtercelboo/pytorch_Highway_Networks.git
+"""
+
+
+class HighWay_CNN(nn.Module):
     
     def __init__(self, args):
         super(HighWay_CNN, self).__init__()
@@ -42,11 +49,8 @@ class  HighWay_CNN(nn.Module):
         else:
             print("using narrow convolution")
             self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), bias=True) for K in Ks]
-        # self.convs1 = [nn.Conv2d(Ci, D, (K, D), stride=1, padding=(K // 2, 0)) for K in Ks]
         print(self.convs1)
 
-        # for con in self.convs1:
-            # print("PP {} ".format(con.weight))
         if args.init_weight:
             print("Initing W .......")
             for conv in self.convs1:
@@ -54,22 +58,15 @@ class  HighWay_CNN(nn.Module):
                 fan_in, fan_out = HighWay_CNN.calculate_fan_in_and_fan_out(conv.weight.data)
                 print(" in {} out {} ".format(fan_in, fan_out))
                 std = np.sqrt(args.init_weight_value) * np.sqrt(2.0 / (fan_in + fan_out))
-                print("aaaaaaaaaaaaa {} ".format(std))
                 init.uniform(conv.bias, 0, 0)
 
         self.dropout = nn.Dropout(args.dropout)
-        # self.dropout = nn.Dropout2d(args.dropout)
-        # self.dropout = nn.AlphaDropout(args.dropout)
 
         in_fea = len(Ks) * Co
-        # self.fc1 = nn.Linear(in_features=in_fea, out_features=C, bias=True)
         self.fc1 = nn.Linear(in_features=in_fea, out_features=in_fea, bias=True)
-        # self.fc2 = nn.Linear(in_features=in_fea // 2, out_features=C, bias=True)
 
         # highway gate layer
-        # self.gate_layer = nn.Linear(in_features=in_fea, out_features=C, bias=True)
         self.gate_layer = nn.Linear(in_features=in_fea, out_features=in_fea, bias=True)
-        # self.gate_layer.bias.data.fill_(-1)
 
         # last liner
         self.logit_layer = nn.Linear(in_features=in_fea, out_features=C, bias=True)
@@ -104,7 +101,6 @@ class  HighWay_CNN(nn.Module):
         return fan_in, fan_out
 
     def forward(self, x):
-        # print("source x {} ".format(x.size()))
         x = self.embed(x)  # (N,W,D)
         x = self.dropout(x)
         x = x.unsqueeze(1)  # (N,Ci,W,D)
@@ -112,29 +108,19 @@ class  HighWay_CNN(nn.Module):
             x = [self.convs1_bn(F.tanh(conv(x))).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
             x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x] #[(N,Co), ...]*len(Ks)
         else:
-            # x = [self.dropout(F.relu(conv(x)).squeeze(3)) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
             x = [F.relu(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
-            # x = [F.tanh(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
-            # x = [conv(x).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
             x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x] #[(N,Co), ...]*len(Ks)
         x = torch.cat(x, 1)
-        # x = self.dropout(x)  # (N,len(Ks)*Co)
         if self.args.batch_normalizations is True:
             x = self.fc1_bn(self.fc1(x))
             fc = self.fc2_bn(self.fc2(F.tanh(x)))
         else:
             fc = self.fc1(x)
-            # fc = self.fc2(F.relu(x))
-
-        # print("xxx {} ".format(x.size()))
 
         gate_layer = F.sigmoid(self.gate_layer(x))
 
         # calculate highway layer values
-        # print(" fc_size {} gate_layer_size {}".format(fc.size(), gate_layer.size()))
         gate_fc_layer = torch.mul(fc, gate_layer)
-        # print("gate_layer {} ".format(gate_layer))
-        # print("1 - gate_layer size {} ".format((1 - gate_layer).size()))
         # if write like follow ,can run,but not equal the HighWay NetWorks formula
         # gate_input = torch.mul((1 - gate_layer), fc)
         gate_input = torch.mul((1 - gate_layer), x)

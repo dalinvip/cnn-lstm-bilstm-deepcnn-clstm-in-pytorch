@@ -8,8 +8,15 @@ import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
-class  CNN_BiLSTM(nn.Module):
-    
+
+"""
+    Neural Network: CNN_BiLSTM
+    Detail: the input crosss cnn model and LSTM model independly, then the result of both concat
+"""
+
+
+class CNN_BiLSTM(nn.Module):
+
     def __init__(self, args):
         super(CNN_BiLSTM,self).__init__()
         self.args = args
@@ -61,9 +68,7 @@ class  CNN_BiLSTM(nn.Module):
         cnn_x = embed
         cnn_x = torch.transpose(cnn_x, 0, 1)
         cnn_x = cnn_x.unsqueeze(1)
-        # cnn_x = [F.relu(conv(cnn_x)).squeeze(3) for conv in self.convs1]  # [(N,Co,W), ...]*len(Ks)
         cnn_x = [conv(cnn_x).squeeze(3) for conv in self.convs1]  # [(N,Co,W), ...]*len(Ks)
-        # cnn_x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in cnn_x]  # [(N,Co), ...]*len(Ks)
         cnn_x = [F.tanh(F.max_pool1d(i, i.size(2)).squeeze(2)) for i in cnn_x]  # [(N,Co), ...]*len(Ks)
         cnn_x = torch.cat(cnn_x, 1)
         cnn_x = self.dropout(cnn_x)
@@ -73,7 +78,6 @@ class  CNN_BiLSTM(nn.Module):
         bilstm_out, self.hidden = self.bilstm(bilstm_x, self.hidden)
         bilstm_out = torch.transpose(bilstm_out, 0, 1)
         bilstm_out = torch.transpose(bilstm_out, 1, 2)
-        # bilstm_out = F.tanh(bilstm_out)
         bilstm_out = F.max_pool1d(bilstm_out, bilstm_out.size(2)).squeeze(2)
         bilstm_out = F.tanh(bilstm_out)
 
@@ -85,9 +89,7 @@ class  CNN_BiLSTM(nn.Module):
 
         # linear
         cnn_bilstm_out = self.hidden2label1(F.tanh(cnn_bilstm_out))
-        # cnn_bilstm_out = F.tanh(self.hidden2label1(cnn_bilstm_out))
         cnn_bilstm_out = self.hidden2label2(F.tanh(cnn_bilstm_out))
-        # cnn_bilstm_out = self.hidden2label2(cnn_bilstm_out)
 
         # output
         logit = cnn_bilstm_out

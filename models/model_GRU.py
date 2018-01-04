@@ -8,19 +8,21 @@ import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
-class  GRU(nn.Module):
+"""
+Neural Networks model : GRU
+"""
+
+
+class GRU(nn.Module):
     
     def __init__(self, args):
         super(GRU, self).__init__()
         self.args = args
-        # print(args)
-
         self.hidden_dim = args.lstm_hidden_dim
         self.num_layers = args.lstm_num_layers
         V = args.embed_num
         D = args.embed_dim
         C = args.class_num
-        # self.embed = nn.Embedding(V, D, max_norm=args.max_norm)
         self.embed = nn.Embedding(V, D)
         # word embedding
         if args.word_Embedding:
@@ -45,9 +47,6 @@ class  GRU(nn.Module):
         self.hidden = self.init_hidden(self.num_layers, input.size(1))
         embed = self.embed(input)
         input = embed.view(len(input), embed.size(1), -1)
-        # lstm
-        # print(input)
-        # print("a", self.hidden)
         lstm_out, hidden = self.gru(input, self.hidden)
         lstm_out = torch.transpose(lstm_out, 0, 1)
         lstm_out = torch.transpose(lstm_out, 1, 2)

@@ -8,7 +8,14 @@ import torch.nn.init as init
 import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
-class  DEEP_CNN(nn.Module):
+
+"""
+    Neural Network: DEEP_CNN
+    Detail: two layer cnn
+"""
+
+
+class DEEP_CNN(nn.Module):
     
     def __init__(self, args):
         super(DEEP_CNN, self).__init__()
@@ -57,7 +64,6 @@ class  DEEP_CNN(nn.Module):
 
     def forward(self, x):
         one_layer = self.embed(x)  # (N,W,D) #  torch.Size([64, 43, 300])
-        # one_layer = self.dropout(one_layer)
         one_layer = one_layer.unsqueeze(1)  # (N,Ci,W,D)  #  torch.Size([64, 1, 43, 300])
         # one layer
         one_layer = [torch.transpose(F.relu(conv(one_layer)).squeeze(3), 1, 2) for conv in self.convs1] # torch.Size([64, 100, 36])

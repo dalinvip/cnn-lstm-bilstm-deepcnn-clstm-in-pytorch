@@ -8,7 +8,14 @@ import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
-class  CNN_BiGRU(nn.Module):
+
+"""
+    Neural Network: CNN_BiGRU
+    Detail: the input crosss cnn model and GRU model independly, then the result of both concat
+"""
+
+
+class CNN_BiGRU(nn.Module):
     
     def __init__(self, args):
         super(CNN_BiGRU,self).__init__()
@@ -23,7 +30,6 @@ class  CNN_BiGRU(nn.Module):
         Co = args.kernel_num
         Ks = args.kernel_sizes
         self.embed = nn.Embedding(V, D)
-        # self.embed = nn.Embedding(V, D, max_norm=args.max_norm)
         if args.word_Embedding:
             pretrained_weight = np.array(args.pretrained_weight)
             self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
@@ -54,20 +60,15 @@ class  CNN_BiGRU(nn.Module):
 
     def forward(self, x):
         embed = self.embed(x)
-
         embed = self.dropout(embed)
-
         # CNN
         cnn_x = embed
         cnn_x = torch.transpose(cnn_x, 0, 1)
         cnn_x = cnn_x.unsqueeze(1)
-        # cnn_x = [F.relu(conv(cnn_x)).squeeze(3) for conv in self.convs1]  # [(N,Co,W), ...]*len(Ks)
         cnn_x = [conv(cnn_x).squeeze(3) for conv in self.convs1]  # [(N,Co,W), ...]*len(Ks)
-        # cnn_x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in cnn_x]  # [(N,Co), ...]*len(Ks)
         cnn_x = [F.tanh(F.max_pool1d(i, i.size(2)).squeeze(2)) for i in cnn_x]  # [(N,Co), ...]*len(Ks)
         cnn_x = torch.cat(cnn_x, 1)
         cnn_x = self.dropout(cnn_x)
-
         # BiGRU
         bigru_x = embed.view(len(x), embed.size(1), -1)
         bigru_x, self.hidden = self.bigru(bigru_x, self.hidden)

@@ -4,10 +4,6 @@ import argparse
 import datetime
 import torch
 import torchtext.data as data
-import torchtext.datasets as datasets
-from Cython.Shadow import profile
-from sklearn.utils import shuffle
-
 from models import model_CNN
 from models import model_HighWay_CNN
 from models import model_DeepCNN
@@ -38,6 +34,7 @@ import shutil
 import numpy as np
 import random
 import hyperparams
+
 # solve encoding
 from imp import reload
 import sys
@@ -124,10 +121,7 @@ parser.add_argument('-device', type=int, default=hyperparams.device, help='devic
 parser.add_argument('-no_cuda', action='store_true', default=hyperparams.no_cuda, help='disable the gpu')
 # option
 parser.add_argument('-snapshot', type=str, default=hyperparams.snapshot, help='filename of model snapshot [default: None]')
-# parser.add_argument('-snapshot', type=str, default="./snapshot/2017-07-13_07-26-41/snapshot_steps155000.pt", help='filename of model snapshot [default: None]')
 parser.add_argument('-predict', type=str, default=hyperparams.predict, help='predict the sentence given')
-# parser.add_argument('-predict', type=str, default="I love you so much， and I love you forever ", help='predict the sentence given')
-# parser.add_argument('-predict', type=str, default="I hate you  and I hate you so sad, I am crying ", help='predict the sentence given')
 parser.add_argument('-test', action='store_true', default=hyperparams.test, help='train or test')
 args = parser.parse_args()
 
@@ -143,13 +137,8 @@ def mrs_two(path, train_name, dev_name, test_name, char_data, text_field, label_
                                         (train_data, dev_data, test_data),
                                         batch_sizes=(args.batch_size, len(dev_data), len(test_data)),
                                         **kargs)
-    # print("aaaaaaaaaaaaaaaa")
-    # train_iter, dev_iter, test_iter = data.Iterator.splits(
-    #                                     (train_data, dev_data, test_data),
-    #                                     batch_sizes=(args.batch_size, args.batch_size, args.batch_size),
-    #                                     **kargs)
-
     return train_iter, dev_iter, test_iter
+
 
 def mrs_two_mui(path, train_name, dev_name, test_name, char_data, text_field, label_field, static_text_field, static_label_field, **kargs):
     train_data, dev_data, test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name, test_name,
@@ -173,7 +162,6 @@ def mrs_two_mui(path, train_name, dev_name, test_name, char_data, text_field, la
     return train_iter, dev_iter, test_iter
 
 
-
 # load five-classification data
 def mrs_five(path, train_name, dev_name, test_name, char_data, text_field, label_field, **kargs):
     train_data, dev_data, test_data = mydatasets_self_five.MR.splits(path, train_name, dev_name, test_name,
@@ -195,7 +183,9 @@ def mrs_five(path, train_name, dev_name, test_name, char_data, text_field, label
                                         **kargs)
     return train_iter, dev_iter, test_iter
 
-def mrs_five_mui(path, train_name, dev_name, test_name, char_data, text_field, label_field, static_text_field, static_label_field, **kargs):
+
+def mrs_five_mui(path, train_name, dev_name, test_name, char_data, text_field, label_field, static_text_field,
+                 static_label_field, **kargs):
     train_data, dev_data, test_data = mydatasets_self_five.MR.splits(path, train_name, dev_name, test_name,
                                                                      char_data, text_field, label_field)
     static_train_data, static_dev_data, static_test_data = mydatasets_self_five.MR.splits(path, train_name, dev_name,
@@ -230,47 +220,39 @@ def mr(text_field, label_field, **kargs):
     return train_iter, dev_iter
 
 
-
 # load data
 print("\nLoading data...")
 text_field = data.Field(lower=True)
-# text_field = data.Field(lower=False)
 label_field = data.Field(sequential=False)
 static_text_field = data.Field(lower=True)
 static_label_field = data.Field(sequential=False)
 if args.FIVE_CLASS_TASK:
     print("Executing 5 Classification Task......")
-    # train_iter, dev_iter, test_iter = mrs_five(args.datafile_path, args.name_trainfile,
-    #                                            args.name_devfile, args.name_testfile, args.char_data, text_field, label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle)
     if args.CNN_MUI is True or args.DEEP_CNN_MUI is True:
         train_iter, dev_iter, test_iter = mrs_five_mui(args.datafile_path, args.name_trainfile,
-                                                       args.name_devfile, args.name_testfile, args.char_data, text_field=text_field,
-                                                       label_field=label_field, static_text_field=static_text_field,
-                                                       static_label_field=static_label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle, sort=False)
+                                                       args.name_devfile, args.name_testfile, args.char_data,
+                                                       text_field=text_field,label_field=label_field,
+                                                       static_text_field=static_text_field,
+                                                       static_label_field=static_label_field, device=-1, repeat=False,
+                                                       shuffle=args.epochs_shuffle, sort=False)
     else:
         train_iter, dev_iter, test_iter = mrs_five(args.datafile_path, args.name_trainfile,
                                                    args.name_devfile, args.name_testfile, args.char_data, text_field,
-                                                   label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle, sort=False)
+                                                   label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle,
+                                                   sort=False)
 elif args.TWO_CLASS_TASK:
     print("Executing 2 Classification Task......")
     if args.CNN_MUI is True or args.DEEP_CNN_MUI is True:
         train_iter, dev_iter, test_iter = mrs_two_mui(args.datafile_path, args.name_trainfile,
                                                       args.name_devfile, args.name_testfile, args.char_data, text_field=text_field,
                                                       label_field=label_field, static_text_field=static_text_field,
-                                                      static_label_field=static_label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle, sort=False)
+                                                      static_label_field=static_label_field, device=-1, repeat=False,
+                                                      shuffle=args.epochs_shuffle, sort=False)
     else:
         train_iter, dev_iter, test_iter = mrs_two(args.datafile_path, args.name_trainfile,
                                                   args.name_devfile, args.name_testfile, args.char_data, text_field,
-                                                  label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle, sort=False)
-
-
-
-
-# handle external word embedding to file for convenience
-# from loaddata.handle_wordEmbedding2File import WordEmbedding2File
-# wordembedding = WordEmbedding2File(wordEmbedding_path="./word2vec/glove.sentiment.conj.pretrained.txt",
-#                                    vocab=text_field.vocab.itos, k_dim=300)
-# wordembedding.handle()
+                                                  label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle,
+                                                  sort=False)
 
 # load word2vec
 if args.word_Embedding:
@@ -295,7 +277,6 @@ if args.word_Embedding:
             static_word_vecs = word_embedding.add_unknown_words_by_uniform(static_word_vecs, static_text_field.vocab.itos, k=args.embed_dim)
     else:
         print("loading unknown word by avg......")
-        # word_vecs = add_unknown_words_by_uniform(word_vecs, text_field.vocab.itos, k=args.embed_dim)
         word_vecs = word_embedding.add_unknown_words_by_avg(word_vecs, text_field.vocab.itos, k=args.embed_dim)
         if args.CNN_MUI is True or args.DEEP_CNN_MUI is True:
             static_word_vecs = word_embedding.add_unknown_words_by_avg(static_word_vecs, static_text_field.vocab.itos, k=args.embed_dim)
@@ -503,6 +484,3 @@ else:
         file.write("\n")
         file.close()
         shutil.copy("./Test_Result.txt", "./snapshot/" + mulu + "/Test_Result.txt")
-        # shutil.copy("./Parameters.txt", "./snapshot/" + mulu + "/Parameters.txt")
-
-

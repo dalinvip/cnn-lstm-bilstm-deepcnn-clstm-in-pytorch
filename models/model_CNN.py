@@ -8,7 +8,13 @@ import torch.nn.init as init
 import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
-class  CNN_Text(nn.Module):
+
+"""
+    Neural Network: CNN
+"""
+
+
+class CNN_Text(nn.Module):
     
     def __init__(self, args):
         super(CNN_Text, self).__init__()
@@ -42,11 +48,8 @@ class  CNN_Text(nn.Module):
         else:
             print("using narrow convolution")
             self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), bias=True) for K in Ks]
-        # self.convs1 = [nn.Conv2d(Ci, D, (K, D), stride=1, padding=(K // 2, 0)) for K in Ks]
         print(self.convs1)
 
-        # for con in self.convs1:
-            # print("PP {} ".format(con.weight))
         if args.init_weight:
             print("Initing W .......")
             for conv in self.convs1:
@@ -54,8 +57,7 @@ class  CNN_Text(nn.Module):
                 fan_in, fan_out = CNN_Text.calculate_fan_in_and_fan_out(conv.weight.data)
                 print(" in {} out {} ".format(fan_in, fan_out))
                 std = np.sqrt(args.init_weight_value) * np.sqrt(2.0 / (fan_in + fan_out))
-                print("aaaaaaaaaaaaa {} ".format(std))
-                # init.uniform(conv.bias, 0, 0)
+        # for cnn cuda
         if self.args.cuda is True:
             for conv in self.convs1:
                 conv = conv.cuda()
@@ -63,8 +65,6 @@ class  CNN_Text(nn.Module):
         self.dropout = nn.Dropout(args.dropout)
         self.dropout_embed = nn.Dropout(args.dropout_embed)
         in_fea = len(Ks) * Co
-        # self.fc1 = nn.Linear(in_features=in_fea, out_features=in_fea // 2, bias=True)
-        # self.fc2 = nn.Linear(in_features=in_fea // 2, out_features=C, bias=True)
         self.fc = nn.Linear(in_features=in_fea, out_features=C, bias=True)
         # whether to use batch normalizations
         if args.batch_normalizations is True:
@@ -103,10 +103,7 @@ class  CNN_Text(nn.Module):
             x = [self.convs1_bn(F.tanh(conv(x))).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
             x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x] #[(N,Co), ...]*len(Ks)
         else:
-            # x = [self.dropout(F.relu(conv(x)).squeeze(3)) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
-            # x = [self.dropout(F.tanh(conv(x)).squeeze(3)) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
             x = [F.relu(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
-            # x = [F.tanh(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
             x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x] #[(N,Co), ...]*len(Ks)
         x = torch.cat(x, 1)
         x = self.dropout(x)  # (N,len(Ks)*Co)

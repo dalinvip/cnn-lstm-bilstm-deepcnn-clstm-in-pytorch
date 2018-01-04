@@ -51,8 +51,6 @@ def train(train_iter, dev_iter, test_iter, model, args):
         # print("now lr is {} \n".format(optimizer.param_groups[0].get("lr")))
         for batch in train_iter:
             feature, target = batch.text, batch.label.data.sub_(1)
-            # feature.data.t_()
-            # target.data.sub_(1)  # batch first, index align
             if args.cuda is True:
                 feature, target = feature.cuda(), target.cuda()
 
@@ -94,8 +92,6 @@ def train(train_iter, dev_iter, test_iter, model, args):
                 test_model = torch.load(save_path)
                 model_count += 1
                 test_eval(test_iter, test_model, save_path, args, model_count)
-                # test_eval(test_iter, model, save_path, args, model_count)
-                # print("model_count \n", model_count)
     return model_count
 
 
@@ -105,10 +101,6 @@ def eval(data_iter, model, args, scheduler):
     for batch in data_iter:
         feature, target = batch.text, batch.label
         target.data.sub_(1)
-        # feature.data.t_(), target.data.sub_(1)  # batch first, index align
-        # feature.data.t_(),\
-        # target.data.sub_(1)  # batch first, index align
-        # target = autograd.Variable(target)
         if args.cuda is True:
             feature, target = feature.cuda(), target.cuda()
 
@@ -118,7 +110,6 @@ def eval(data_iter, model, args, scheduler):
             model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
         logit = model(feature)
         loss = F.cross_entropy(logit, target, size_average=False)
-        # scheduler.step(loss.data[0])
 
         avg_loss += loss.data[0]
         corrects += (torch.max(logit, 1)[1].view(target.size()).data == target.data).sum()
@@ -140,9 +131,6 @@ def test_eval(data_iter, model, save_path, args, model_count):
     for batch in data_iter:
         feature, target = batch.text, batch.label
         target.data.sub_(1)
-        # feature.data.t_()
-        # target.data.sub_(1)  # batch first, index align
-        # target = autograd.Variable(target)
         if args.cuda is True:
             feature, target = feature.cuda(), target.cuda()
 

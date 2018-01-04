@@ -8,8 +8,14 @@ import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
-class  CGRU(nn.Module):
-    
+"""
+    Neural Network: CGRU
+    Detail: The input first cross CNN model ,then the output of CNN as the input of GRU
+"""
+
+
+class CGRU(nn.Module):
+
     def __init__(self, args):
         super(CGRU, self).__init__()
         self.args = args

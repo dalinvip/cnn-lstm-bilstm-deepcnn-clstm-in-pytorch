@@ -11,17 +11,19 @@ random.seed(hyperparams.seed_num)
 
 """
 Description:
-the model is a mulit-channel CNNS model, 
-the model use two external word embedding, and then,
-one of word embedding built from train/dev/test dataset,
-and it be used to no-fine-tune,other one built from only
-train dataset,and be used to fine-tune.
-
-my idea,even if the word embedding built from train/dev/test dataset, 
-whether can use fine-tune, in others words, whether can fine-tune with
-two external word embedding?
+    the model is a mulit-channel CNNS model, 
+    the model use two external word embedding, and then,
+    one of word embedding built from train/dev/test dataset,
+    and it be used to no-fine-tune,other one built from only
+    train dataset,and be used to fine-tune.
+    
+    my idea,even if the word embedding built from train/dev/test dataset, 
+    whether can use fine-tune, in others words, whether can fine-tune with
+    two external word embedding.
 """
-class  CNN_MUI(nn.Module):
+
+
+class CNN_MUI(nn.Module):
     
     def __init__(self, args):
         super(CNN_MUI, self).__init__()
@@ -39,12 +41,10 @@ class  CNN_MUI(nn.Module):
             print("max_norm = {} ".format(args.max_norm))
             self.embed_no_static = nn.Embedding(V, D, max_norm=args.max_norm, scale_grad_by_freq=True)
             self.embed_static = nn.Embedding(V_mui, D, max_norm=args.max_norm, scale_grad_by_freq=True)
-            # self.embed_static = nn.Embedding(V, D, max_norm=args.max_norm, scale_grad_by_freq=True)
         else:
             print("max_norm = {} ".format(args.max_norm))
             self.embed_no_static = nn.Embedding(V, D, scale_grad_by_freq=True)
             self.embed_static = nn.Embedding(V_mui, D, scale_grad_by_freq=True)
-            # self.embed_static = nn.Embedding(V, D, scale_grad_by_freq=True)
         if args.word_Embedding:
             pretrained_weight = np.array(args.pretrained_weight)
             self.embed_no_static.weight.data.copy_(torch.from_numpy(pretrained_weight))
@@ -61,7 +61,6 @@ class  CNN_MUI(nn.Module):
         else:
             print("using narrow convolution")
             self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), bias=True) for K in Ks]
-        # self.convs1 = [nn.Conv2d(Ci, D, (K, D), stride=1, padding=(K // 2, 0)) for K in Ks]
         print(self.convs1)
 
         if args.init_weight:
@@ -94,17 +93,10 @@ class  CNN_MUI(nn.Module):
         x = F.max_pool1d(x, x.size(2)).squeeze(2)
         return x
 
-
     def forward(self, x):
-        # print("aaaaa")
         x_no_static = self.embed_no_static(x)
-        # x_no_static = self.dropout(x_no_static)
         x_static = self.embed_static(x)
-        # fix the embedding
-        # x_static = Variable(x_static.data)
-        # x_static = self.dropout(x_static)
         x = torch.stack([x_static, x_no_static], 1)
-        # x = x.unsqueeze(1) # (N,Ci,W,D)
         x = self.dropout(x)
         if self.args.batch_normalizations is True:
             x = [F.relu(self.convs1_bn(conv(x))).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
@@ -113,14 +105,7 @@ class  CNN_MUI(nn.Module):
             x = [F.relu(conv(x)).squeeze(3) for conv in self.convs1] #[(N,Co,W), ...]*len(Ks)
             x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x]  # [(N,Co), ...]*len(Ks)
         x = torch.cat(x, 1)
-        '''
-        x1 = self.conv_and_pool(x,self.conv13) #(N,Co)
-        x2 = self.conv_and_pool(x,self.conv14) #(N,Co)
-        x3 = self.conv_and_pool(x,self.conv15) #(N,Co)
-        x = torch.cat((x1, x2, x3), 1) # (N,len(Ks)*Co)
-        '''
         x = self.dropout(x)  # (N,len(Ks)*Co)
-
         if self.args.batch_normalizations is True:
             x = self.fc1(x)
             logit = self.fc2(F.relu(x))
