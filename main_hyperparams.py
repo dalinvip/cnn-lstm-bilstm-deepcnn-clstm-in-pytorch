@@ -48,9 +48,11 @@ torch.manual_seed(hyperparams.seed_num)
 np.random.seed((hyperparams.seed_num))
 random.seed(hyperparams.seed_num)
 torch.cuda.manual_seed(233)
+
 """
 if can not fix, try this, but the speed will de slowed
-# torch.backends.cudnn.enabled = False
+#   torch.backends.cudnn.enabled = False
+    torch.backends.cudnn.deterministic = True
 """
 
 
