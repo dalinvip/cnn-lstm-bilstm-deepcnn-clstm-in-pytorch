@@ -22,7 +22,8 @@ FIVE_CLASS_TASK = False
 TWO_CLASS_TASK = True
 dropout = 0.4
 dropout_embed = 0.5
-max_norm = None # when the valus is not None, the random seed can not fix in gpu(pytorch version 0.3)
+# when the valus is not None, the random seed can not fix in gpu(pytorch version 0.3)
+max_norm = None
 clip_max_norm = 3
 # clip_max_norm
 kernel_num = 200
