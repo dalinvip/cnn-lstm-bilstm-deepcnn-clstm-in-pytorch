@@ -45,6 +45,7 @@ if sys.getdefaultencoding() != defaultencoding:
 
 # random seed
 torch.manual_seed(hyperparams.seed_num)
+np.random.seed((hyperparams.seed_num))
 random.seed(hyperparams.seed_num)
 torch.cuda.manual_seed(233)
 parser = argparse.ArgumentParser(description="text classification")
@@ -168,12 +169,6 @@ def mrs_five(path, train_name, dev_name, test_name, char_data, text_field, label
                                                                      char_data, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
     text_field.build_vocab(train_data, min_freq=args.min_freq)
-    if os.path.exists("./vocab.txt"):
-        os.remove("./vocab.txt")
-    file = open("./vocab.txt", "w")
-    for word in text_field.vocab.itos:
-        file.write(word)
-        file.write("\n")
     label_field.build_vocab(train_data)
     train_iter, dev_iter, test_iter = data.Iterator.splits(
                                         (train_data, dev_data, test_data),
@@ -316,10 +311,10 @@ file.close()
 shutil.copy("./Parameters.txt", "./snapshot/" + mulu + "/Parameters.txt")
 shutil.copy("./hyperparams.py", "./snapshot/" + mulu)
 
-if args.cuda is True:
-    torch.cuda.seed()
-    torch.cuda.manual_seed(hyperparams.seed_num)
-
+# if args.cuda is True:
+    # torch.cuda.seed()
+    # torch.cuda.manual_seed(hyperparams.seed_num)
+#
 # model
 if args.snapshot is None:
     if args.CNN:

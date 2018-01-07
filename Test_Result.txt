@@ -1,3 +1,35 @@
-model snapshot\2017-08-03_14-22-06\snapshot_steps5.pt
-Evaluation - loss: 1.576202  acc: 28.6425%(633/2210) 
+model snapshot\2018-01-07_09-41-54\snapshot_steps100.pt
+Evaluation - loss: 0.693320  acc: 50.3020%(916/1821) 
+model_count 1 
+
+
+The Current Best Result is : 50.302
+
+model snapshot\2018-01-07_09-41-59\snapshot_steps100.pt
+Evaluation - loss: 0.693320  acc: 50.3020%(916/1821) 
+model_count 1 
+
+
+The Current Best Result is : 50.302
+
+model snapshot\2018-01-07_09-41-54\snapshot_steps200.pt
+Evaluation - loss: 0.687489  acc: 52.3888%(954/1821) 
+model_count 2 
+
+
+The Current Best Result is : 52.3888
+
+model snapshot\2018-01-07_09-41-54\snapshot_steps300.pt
+Evaluation - loss: 0.683847  acc: 52.2241%(951/1821) 
+model_count 3 
+
+
+The Current Best Result is : 52.3888
+
+model snapshot\2018-01-07_09-41-54\snapshot_steps400.pt
+Evaluation - loss: 0.677888  acc: 60.7908%(1107/1821) 
+model_count 4 
+
+
+The Current Best Result is : 60.7908
 

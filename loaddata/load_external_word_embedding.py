@@ -1,6 +1,10 @@
 # coding=utf-8
 import numpy as np
 import collections
+import random
+import hyperparams
+np.random.seed(hyperparams.seed_num)
+random.seed(hyperparams.seed_num)
 
 
 class Word_Embedding():

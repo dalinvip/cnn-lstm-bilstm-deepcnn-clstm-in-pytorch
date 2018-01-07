@@ -8,7 +8,7 @@ import torch.nn.init as init
 import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
-
+np.random.seed(hyperparams.seed_num)
 """
 Neural Networks model : LSTM
 """
@@ -27,7 +27,7 @@ class LSTM(nn.Module):
         C = args.class_num
         if args.max_norm is not None:
             print("max_norm = {} ".format(args.max_norm))
-            self.embed = nn.Embedding(V, D, max_norm=args.max_norm, scale_grad_by_freq=True)
+            self.embed = nn.Embedding(V, D, max_norm=None, scale_grad_by_freq=False)
         else:
             print("max_norm = {} |||||".format(args.max_norm))
             self.embed = nn.Embedding(V, D, scale_grad_by_freq=True)

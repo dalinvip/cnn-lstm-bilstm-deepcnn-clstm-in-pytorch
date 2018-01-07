@@ -7,6 +7,7 @@ import torch.nn.utils as utils
 import torch.optim.lr_scheduler as lr_scheduler
 import shutil
 import random
+import numpy as np
 import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)

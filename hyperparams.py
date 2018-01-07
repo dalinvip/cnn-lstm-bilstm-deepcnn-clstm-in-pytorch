@@ -16,19 +16,19 @@ name_devfile = "raw.clean.dev"
 name_testfile = "raw.clean.test"
 word_data = False
 char_data = False
-shuffle = True
-epochs_shuffle = True
+shuffle = False
+epochs_shuffle = False
 FIVE_CLASS_TASK = False
 TWO_CLASS_TASK = True
 dropout = 0.4
 dropout_embed = 0.5
-max_norm = 5
+max_norm = None # when the valus is not None, the random seed can not fix in gpu(pytorch version 0.3)
 clip_max_norm = 3
 # clip_max_norm
 kernel_num = 200
-kernel_sizes = "1,2,3,4"
+kernel_sizes = "1,2"
 static = False
-CNN = False
+CNN = True
 HighWay_CNN = False
 CNN_MUI = False
 DEEP_CNN = False
@@ -72,7 +72,7 @@ test = False
 num_threads = 1
 freq_1_unk = False
 # whether to init w
-init_weight = True
+init_weight = False
 init_weight_value = 6.0
 # L2 weight_decay
 weight_decay = 1e-8   # default value is zero in Adam SGD

@@ -29,7 +29,7 @@ class CNN_Text(nn.Module):
 
         if args.max_norm is not None:
             print("max_norm = {} ".format(args.max_norm))
-            self.embed = nn.Embedding(V, D, max_norm=args.max_norm, scale_grad_by_freq=True)
+            self.embed = nn.Embedding(V, D, max_norm=5, scale_grad_by_freq=True)
             # self.embed.weight.data.uniform(-0.1, 0.1)
         else:
             print("max_norm = {} ".format(args.max_norm))
