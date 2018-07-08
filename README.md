@@ -1,7 +1,8 @@
-﻿## Introduction
+## Introduction
 
 * The sentiment classification tasks that apply multiple neural network
-* the repository is being updated......
+* The repository is being updated......
+* Recently, the structure of this code will be rewritten.
 
 ## Requirement
 
