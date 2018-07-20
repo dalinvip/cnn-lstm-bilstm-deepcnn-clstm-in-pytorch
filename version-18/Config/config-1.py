@@ -3,17 +3,9 @@ from configparser import ConfigParser
 import os
 
 
-class myconf(ConfigParser):
-    def __init__(self, defaults=None):
-        ConfigParser.__init__(self, defaults=defaults)
-
-    def optionxform(self, optionstr):
-        return optionstr
-
-
-class Configurable(myconf):
+class Configurable(object):
     def __init__(self, config_file):
-        config = myconf()
+        config = ConfigParser()
         config.read(config_file)
         self._config = config
 
@@ -23,7 +15,7 @@ class Configurable(myconf):
                 print(k, ":", v)
         # if not os.path.isdir(self.save_dir):
         #     os.mkdir(self.save_dir)
-        config.write(open(config_file, 'w'))
+        # config.write(open(config_file, 'w'))
 
     # Data
     @property

@@ -19,7 +19,7 @@ class BiLSTM_1(nn.Module):
         V = args.embed_num
         D = args.embed_dim
         C = args.class_num
-        # self.embed = nn.Embedding(V, D, max_norm=args.max_norm)
+        # self.embed = nn.Embedding(V, D, max_norm=config.max_norm)
         self.embed = nn.Embedding(V, D)
         if args.word_Embedding:
             pretrained_weight = np.array(args.pretrained_weight)

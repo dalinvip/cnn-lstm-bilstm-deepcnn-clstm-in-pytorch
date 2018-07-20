@@ -17,10 +17,10 @@ def train(train_iter, dev_iter, test_iter, model, args):
         model.cuda()
         torch.cuda.manual_seed(hyperparams.seed_num)
 
-    # optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-8)
-    # optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay)
-    # optimizer = torch.optim.SGD(model.parameters(), lr=args.lr,momentum=)
-    # optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=config.lr, weight_decay=1e-8)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=config.lr, weight_decay=config.init_weight_decay)
+    # optimizer = torch.optim.SGD(model.parameters(), lr=config.lr,momentum=)
+    # optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=config.lr)
 
     if args.Adam is True:
         print("Adam Training......")

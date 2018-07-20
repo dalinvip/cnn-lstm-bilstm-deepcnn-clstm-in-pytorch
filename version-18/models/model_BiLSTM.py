@@ -12,6 +12,7 @@ random.seed(seed_num)
 Neural Networks model : Bidirection LSTM
 """
 
+
 class BiLSTM(nn.Module):
     
     def __init__(self, args):
@@ -22,7 +23,7 @@ class BiLSTM(nn.Module):
         V = args.embed_num
         D = args.embed_dim
         C = args.class_num
-        # self.embed = nn.Embedding(V, D, max_norm=args.max_norm)
+        # self.embed = nn.Embedding(V, D, max_norm=config.max_norm)
         self.embed = nn.Embedding(V, D)
         if args.word_Embedding:
             pretrained_weight = np.array(args.pretrained_weight)
@@ -33,7 +34,7 @@ class BiLSTM(nn.Module):
         self.hidden2label1 = nn.Linear(self.hidden_dim, self.hidden_dim // 2)
         self.hidden2label2 = nn.Linear(self.hidden_dim // 2, C)
         self.hidden = self.init_hidden(self.num_layers, args.batch_size)
-        # self.dropout = nn.Dropout(args.dropout)
+        # self.dropout = nn.Dropout(config.dropout)
 
     def init_hidden(self, num_layers, batch_size):
         # the first is the hidden h

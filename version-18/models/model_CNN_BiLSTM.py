@@ -18,7 +18,7 @@ random.seed(seed_num)
 class CNN_BiLSTM(nn.Module):
 
     def __init__(self, args):
-        super(CNN_BiLSTM,self).__init__()
+        super(CNN_BiLSTM, self).__init__()
         self.args = args
         self.hidden_dim = args.lstm_hidden_dim
         self.num_layers = args.lstm_num_layers
@@ -30,7 +30,7 @@ class CNN_BiLSTM(nn.Module):
         Co = args.kernel_num
         Ks = args.kernel_sizes
         self.embed = nn.Embedding(V, D)
-        # self.embed = nn.Embedding(V, D, max_norm=args.max_norm)
+        # self.embed = nn.Embedding(V, D, max_norm=config.max_norm)
         if args.word_Embedding:
             pretrained_weight = np.array(args.pretrained_weight)
             self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))

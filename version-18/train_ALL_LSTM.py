@@ -17,10 +17,10 @@ def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:
         model.cuda()
 
-    # optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-8)
-    # optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay)
-    # optimizer = torch.optim.SGD(model.parameters(), lr=args.lr,momentum=)
-    # optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=config.lr, weight_decay=1e-8)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=config.lr, weight_decay=config.init_weight_decay)
+    # optimizer = torch.optim.SGD(model.parameters(), lr=config.lr,momentum=)
+    # optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=config.lr)
 
     if args.Adam is True:
         print("Adam Training......")
@@ -66,7 +66,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
             loss = F.cross_entropy(logit, target)
             loss.backward()
             if args.init_clip_max_norm is not None:
-                # print("aaaa {} ".format(args.init_clip_max_norm))
+                # print("aaaa {} ".format(config.init_clip_max_norm))
                 utils.clip_grad_norm(model.parameters(), max_norm=args.init_clip_max_norm)
             optimizer.step()
 
