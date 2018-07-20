@@ -81,6 +81,11 @@ class CNN_MUI(nn.Module):
         '''
         self.dropout = nn.Dropout(args.dropout)
 
+        # for cnn cuda
+        if self.args.cuda is True:
+            for conv in self.convs1:
+                conv = conv.cuda()
+
         in_fea = len(Ks) * Co
         self.fc1 = nn.Linear(in_features=in_fea, out_features=in_fea // 2, bias=True)
         self.fc2 = nn.Linear(in_features=in_fea // 2, out_features=C, bias=True)

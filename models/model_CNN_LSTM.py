@@ -42,6 +42,10 @@ class CNN_LSTM(nn.Module):
         # CNN
         self.convs1 = [nn.Conv2d(Ci, Co, (K, D)) for K in Ks]
         self.dropout = nn.Dropout(args.dropout)
+        # for cnn cuda
+        if self.args.cuda is True:
+            for conv in self.convs1:
+                conv = conv.cuda()
 
         # LSTM
         self.lstm = nn.LSTM(D, self.hidden_dim, dropout=args.dropout, num_layers=self.num_layers)

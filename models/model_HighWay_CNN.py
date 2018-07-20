@@ -66,6 +66,11 @@ class HighWay_CNN(nn.Module):
                 std = np.sqrt(args.init_weight_value) * np.sqrt(2.0 / (fan_in + fan_out))
                 init.uniform(conv.bias, 0, 0)
 
+        # for cnn cuda
+        if self.args.cuda is True:
+            for conv in self.convs1:
+                conv = conv.cuda()
+
         self.dropout = nn.Dropout(args.dropout)
 
         in_fea = len(Ks) * Co

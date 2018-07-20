@@ -44,6 +44,10 @@ class CNN_BiLSTM(nn.Module):
         # CNN
         self.convs1 = [nn.Conv2d(Ci, Co, (K, D), padding=(K//2, 0), stride=1) for K in Ks]
         print(self.convs1)
+        # for cnn cuda
+        if self.args.cuda is True:
+            for conv in self.convs1:
+                conv = conv.cuda()
 
         # BiLSTM
         self.bilstm = nn.LSTM(D, self.hidden_dim, num_layers=self.num_layers, dropout=args.dropout, bidirectional=True, bias=True)

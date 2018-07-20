@@ -72,13 +72,22 @@ class DEEP_CNN_MUI(nn.Module):
                 init.xavier_normal(conv2.weight.data, gain=np.sqrt(args.init_weight_value))
                 init.uniform(conv2.bias, 0, 0)
 
+        # for cnn cuda
+        if self.args.cuda is True:
+            for conv in self.convs1:
+                conv = conv.cuda()
+
+        # for cnn cuda
+        if self.args.cuda is True:
+            for conv in self.convs2:
+                conv = conv.cuda()
+
         # dropout
         self.dropout = nn.Dropout(args.dropout)
         # linear
         in_fea = len(Ks) * Co
         self.fc1 = nn.Linear(in_features=in_fea, out_features=in_fea // 2, bias=True)
         self.fc2 = nn.Linear(in_features=in_fea // 2, out_features=C, bias=True)
-
 
     def forward(self, x):
         x_no_static = self.embed_no_static(x)

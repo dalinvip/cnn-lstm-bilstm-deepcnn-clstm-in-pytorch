@@ -44,6 +44,10 @@ class CGRU(nn.Module):
             KK.append( K + 1 if K % 2 == 0 else K)
         # self.convs1 = [nn.Conv2d(Ci, Co, (K, D), stride=1, padding=(K//2, 0)) for K in KK]
         self.convs1 = [nn.Conv2d(Ci, D, (K, D), stride=1, padding=(K//2, 0)) for K in KK]
+        # for cnn cuda
+        if self.args.cuda is True:
+            for conv in self.convs1:
+                conv = conv.cuda()
         # GRU
         self.gru = nn.GRU(D, self.hidden_dim, num_layers=self.num_layers, dropout=args.dropout)
         self.hidden = self.init_hidden(self.num_layers, args.batch_size)

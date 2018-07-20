@@ -60,6 +60,16 @@ class DEEP_CNN(nn.Module):
                 init.xavier_normal(conv2.weight.data, gain=np.sqrt(args.init_weight_value))
                 init.uniform(conv2.bias, 0, 0)
 
+        # for cnn cuda
+        if self.args.cuda is True:
+            for conv in self.convs1:
+                conv = conv.cuda()
+
+        # for cnn cuda
+        if self.args.cuda is True:
+            for conv in self.convs2:
+                conv = conv.cuda()
+
         # dropout
         self.dropout = nn.Dropout(args.dropout)
         # linear
@@ -75,7 +85,7 @@ class DEEP_CNN(nn.Module):
         one_layer = [torch.transpose(F.relu(conv(one_layer)).squeeze(3), 1, 2) for conv in self.convs1] # torch.Size([64, 100, 36])
         # two layer
         two_layer = [F.relu(conv(one_layer.unsqueeze(1))).squeeze(3) for (conv, one_layer) in zip(self.convs2, one_layer)]
-        print("two_layer {}".format(two_layer[0].size()))
+        # print("two_layer {}".format(two_layer[0].size()))
         # pooling
         output = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in two_layer]   #  torch.Size([64, 100]) torch.Size([64, 100])
         output = torch.cat(output, 1)  # torch.Size([64, 300])
