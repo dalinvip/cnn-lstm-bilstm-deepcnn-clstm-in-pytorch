@@ -85,11 +85,19 @@ class Configurable(myconf):
     # Save
     @property
     def snapshot(self):
-        return self._config.get('Save', 'snapshot')
+        value = self._config.get('Save', 'snapshot')
+        if value == "None" or value == "none":
+            return None
+        else:
+            return value
 
     @property
     def predict(self):
-        return self._config.get('Save', 'predict')
+        value = self._config.get('Save', 'predict')
+        if value == "None" or value == "none":
+            return None
+        else:
+            return value
 
     @property
     def test(self):
@@ -98,6 +106,10 @@ class Configurable(myconf):
     @property
     def save_dir(self):
         return self._config.get('Save', 'save_dir')
+
+    @save_dir.setter
+    def save_dir(self, value):
+        self._config.set('Save', 'save_dir', str(value))
 
     @property
     def rm_model(self):
@@ -214,7 +226,11 @@ class Configurable(myconf):
 
     @property
     def max_norm(self):
-        return self._config.get("Model", "max_norm")
+        value = self._config.get("Model", "max_norm")
+        if value == "None" or value == "none":
+            return None
+        else:
+            return value
 
     @property
     def clip_max_norm(self):
@@ -226,7 +242,14 @@ class Configurable(myconf):
 
     @property
     def kernel_sizes(self):
-        return self._config.get("Model", "kernel_sizes")
+        value = self._config.get("Model", "kernel_sizes")
+        # print(list(value))
+        value = [int(k) for k in list(value) if k != ","]
+        return value
+
+    @kernel_sizes.setter
+    def kernel_sizes(self, value):
+        self._config.set("Model", "kernel_sizes", str(value))
 
     @property
     def init_weight(self):

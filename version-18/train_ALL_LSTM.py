@@ -88,11 +88,11 @@ def train(train_iter, dev_iter, test_iter, model, args):
                 if not os.path.isdir(args.save_dir): os.makedirs(args.save_dir)
                 save_prefix = os.path.join(args.save_dir, 'snapshot')
                 save_path = '{}_steps{}.pt'.format(save_prefix, steps)
-                torch.save(model, save_path)
+                torch.save(model.state_dict(), save_path)
                 print("\n", save_path, end=" ")
-                test_model = torch.load(save_path)
+                # test_model = torch.load(save_path)
                 model_count += 1
-                test_eval(test_iter, test_model, save_path, args, model_count)
+                test_eval(test_iter, model, save_path, args, model_count)
     return model_count
 
 

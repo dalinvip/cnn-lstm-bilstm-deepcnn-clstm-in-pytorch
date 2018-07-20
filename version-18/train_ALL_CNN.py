@@ -87,11 +87,11 @@ def train(train_iter, dev_iter, test_iter, model, args):
                     os.makedirs(args.save_dir)
                 save_prefix = os.path.join(args.save_dir, 'snapshot')
                 save_path = '{}_steps{}.pt'.format(save_prefix, steps)
-                torch.save(model, save_path)
+                # print(save_path)
+                torch.save(model.state_dict(), save_path)
                 print("\n", save_path, end=" ")
-                test_model = torch.load(save_path)
                 model_count += 1
-                test_eval(test_iter, test_model, save_path, args, model_count)
+                test_eval(test_iter, model, save_path, args, model_count)
     return model_count
 
 
@@ -129,7 +129,7 @@ def test_eval(data_iter, model, save_path, args, model_count):
             feature, target = feature.cuda(), target.cuda()
 
         logit = model(feature)
-        loss = F.cross_entropy(logit, target, size_average=False)
+        loss = F.cross_entropy(logit, target, size_average=True)
         avg_loss += loss.data[0]
         corrects += (torch.max(logit, 1)
                      [1].view(target.size()).data == target.data).sum()

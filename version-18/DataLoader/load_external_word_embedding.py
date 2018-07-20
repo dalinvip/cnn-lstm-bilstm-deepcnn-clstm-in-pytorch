@@ -69,7 +69,7 @@ class Word_Embedding():
                 iov += 1
                 list_word2vec.append(word_vecs[word])
         print("oov count", oov)
-        print("iov count", iov)
+        print("iv count", iov)
         return list_word2vec
 
     # solve unknown word by uniform(-0.25,0.25)
@@ -86,7 +86,7 @@ class Word_Embedding():
                 iov += 1
                 list_word2vec.append(word_vecs[word])
         print("oov count", oov)
-        print("iov count", iov)
+        print("iv count", iov)
         return list_word2vec
 
     # load word embedding

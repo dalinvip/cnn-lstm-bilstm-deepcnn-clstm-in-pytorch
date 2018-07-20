@@ -146,6 +146,44 @@ def mrs_five_mui(path, train_name, dev_name, test_name, char_data, text_field, l
     return train_iter, dev_iter, test_iter
 
 
+def load_preEmbedding():
+    # load word2vec
+    static_word_vecs = None
+    if config.word_Embedding:
+        # static_word_vecs = None
+        word_embedding = Word_Embedding()
+        if config.embed_dim is not None:
+            print("word_Embedding_Path {} ".format(config.word_Embedding_Path))
+            path = config.word_Embedding_Path
+        print("loading word2vec vectors...")
+        if config.freq_1_unk is True:
+            word_vecs = word_embedding.load_my_vecs_freq1(path, config.text_field.vocab.itos, config.text_field.vocab.freqs, pro=0.5)  # has some error in this function
+        else:
+            word_vecs = word_embedding.load_my_vecs(path, config.text_field.vocab.itos, config.text_field.vocab.freqs, k=config.embed_dim)
+            if config.CNN_MUI is True or config.DEEP_CNN_MUI is True:
+                static_word_vecs = word_embedding.load_my_vecs(path, config.static_text_field.vocab.itos, config.text_field.vocab.freqs, k=config.embed_dim)
+        print("word2vec loaded!")
+        print("num words already in word2vec: " + str(len(word_vecs)))
+        print("loading unknown word2vec and convert to list...")
+        if config.char_data:
+            print("loading unknown word by rand......")
+            word_vecs = word_embedding.add_unknown_words_by_uniform(word_vecs, config.text_field.vocab.itos, k=config.embed_dim)
+            if config.CNN_MUI is True or config.DEEP_CNN_MUI is True:
+                static_word_vecs = word_embedding.add_unknown_words_by_uniform(static_word_vecs, config.static_text_field.vocab.itos, k=config.embed_dim)
+        else:
+            print("loading unknown word by avg......")
+            word_vecs = word_embedding.add_unknown_words_by_avg(word_vecs, config.text_field.vocab.itos, k=config.embed_dim)
+            if config.CNN_MUI is True or config.DEEP_CNN_MUI is True:
+                static_word_vecs = word_embedding.add_unknown_words_by_avg(static_word_vecs, config.static_text_field.vocab.itos, k=config.embed_dim)
+            print("len(word_vecs) {} ".format(len(word_vecs)))
+        print("unknown word2vec loaded ! and converted to list...")
+
+    if config.word_Embedding:
+        config.pretrained_weight = word_vecs
+        if config.CNN_MUI is True or config.DEEP_CNN_MUI is True:
+            config.pretrained_weight_static = static_word_vecs
+
+
 def Load_Data():
     """
     load five classification task data and two classification task data
@@ -185,15 +223,219 @@ def define_dict():
     # return text_field
 
 
+def save_arguments():
+    shutil.copytree("./Config", "./snapshot/" + config.mulu + "/Config")
+
+
+def update_arguments():
+    config.lr = config.learning_rate
+    config.init_weight_decay = config.weight_decay
+    config.init_clip_max_norm = config.clip_max_norm
+    config.embed_num = len(config.text_field.vocab)
+    config.class_num = len(config.label_field.vocab) - 1
+    if config.CNN_MUI is True or config.DEEP_CNN_MUI is True:
+        config.embed_num_mui = len(config.static_text_field.vocab)
+    # config.kernel_sizes = [int(k) for k in config.kernel_sizes.split(',')]
+    config.cuda = config.no_cuda
+    print(config.kernel_sizes)
+    mulu = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    config.mulu = mulu
+    config.save_dir = os.path.join(""+config.save_dir, config.mulu)
+    if not os.path.isdir(config.save_dir):
+        os.makedirs(config.save_dir)
+
+
+def load_model():
+    model = None
+    if config.snapshot is None:
+        if config.CNN:
+            print("loading CNN model.....")
+            model = CNN_Text(config)
+            # save model in this time
+            shutil.copy("./models/model_CNN.py", "./snapshot/" + config.mulu)
+        elif config.DEEP_CNN:
+            print("loading DEEP_CNN model......")
+            model = DEEP_CNN(config)
+            shutil.copy("./models/model_DeepCNN.py", "./snapshot/" + config.mulu)
+        elif config.DEEP_CNN_MUI:
+            print("loading DEEP_CNN_MUI model......")
+            model = DEEP_CNN_MUI(config)
+            shutil.copy("./models/model_DeepCNN_MUI.py", "./snapshot/" + config.mulu)
+        elif config.LSTM:
+            print("loading LSTM model......")
+            model = LSTM(config)
+            shutil.copy("./models/model_LSTM.py", "./snapshot/" + config.mulu)
+        elif config.GRU:
+            print("loading GRU model......")
+            model = GRU(config)
+            shutil.copy("./models/model_GRU.py", "./snapshot/" + config.mulu)
+        elif config.BiLSTM:
+            print("loading BiLSTM model......")
+            model = BiLSTM(config)
+            shutil.copy("./models/model_BiLSTM.py", "./snapshot/" + config.mulu)
+        elif config.BiLSTM_1:
+            print("loading BiLSTM_1 model......")
+            # model = model_BiLSTM_lexicon.BiLSTM_1(config)
+            model = BiLSTM_1(config)
+            shutil.copy("./models/model_BiLSTM_1.py", "./snapshot/" + config.mulu)
+        elif config.CNN_LSTM:
+            print("loading CNN_LSTM model......")
+            model = CNN_LSTM(config)
+            shutil.copy("./models/model_CNN_LSTM.py", "./snapshot/" + config.mulu)
+        elif config.CLSTM:
+            print("loading CLSTM model......")
+            model = CLSTM(config)
+            shutil.copy("./models/model_CLSTM.py", "./snapshot/" + config.mulu)
+        elif config.CBiLSTM:
+            print("loading CBiLSTM model......")
+            model = CBiLSTM(config)
+            shutil.copy("./models/model_CBiLSTM.py", "./snapshot/" + config.mulu)
+        elif config.CGRU:
+            print("loading CGRU model......")
+            model = CGRU(config)
+            shutil.copy("./models/model_CGRU.py", "./snapshot/" + config.mulu)
+        elif config.CNN_BiLSTM:
+            print("loading CNN_BiLSTM model......")
+            model = CNN_BiLSTM(config)
+            shutil.copy("./models/model_CNN_BiLSTM.py", "./snapshot/" + config.mulu)
+        elif config.BiGRU:
+            print("loading BiGRU model......")
+            model = BiGRU(config)
+            shutil.copy("./models/model_BiGRU.py", "./snapshot/" + config.mulu)
+        elif config.CNN_BiGRU:
+            print("loading CNN_BiGRU model......")
+            model = CNN_BiGRU(config)
+            shutil.copy("./models/model_CNN_BiGRU.py", "./snapshot/" + config.mulu)
+        elif config.CNN_MUI:
+            print("loading CNN_MUI model......")
+            model = CNN_MUI(config)
+            shutil.copy("./models/model_CNN_MUI.py", "./snapshot/" + config.mulu)
+        elif config.HighWay_CNN is True:
+            print("loading HighWay_CNN model......")
+            model = HighWay_CNN(config)
+            shutil.copy("./models/model_HighWay_CNN.py", "./snapshot/" + config.mulu)
+        elif config.HighWay_BiLSTM_1 is True:
+            print("loading HighWay_BiLSTM_1 model......")
+            model = HighWay_BiLSTM_1(config)
+            shutil.copy("./models/model_HighWay_BiLSTM_1.py", "./snapshot/" + config.mulu)
+        print(model)
+    else:
+        print('\nLoading model from [%s]...' % config.snapshot)
+        try:
+            model = torch.load(config.snapshot)
+        except:
+            print("Sorry, This snapshot doesn't exist.")
+            exit()
+    if config.cuda is True:
+        model = model.cuda()
+    return model
+
+
+def start_train(model, train_iter, dev_iter, test_iter):
+    """
+    :function：start train
+    :param model:
+    :param train_iter:
+    :param dev_iter:
+    :param test_iter:
+    :return:
+    """
+    if config.predict is not None:
+        label = train_ALL_CNN.predict(config.predict, model, config.text_field, config.label_field)
+        print('\n[Text]  {}[Label] {}\n'.format(config.predict, label))
+    elif config.test:
+        try:
+            print(test_iter)
+            train_ALL_CNN.test_eval(test_iter, model, config)
+        except Exception as e:
+            print("\nSorry. The test dataset doesn't  exist.\n")
+    else:
+        print("\n cpu_count \n", mu.cpu_count())
+        torch.set_num_threads(config.num_threads)
+        if os.path.exists("./Test_Result.txt"):
+            os.remove("./Test_Result.txt")
+        if config.CNN:
+            print("CNN training start......")
+            model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, config)
+        elif config.DEEP_CNN:
+            print("DEEP_CNN training start......")
+            model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, config)
+        elif config.LSTM:
+            print("LSTM training start......")
+            model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, config)
+        elif config.GRU:
+            print("GRU training start......")
+            model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, config)
+        elif config.BiLSTM:
+            print("BiLSTM training start......")
+            model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, config)
+        elif config.BiLSTM_1:
+            print("BiLSTM_1 training start......")
+            model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, config)
+        elif config.CNN_LSTM:
+            print("CNN_LSTM training start......")
+            model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, config)
+        elif config.CLSTM:
+            print("CLSTM training start......")
+            model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, config)
+        elif config.CBiLSTM:
+            print("CBiLSTM training start......")
+            model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, config)
+        elif config.CGRU:
+            print("CGRU training start......")
+            model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, config)
+        elif config.CNN_BiLSTM:
+            print("CNN_BiLSTM training start......")
+            model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, config)
+        elif config.BiGRU:
+            print("BiGRU training start......")
+            model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, config)
+        elif config.CNN_BiGRU:
+            print("CNN_BiGRU training start......")
+            model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, config)
+        elif config.CNN_MUI:
+            print("CNN_MUI training start......")
+            model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, config)
+        elif config.DEEP_CNN_MUI:
+            print("DEEP_CNN_MUI training start......")
+            model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, config)
+        elif config.HighWay_CNN is True:
+            print("HighWay_CNN training start......")
+            model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, config)
+        elif config.HighWay_BiLSTM_1 is True:
+            print("HighWay_BiLSTM_1 training start......")
+            model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, config)
+        print("Model_count", model_count)
+        resultlist = []
+        if os.path.exists("./Test_Result.txt"):
+            file = open("./Test_Result.txt")
+            for line in file.readlines():
+                if line[:10] == "Evaluation":
+                    resultlist.append(float(line[34:41]))
+            result = sorted(resultlist)
+            file.close()
+            file = open("./Test_Result.txt", "a")
+            file.write("\nThe Best Result is : " + str(result[len(result) - 1]))
+            file.write("\n")
+            file.close()
+            shutil.copy("./Test_Result.txt", "./snapshot/" + config.mulu + "/Test_Result.txt")
+
+
 def main():
     """
         main function
     """
     # define word dict
     define_dict()
-
     # load data
     train_iter, dev_iter, test_iter = Load_Data()
+    # load pretrain embedding
+    load_preEmbedding()
+    # update config and print
+    update_arguments()
+    save_arguments()
+    model = load_model()
+    start_train(model, train_iter, dev_iter, test_iter)
 
 
 if __name__ == "__main__":
