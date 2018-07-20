@@ -1,8 +1,0 @@
-	_CONFIG=<Config.config.myconf object at 0x000001DC3E138C88>
-	CLASS_NUM=2
-	EMBED_NUM=13838
-	LABEL_FIELD=<torchtext.data.field.Field object at 0x000001DC3E138C18>
-	MULU=2018-07-20_10-17-27
-	STATIC_LABEL_FIELD=<torchtext.data.field.Field object at 0x000001DC3E138E10>
-	STATIC_TEXT_FIELD=<torchtext.data.field.Field object at 0x000001DC3E138E80>
-	TEXT_FIELD=<torchtext.data.field.Field object at 0x000001DC3B252D68>
