@@ -15,9 +15,9 @@ import torch.optim.lr_scheduler as lr_scheduler
 import shutil
 import random
 import numpy as np
-import hyperparams
-torch.manual_seed(hyperparams.seed_num)
-random.seed(hyperparams.seed_num)
+from DataUtils.Common import seed_num
+torch.manual_seed(seed_num)
+random.seed(seed_num)
 
 
 def train(train_iter, dev_iter, test_iter, model, args):
