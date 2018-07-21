@@ -24,11 +24,6 @@ def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:
         model.cuda()
 
-    # optimizer = torch.optim.Adam(model.parameters(), lr=config.lr, weight_decay=1e-8)
-    # optimizer = torch.optim.Adam(model.parameters(), lr=config.lr, weight_decay=config.init_weight_decay)
-    # optimizer = torch.optim.SGD(model.parameters(), lr=config.lr,momentum=)
-    # optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=config.lr)
-
     if args.Adam is True:
         print("Adam Training......")
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay)
@@ -40,23 +35,12 @@ def train(train_iter, dev_iter, test_iter, model, args):
         print("Adadelta Training.......")
         optimizer = torch.optim.Adadelta(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay)
 
-    # lambda1 = lambda epoch: epoch // 30
-    # lambda2 = lambda epoch: 0.99 ** epoch
-    # print("lambda1 {} lambda2 {} ".format(lambda1, lambda2))
-    # scheduler = lr_scheduler.LambdaLR(optimizer, lr_lambda=[lambda2])
-
-    # scheduler = lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.9)
-
-    scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, 'min')
-
     steps = 0
     model_count = 0
+    best_accuracy = Best_Result()
     model.train()
     for epoch in range(1, args.epochs+1):
         print("\n## 第{} 轮迭代，共计迭代 {} 次 ！##\n".format(epoch, args.epochs))
-        # scheduler.step()
-        # print("now lr is {} \n".format(scheduler.get_lr()))
-        # print("now lr is {} \n".format(optimizer.param_groups[0].get("lr")))
         for batch in train_iter:
             feature, target = batch.text, batch.label.data.sub_(1)
             if args.cuda is True:
@@ -64,16 +48,10 @@ def train(train_iter, dev_iter, test_iter, model, args):
 
             target = autograd.Variable(target)  # question 1
             optimizer.zero_grad()
-            model.zero_grad()
-            model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
-            if feature.size(1) != args.batch_size:
-                # continue
-                model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
             logit = model(feature)
             loss = F.cross_entropy(logit, target)
             loss.backward()
             if args.init_clip_max_norm is not None:
-                # print("aaaa {} ".format(config.init_clip_max_norm))
                 utils.clip_grad_norm(model.parameters(), max_norm=args.init_clip_max_norm)
             optimizer.step()
 
@@ -90,20 +68,22 @@ def train(train_iter, dev_iter, test_iter, model, args):
                                                                              corrects,
                                                                              batch.batch_size))
             if steps % args.test_interval == 0:
-                eval(dev_iter, model, args, scheduler)
+                print("\nDev  Accuracy: ", end="")
+                eval(dev_iter, model, args, best_accuracy, test=False)
+                print("Test Accuracy: ", end="")
+                eval(test_iter, model, args, best_accuracy, test=True)
             if steps % args.save_interval == 0:
                 if not os.path.isdir(args.save_dir): os.makedirs(args.save_dir)
                 save_prefix = os.path.join(args.save_dir, 'snapshot')
                 save_path = '{}_steps{}.pt'.format(save_prefix, steps)
                 torch.save(model.state_dict(), save_path)
-                print("\n", save_path, end=" ")
-                # test_model = torch.load(save_path)
+                if os.path.isfile(save_path) and args.rm_model is True:
+                    os.remove(save_path)
                 model_count += 1
-                test_eval(test_iter, model, save_path, args, model_count)
     return model_count
 
 
-def eval(data_iter, model, args, scheduler):
+def eval(data_iter, model, args, best_accuracy, test=False):
     model.eval()
     corrects, avg_loss = 0, 0
     for batch in data_iter:
@@ -111,11 +91,6 @@ def eval(data_iter, model, args, scheduler):
         target.data.sub_(1)
         if args.cuda is True:
             feature, target = feature.cuda(), target.cuda()
-
-        model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
-        if feature.size(1) != args.batch_size:
-            # continue
-            model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
         logit = model(feature)
         loss = F.cross_entropy(logit, target, size_average=False)
 
@@ -126,66 +101,27 @@ def eval(data_iter, model, args, scheduler):
     avg_loss = loss.data[0]/size
     accuracy = float(corrects)/size * 100.0
     model.train()
-    print('\nEvaluation - loss: {:.6f}  acc: {:.4f}%({}/{}) \n'.format(avg_loss,
-                                                                       accuracy,
-                                                                       corrects,
-                                                                       size))
+    print(' Evaluation - loss: {:.6f}  acc: {:.4f}%({}/{}) '.format(avg_loss, accuracy, corrects, size))
+    if test is False:
+        if accuracy >= best_accuracy.best_dev_accuracy:
+            best_accuracy.best_dev_accuracy = accuracy
+            best_accuracy.best_test = True
+    if test is True and best_accuracy.best_test is True:
+        best_accuracy.accuracy = accuracy
+
+    if test is True:
+        print("The Current Best Dev Accuracy: {:.4f}, and Test Accuracy is :{:.4f}\n".format(best_accuracy.best_dev_accuracy,
+                                                                                             best_accuracy.accuracy))
+    if test is True:
+        best_accuracy.best_test = False
 
 
-def test_eval(data_iter, model, save_path, args, model_count):
-    # print(save_path)
-    model.eval()
-    corrects, avg_loss = 0, 0
-    for batch in data_iter:
-        feature, target = batch.text, batch.label
-        target.data.sub_(1)
-        if args.cuda is True:
-            feature, target = feature.cuda(), target.cuda()
+class Best_Result:
+    def __init__(self):
+        self.best_dev_accuracy = -1
+        self.best_accuracy = -1
+        self.best_epoch = 1
+        self.best_test = False
+        self.accuracy = -1
 
-        model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
-        if feature.size(1) != args.batch_size:
-            # continue
-            model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
-        logit = model(feature)
-        loss = F.cross_entropy(logit, target, size_average=False)
 
-        avg_loss += loss.data[0]
-        corrects += (torch.max(logit, 1)
-                     [1].view(target.size()).data == target.data).sum()
-
-    size = len(data_iter.dataset)
-    avg_loss = loss.data[0]/size
-    accuracy = float(corrects)/size * 100.0
-    model.train()
-    print('\nEvaluation - loss: {:.6f}  acc: {:.4f}%({}/{}) \n'.format(avg_loss,
-                                                                       accuracy,
-                                                                       corrects,
-                                                                       size))
-    print("model_count {}".format(model_count))
-    # test result
-    if os.path.exists("./Test_Result.txt"):
-        file = open("./Test_Result.txt", "a")
-    else:
-        file = open("./Test_Result.txt", "w")
-    file.write("model " + save_path + "\n")
-    file.write("Evaluation - loss: {:.6f}  acc: {:.4f}%({}/{}) \n".format(avg_loss, accuracy, corrects, size))
-    file.write("model_count {} \n".format(model_count))
-    file.write("\n")
-    file.close()
-    # calculate the best score in current file
-    resultlist = []
-    if os.path.exists("./Test_Result.txt"):
-        file = open("./Test_Result.txt")
-        for line in file.readlines():
-            if line[:10] == "Evaluation":
-                resultlist.append(float(line[34:41]))
-        result = sorted(resultlist)
-        file.close()
-        file = open("./Test_Result.txt", "a")
-        file.write("\nThe Current Best Result is : " + str(result[len(result) - 1]))
-        file.write("\n\n")
-        file.close()
-    shutil.copy("./Test_Result.txt", "./snapshot/" + args.mulu + "/Test_Result.txt")
-    # whether to delete the model after test acc so that to save space
-    if os.path.isfile(save_path) and args.rm_model is True:
-        os.remove(save_path)

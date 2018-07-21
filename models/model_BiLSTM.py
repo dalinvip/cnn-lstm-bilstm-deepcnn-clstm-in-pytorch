@@ -39,23 +39,12 @@ class BiLSTM(nn.Module):
 
         self.hidden2label1 = nn.Linear(self.hidden_dim, self.hidden_dim // 2)
         self.hidden2label2 = nn.Linear(self.hidden_dim // 2, C)
-        self.hidden = self.init_hidden(self.num_layers, args.batch_size)
         # self.dropout = nn.Dropout(config.dropout)
-
-    def init_hidden(self, num_layers, batch_size):
-        # the first is the hidden h
-        # the second is the cell  c
-        if self.args.cuda is True:
-            return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim // 2)).cuda(),
-                    Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim // 2)).cuda())
-        else:
-            return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim // 2)),
-                    Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim // 2)))
 
     def forward(self, x):
         embed = self.embed(x)
         x = embed.view(len(x), embed.size(1), -1)
-        bilstm_out, self.hidden = self.bilstm(x, self.hidden)
+        bilstm_out, _ = self.bilstm(x)
 
         bilstm_out = torch.transpose(bilstm_out, 0, 1)
         bilstm_out = torch.transpose(bilstm_out, 1, 2)

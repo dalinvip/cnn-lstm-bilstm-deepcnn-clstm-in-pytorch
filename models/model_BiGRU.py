@@ -38,23 +38,15 @@ class BiGRU(nn.Module):
         self.bigru = nn.GRU(D, self.hidden_dim, dropout=args.dropout, num_layers=self.num_layers, bidirectional=True)
         # linear
         self.hidden2label = nn.Linear(self.hidden_dim * 2, C)
-        # hidden
-        self.hidden = self.init_hidden(self.num_layers, args.batch_size)
-        # dropout
+        #  dropout
         self.dropout = nn.Dropout(args.dropout)
-
-    def init_hidden(self, num_layers, batch_size):
-        if self.args.cuda is True:
-            return Variable(torch.zeros(num_layers * 2, batch_size, self.hidden_dim)).cuda()
-        else:
-            return Variable(torch.zeros(num_layers * 2, batch_size, self.hidden_dim))
 
     def forward(self, input):
         embed = self.embed(input)
         embed = self.dropout(embed)
         input = embed.view(len(input), embed.size(1), -1)
         # gru
-        gru_out, hidden = self.bigru(input, self.hidden)
+        gru_out, _ = self.bigru(input)
         gru_out = torch.transpose(gru_out, 0, 1)
         gru_out = torch.transpose(gru_out, 1, 2)
         # pooling

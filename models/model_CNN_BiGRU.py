@@ -50,7 +50,6 @@ class CNN_BiGRU(nn.Module):
 
         # BiGRU
         self.bigru = nn.GRU(D, self.hidden_dim, num_layers=self.num_layers, dropout=args.dropout, bidirectional=True, bias=True)
-        self.hidden = self.init_hidden(self.num_layers, args.batch_size)
 
         # linear
         L = len(Ks) * Co + self.hidden_dim * 2
@@ -59,14 +58,6 @@ class CNN_BiGRU(nn.Module):
 
         # dropout
         self.dropout = nn.Dropout(args.dropout)
-
-    def init_hidden(self,num_layers, batch_size):
-        # the first is the hidden h
-        # the second is the cell  c
-        if self.args.cuda is True:
-            return Variable(torch.zeros(num_layers * 2, batch_size, self.hidden_dim)).cuda()
-        else:
-            return Variable(torch.zeros(num_layers * 2, batch_size, self.hidden_dim))
 
     def forward(self, x):
         embed = self.embed(x)
@@ -81,7 +72,7 @@ class CNN_BiGRU(nn.Module):
         cnn_x = self.dropout(cnn_x)
         # BiGRU
         bigru_x = embed.view(len(x), embed.size(1), -1)
-        bigru_x, self.hidden = self.bigru(bigru_x, self.hidden)
+        bigru_x, _ = self.bigru(bigru_x)
         bigru_x = torch.transpose(bigru_x, 0, 1)
         bigru_x = torch.transpose(bigru_x, 1, 2)
         # bilstm_out = F.tanh(bilstm_out)

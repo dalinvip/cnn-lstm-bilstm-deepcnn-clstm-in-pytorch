@@ -51,55 +51,17 @@ class BiLSTM_1(nn.Module):
             init.xavier_normal(self.bilstm.all_weights[1][1], gain=np.sqrt(args.init_weight_value))
 
         self.hidden2label = nn.Linear(self.hidden_dim * 2, C)
-        self.hidden = self.init_hidden(self.num_layers, args.batch_size)
-        print("self.hidden", self.hidden)
-
-    def init_hidden(self, num_layers, batch_size):
-        # the first is the hidden h
-        # the second is the cell  c
-        if self.args.cuda is True:
-            return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)).cuda(),
-                    Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)).cuda())
-        else:
-            return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)),
-                    Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)))
-
-    def calculate_fan_in_and_fan_out(tensor):
-        dimensions = tensor.ndimension()
-        if dimensions < 2:
-            raise ValueError("Fan in and fan out can not be computed for tensor with less than 2 dimensions")
-
-        if dimensions == 2:  # Linear
-            fan_in = tensor.size(1)
-            fan_out = tensor.size(0)
-        else:
-            num_input_fmaps = tensor.size(1)
-            num_output_fmaps = tensor.size(0)
-            receptive_field_size = 1
-            if tensor.dim() > 2:
-                receptive_field_size = tensor[0][0].numel()
-            fan_in = num_input_fmaps * receptive_field_size
-            fan_out = num_output_fmaps * receptive_field_size
-
-        return fan_in, fan_out
 
     def forward(self, x):
         x = self.embed(x)
         x = self.dropout_embed(x)
-        # x = x.view(len(x), x.size(1), -1)
-        # x = embed.view(len(x), embed.size(1), -1)
-        bilstm_out, self.hidden = self.bilstm(x, self.hidden)
-        # print(self.hidden)
+        bilstm_out, _ = self.bilstm(x)
 
         bilstm_out = torch.transpose(bilstm_out, 0, 1)
         bilstm_out = torch.transpose(bilstm_out, 1, 2)
         bilstm_out = F.tanh(bilstm_out)
         bilstm_out = F.max_pool1d(bilstm_out, bilstm_out.size(2)).squeeze(2)
         bilstm_out = F.tanh(bilstm_out)
-        # bilstm_out = self.dropout(bilstm_out)
-
-        # bilstm_out = self.hidden2label1(bilstm_out)
-        # logit = self.hidden2label2(F.tanh(bilstm_out))
 
         logit = self.hidden2label(bilstm_out)
 

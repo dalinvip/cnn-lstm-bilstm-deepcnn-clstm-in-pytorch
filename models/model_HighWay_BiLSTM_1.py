@@ -76,23 +76,10 @@ class HighWay_BiLSTM_1(nn.Module):
         # last liner
         self.logit_layer = nn.Linear(in_features=self.hidden_dim * 2, out_features=C, bias=True)
 
-        self.hidden = self.init_hidden(self.num_layers, args.batch_size)
-        print("self.hidden", self.hidden)
-
-    def init_hidden(self, num_layers, batch_size):
-        # the first is the hidden h
-        # the second is the cell  c
-        if self.args.cuda is True:
-            return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)).cuda(),
-                    Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)).cuda())
-        else:
-            return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)),
-                    Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)))
-
     def forward(self, x):
         x = self.embed(x)
         x = self.dropout(x)
-        bilstm_out, self.hidden = self.bilstm(x, self.hidden)
+        bilstm_out, _ = self.bilstm(x)
 
         bilstm_out = torch.transpose(bilstm_out, 0, 1)
         bilstm_out = torch.transpose(bilstm_out, 1, 2)

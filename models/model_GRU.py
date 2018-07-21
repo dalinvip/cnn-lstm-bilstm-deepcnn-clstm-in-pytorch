@@ -38,22 +38,13 @@ class GRU(nn.Module):
         self.gru = nn.GRU(D, self.hidden_dim, dropout=args.dropout, num_layers=self.num_layers)
         # linear
         self.hidden2label = nn.Linear(self.hidden_dim, C)
-        # hidden
-        self.hidden = self.init_hidden(self.num_layers, args.batch_size)
-        # dropout
+        #  dropout
         self.dropout = nn.Dropout(args.dropout)
 
-    def init_hidden(self, num_layers, batch_size):
-        if self.args.cuda is True:
-            return Variable(torch.zeros(num_layers, batch_size, self.hidden_dim)).cuda()
-        else:
-            return Variable(torch.zeros(num_layers, batch_size, self.hidden_dim))
-
     def forward(self, input):
-        self.hidden = self.init_hidden(self.num_layers, input.size(1))
         embed = self.embed(input)
         input = embed.view(len(input), embed.size(1), -1)
-        lstm_out, hidden = self.gru(input, self.hidden)
+        lstm_out, _ = self.gru(input)
         lstm_out = torch.transpose(lstm_out, 0, 1)
         lstm_out = torch.transpose(lstm_out, 1, 2)
         # pooling

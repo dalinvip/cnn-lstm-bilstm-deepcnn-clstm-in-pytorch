@@ -50,22 +50,12 @@ class CLSTM(nn.Module):
                 conv = conv.cuda()
         # LSTM
         self.lstm = nn.LSTM(D, self.hidden_dim, num_layers= self.num_layers, dropout=args.dropout)
-        self.hidden = self.init_hidden(self.num_layers, args.batch_size)
+
         # linear
         self.hidden2label1 = nn.Linear(self.hidden_dim, self.hidden_dim // 2)
         self.hidden2label2 = nn.Linear(self.hidden_dim // 2, C)
         # dropout
         self.dropout = nn.Dropout(args.dropout)
-
-    def init_hidden(self,num_layers, batch_size):
-        # the first is the hidden h
-        # the second is the cell  c
-        if self.args.cuda is True:
-            return (Variable(torch.zeros(1 * num_layers, batch_size, self.hidden_dim)).cuda(),
-                    Variable(torch.zeros(1 * num_layers, batch_size, self.hidden_dim)).cuda())
-        else:
-            return (Variable(torch.zeros(1 * num_layers, batch_size, self.hidden_dim)),
-                    Variable(torch.zeros(1 * num_layers, batch_size, self.hidden_dim)))
 
     def forward(self, x):
         embed = self.embed(x)
@@ -77,7 +67,7 @@ class CLSTM(nn.Module):
         cnn_x = torch.cat(cnn_x, 0)
         cnn_x = torch.transpose(cnn_x, 1, 2)
         # LSTM
-        lstm_out, self.hidden = self.lstm(cnn_x, self.hidden)
+        lstm_out, _ = self.lstm(cnn_x)
         lstm_out = torch.transpose(lstm_out, 0, 1)
         lstm_out = torch.transpose(lstm_out, 1, 2)
         lstm_out = F.max_pool1d(lstm_out, lstm_out.size(2)).squeeze(2)

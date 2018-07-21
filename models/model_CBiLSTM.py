@@ -52,7 +52,6 @@ class CBiLSTM(nn.Module):
 
         # LSTM
         self.bilstm = nn.LSTM(D, self.hidden_dim, num_layers=self.num_layers, dropout=args.dropout, bidirectional=True)
-        self.hidden = self.init_hidden(self.num_layers, args.batch_size)
 
         # linear
         self.hidden2label1 = nn.Linear(self.hidden_dim * 2, self.hidden_dim)
@@ -60,16 +59,6 @@ class CBiLSTM(nn.Module):
 
         # dropout
         self.dropout = nn.Dropout(args.dropout)
-
-    def init_hidden(self,num_layers, batch_size):
-        # the first is the hidden h
-        # the second is the cell  c
-        if self.args.cuda is True:
-            return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)).cuda(),
-                    Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)).cuda())
-        else:
-            return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)),
-                    Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)))
 
     def forward(self, x):
         embed = self.embed(x)
@@ -82,7 +71,7 @@ class CBiLSTM(nn.Module):
         cnn_x = torch.transpose(cnn_x, 1, 2)
 
         # BiLSTM
-        bilstm_out, self.hidden = self.bilstm(cnn_x, self.hidden)
+        bilstm_out, _ = self.bilstm(cnn_x)
         bilstm_out = torch.transpose(bilstm_out, 0, 1)
         bilstm_out = torch.transpose(bilstm_out, 1, 2)
         bilstm_out = F.max_pool1d(bilstm_out, bilstm_out.size(2)).squeeze(2)

@@ -51,28 +51,17 @@ class LSTM(nn.Module):
 
         # linear
         self.hidden2label = nn.Linear(self.hidden_dim, C)
-        # hidden
-        self.hidden = self.init_hidden(self.num_layers, args.batch_size)
         # dropout
         self.dropout = nn.Dropout(args.dropout)
         self.dropout_embed = nn.Dropout(args.dropout_embed)
-
-    def init_hidden(self, num_layers, batch_size):
-        # the first is the hidden h
-        # the second is the cell  c
-        if self.args.cuda is True:
-            return (Variable(torch.zeros(1 * num_layers, batch_size, self.hidden_dim)).cuda(),
-                    Variable(torch.zeros(1 * num_layers, batch_size, self.hidden_dim)).cuda())
-        else:
-            return (Variable(torch.zeros(1 * num_layers, batch_size, self.hidden_dim)),
-                    Variable(torch.zeros(1 * num_layers, batch_size, self.hidden_dim)))
 
     def forward(self, x):
         embed = self.embed(x)
         embed = self.dropout_embed(embed)
         x = embed.view(len(x), embed.size(1), -1)
         # lstm
-        lstm_out, self.hidden = self.lstm(x, self.hidden)
+        lstm_out, _ = self.lstm(x)
+        # lstm_out, self.hidden = self.lstm(x, self.hidden)
         lstm_out = torch.transpose(lstm_out, 0, 1)
         lstm_out = torch.transpose(lstm_out, 1, 2)
         # pooling
