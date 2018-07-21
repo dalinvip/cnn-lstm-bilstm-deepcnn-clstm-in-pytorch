@@ -31,6 +31,7 @@ modify the config file, see the Config directory([here](https://github.com/bamte
 ## Result ##
 
 - I haven't adjusted the hyper-parameters seriously, you can also see train log in [here](https://github.com/bamtercelboo/cnn-lstm-bilstm-deepcnn-clstm-in-pytorch/tree/master/result).
+- The following test set accuracy are based on the best dev set accuracy.
 
 ![](https://i.imgur.com/HsJe3Qz.jpg)
 
