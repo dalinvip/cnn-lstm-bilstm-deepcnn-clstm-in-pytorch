@@ -294,8 +294,8 @@ class Configurable(myconf):
         return self._config.getint("Train", "device")
 
     @property
-    def no_cuda(self):
-        return self._config.getboolean("Train", "no_cuda")
+    def cuda(self):
+        return self._config.getboolean("Train", "cuda")
 
     @property
     def epochs(self):

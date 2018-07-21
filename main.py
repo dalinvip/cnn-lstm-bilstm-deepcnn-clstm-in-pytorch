@@ -243,7 +243,6 @@ def update_arguments():
     if config.CNN_MUI is True or config.DEEP_CNN_MUI is True:
         config.embed_num_mui = len(config.static_text_field.vocab)
     # config.kernel_sizes = [int(k) for k in config.kernel_sizes.split(',')]
-    config.cuda = config.no_cuda
     print(config.kernel_sizes)
     mulu = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     config.mulu = mulu
@@ -452,7 +451,7 @@ if __name__ == "__main__":
     config = parser.parse_args()
 
     config = configurable.Configurable(config_file=config.config_file)
-    if config.no_cuda is True:
+    if config.cuda is True:
         print("Using GPU To Train......")
         # torch.backends.cudnn.enabled = True
         # torch.backends.cudnn.deterministic = True
