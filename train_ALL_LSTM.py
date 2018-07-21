@@ -40,7 +40,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
     best_accuracy = Best_Result()
     model.train()
     for epoch in range(1, args.epochs+1):
-        print("\n## 第{} 轮迭代，共计迭代 {} 次 ！##\n".format(epoch, args.epochs))
+        print("\n## The {} Epoch, All {} Epochs ! ##".format(epoch, args.epochs))
         for batch in train_iter:
             feature, target = batch.text, batch.label.data.sub_(1)
             if args.cuda is True:
@@ -69,9 +69,9 @@ def train(train_iter, dev_iter, test_iter, model, args):
                                                                              batch.batch_size))
             if steps % args.test_interval == 0:
                 print("\nDev  Accuracy: ", end="")
-                eval(dev_iter, model, args, best_accuracy, test=False)
+                eval(dev_iter, model, args, best_accuracy, epoch, test=False)
                 print("Test Accuracy: ", end="")
-                eval(test_iter, model, args, best_accuracy, test=True)
+                eval(test_iter, model, args, best_accuracy, epoch, test=True)
             if steps % args.save_interval == 0:
                 if not os.path.isdir(args.save_dir): os.makedirs(args.save_dir)
                 save_prefix = os.path.join(args.save_dir, 'snapshot')
@@ -83,7 +83,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
     return model_count
 
 
-def eval(data_iter, model, args, best_accuracy, test=False):
+def eval(data_iter, model, args, best_accuracy, epoch, test=False):
     model.eval()
     corrects, avg_loss = 0, 0
     for batch in data_iter:
@@ -105,13 +105,14 @@ def eval(data_iter, model, args, best_accuracy, test=False):
     if test is False:
         if accuracy >= best_accuracy.best_dev_accuracy:
             best_accuracy.best_dev_accuracy = accuracy
+            best_accuracy.best_epoch = epoch
             best_accuracy.best_test = True
     if test is True and best_accuracy.best_test is True:
         best_accuracy.accuracy = accuracy
 
     if test is True:
-        print("The Current Best Dev Accuracy: {:.4f}, and Test Accuracy is :{:.4f}\n".format(best_accuracy.best_dev_accuracy,
-                                                                                             best_accuracy.accuracy))
+        print("The Current Best Dev Accuracy: {:.4f}, and Test Accuracy is :{:.4f}, locate on {} epoch.\n".format(
+            best_accuracy.best_dev_accuracy, best_accuracy.accuracy, best_accuracy.best_epoch))
     if test is True:
         best_accuracy.best_test = False
 
