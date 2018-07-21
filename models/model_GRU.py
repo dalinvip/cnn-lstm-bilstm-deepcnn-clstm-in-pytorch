@@ -29,11 +29,11 @@ class GRU(nn.Module):
         V = args.embed_num
         D = args.embed_dim
         C = args.class_num
-        self.embed = nn.Embedding(V, D)
-        # word embedding
+        self.embed = nn.Embedding(V, D, padding_idx=args.paddingId)
+        # pretrained  embedding
         if args.word_Embedding:
-            pretrained_weight = np.array(args.pretrained_weight)
-            self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
+            self.embed.weight.data.copy_(args.pretrained_weight)
+
         # gru
         self.gru = nn.GRU(D, self.hidden_dim, dropout=args.dropout, num_layers=self.num_layers)
         # linear

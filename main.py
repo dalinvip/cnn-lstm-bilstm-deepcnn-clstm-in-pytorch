@@ -32,7 +32,7 @@ import train_ALL_CNN
 import train_ALL_LSTM
 from DataLoader import mydatasets_self_five
 from DataLoader import mydatasets_self_two
-from DataLoader.load_external_word_embedding import Word_Embedding
+from DataUtils.Load_Pretrained_Embed import load_pretrained_emb_zeros, load_pretrained_emb_avg, load_pretrained_emb_Embedding, load_pretrained_emb_uniform
 import multiprocessing as mu
 import shutil
 import numpy as np
@@ -47,7 +47,7 @@ if sys.getdefaultencoding() != defaultencoding:
     sys.setdefaultencoding(defaultencoding)
 
 # random seed
-from DataUtils.Common import seed_num
+from DataUtils.Common import seed_num, pad, unk
 torch.manual_seed(seed_num)
 random.seed(seed_num)
 torch.manual_seed(seed_num)
@@ -155,40 +155,23 @@ def mrs_five_mui(path, train_name, dev_name, test_name, char_data, text_field, l
 
 def load_preEmbedding():
     # load word2vec
-    static_word_vecs = None
+    static_pretrain_embed = None
+    pretrain_embed = None
     if config.word_Embedding:
-        # static_word_vecs = None
-        word_embedding = Word_Embedding()
-        if config.embed_dim is not None:
-            print("word_Embedding_Path {} ".format(config.word_Embedding_Path))
-            path = config.word_Embedding_Path
-        print("loading word2vec vectors...")
-        if config.freq_1_unk is True:
-            word_vecs = word_embedding.load_my_vecs_freq1(path, config.text_field.vocab.itos, config.text_field.vocab.freqs, pro=0.5)  # has some error in this function
-        else:
-            word_vecs = word_embedding.load_my_vecs(path, config.text_field.vocab.itos, config.text_field.vocab.freqs, k=config.embed_dim)
-            if config.CNN_MUI is True or config.DEEP_CNN_MUI is True:
-                static_word_vecs = word_embedding.load_my_vecs(path, config.static_text_field.vocab.itos, config.text_field.vocab.freqs, k=config.embed_dim)
-        print("word2vec loaded!")
-        print("num words already in word2vec: " + str(len(word_vecs)))
-        print("loading unknown word2vec and convert to list...")
-        if config.char_data:
-            print("loading unknown word by rand......")
-            word_vecs = word_embedding.add_unknown_words_by_uniform(word_vecs, config.text_field.vocab.itos, k=config.embed_dim)
-            if config.CNN_MUI is True or config.DEEP_CNN_MUI is True:
-                static_word_vecs = word_embedding.add_unknown_words_by_uniform(static_word_vecs, config.static_text_field.vocab.itos, k=config.embed_dim)
-        else:
-            print("loading unknown word by avg......")
-            word_vecs = word_embedding.add_unknown_words_by_avg(word_vecs, config.text_field.vocab.itos, k=config.embed_dim)
-            if config.CNN_MUI is True or config.DEEP_CNN_MUI is True:
-                static_word_vecs = word_embedding.add_unknown_words_by_avg(static_word_vecs, config.static_text_field.vocab.itos, k=config.embed_dim)
-            print("len(word_vecs) {} ".format(len(word_vecs)))
-        print("unknown word2vec loaded ! and converted to list...")
-
-    if config.word_Embedding:
-        config.pretrained_weight = word_vecs
+        print("word_Embedding_Path {} ".format(config.word_Embedding_Path))
+        path = config.word_Embedding_Path
+        print("loading pretrain embedding......")
+        paddingkey = pad
+        pretrain_embed = load_pretrained_emb_Embedding(path=path, text_field_words_dict=config.text_field.vocab.itos,
+                                                       pad=paddingkey)
         if config.CNN_MUI is True or config.DEEP_CNN_MUI is True:
-            config.pretrained_weight_static = static_word_vecs
+            static_pretrain_embed = load_pretrained_emb_Embedding(path=path, text_field_words_dict=config.static_text_field.vocab.itos,
+                                                                  pad=paddingkey)
+        config.pretrained_weight = pretrain_embed
+        if config.CNN_MUI is True or config.DEEP_CNN_MUI is True:
+            config.pretrained_weight_static = static_pretrain_embed
+
+        print("pretrain embedding load finished!")
 
 
 def Load_Data():
@@ -240,8 +223,12 @@ def update_arguments():
     config.init_clip_max_norm = config.clip_max_norm
     config.embed_num = len(config.text_field.vocab)
     config.class_num = len(config.label_field.vocab) - 1
+    config.paddingId = config.text_field.vocab.stoi[pad]
+    config.unkId = config.text_field.vocab.stoi[unk]
     if config.CNN_MUI is True or config.DEEP_CNN_MUI is True:
         config.embed_num_mui = len(config.static_text_field.vocab)
+        config.paddingId_mui = config.static_text_field.vocab.stoi[pad]
+        config.unkId_mui = config.static_text_field.vocab.stoi[unk]
     # config.kernel_sizes = [int(k) for k in config.kernel_sizes.split(',')]
     print(config.kernel_sizes)
     mulu = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')

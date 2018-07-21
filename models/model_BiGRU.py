@@ -29,11 +29,10 @@ class BiGRU(nn.Module):
         V = args.embed_num
         D = args.embed_dim
         C = args.class_num
-        self.embed = nn.Embedding(V, D)
+        self.embed = nn.Embedding(V, D, padding_idx=args.paddingId)
         # pretrained  embedding
         if args.word_Embedding:
-            pretrained_weight = np.array(args.pretrained_weight)
-            self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
+            self.embed.weight.data.copy_(args.pretrained_weight)
         # gru
         self.bigru = nn.GRU(D, self.hidden_dim, dropout=args.dropout, num_layers=self.num_layers, bidirectional=True)
         # linear

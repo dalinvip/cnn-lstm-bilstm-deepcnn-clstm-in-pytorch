@@ -56,6 +56,8 @@ class MR(data.Dataset):
             examples = []
             with open(path) as f:
                 a, b = 0, 0
+                # v = f.readlines()
+                # print(len(v))
                 for line in f.readlines():
                     sentence, flag = line.strip().split(' ||| ')
                     if char_data is True:
@@ -64,6 +66,7 @@ class MR(data.Dataset):
                     # print(sentence)
                     # clear string in every sentence
                     sentence = clean_str(sentence)
+                    # print(sentence)
                     if line[-2] == '0':
                         a += 1
                         examples += [data.Example.fromlist([sentence, 'negative'], fields=fields)]

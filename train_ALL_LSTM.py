@@ -40,6 +40,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
     best_accuracy = Best_Result()
     model.train()
     for epoch in range(1, args.epochs+1):
+        steps = 0
         print("\n## The {} Epoch, All {} Epochs ! ##".format(epoch, args.epochs))
         for batch in train_iter:
             feature, target = batch.text, batch.label.data.sub_(1)

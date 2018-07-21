@@ -35,14 +35,12 @@ class CNN_Text(nn.Module):
 
         if args.max_norm is not None:
             print("max_norm = {} ".format(args.max_norm))
-            self.embed = nn.Embedding(V, D, max_norm=5, scale_grad_by_freq=True)
-            # self.embed.weight.data.uniform(-0.1, 0.1)
+            self.embed = nn.Embedding(V, D, max_norm=5, scale_grad_by_freq=True, padding_idx=args.paddingId)
         else:
             print("max_norm = {} ".format(args.max_norm))
-            self.embed = nn.Embedding(V, D, scale_grad_by_freq=True)
+            self.embed = nn.Embedding(V, D, scale_grad_by_freq=True, padding_idx=args.paddingId)
         if args.word_Embedding:
-            pretrained_weight = np.array(args.pretrained_weight)
-            self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
+            self.embed.weight.data.copy_(args.pretrained_weight)
             # fixed the word embedding
             self.embed.weight.requires_grad = True
         print("dddd {} ".format(self.embed.weight.data.size()))

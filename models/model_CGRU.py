@@ -33,10 +33,10 @@ class CGRU(nn.Module):
         Ci = 1
         Co = args.kernel_num
         Ks = args.kernel_sizes
-        self.embed = nn.Embedding(V, D)
+        self.embed = nn.Embedding(V, D, padding_idx=args.paddingId)
+        # pretrained  embedding
         if args.word_Embedding:
-            pretrained_weight = np.array(args.pretrained_weight)
-            self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
+            self.embed.weight.data.copy_(args.pretrained_weight)
 
         # CNN
         KK = []

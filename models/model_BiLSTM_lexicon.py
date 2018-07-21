@@ -26,10 +26,10 @@ class BiLSTM_1(nn.Module):
         D = args.embed_dim
         C = args.class_num
         # self.embed = nn.Embedding(V, D, max_norm=config.max_norm)
-        self.embed = nn.Embedding(V, D)
+        self.embed = nn.Embedding(V, D, padding_idx=args.paddingId)
+        # pretrained  embedding
         if args.word_Embedding:
-            pretrained_weight = np.array(args.pretrained_weight)
-            self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
+            self.embed.weight.data.copy_(args.pretrained_weight)
         self.bilstm = nn.LSTM(D, self.hidden_dim, num_layers=self.num_layers, dropout=args.dropout, bidirectional=True, bias=True)
         # print(self.bilstm)
         self.hidden2label = nn.Linear(self.hidden_dim * 2 * 2, C, bias=True)

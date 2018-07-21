@@ -34,10 +34,10 @@ class CNN_LSTM(nn.Module):
         Co = args.kernel_num
         Ks = args.kernel_sizes
         self.C = C
-        self.embed = nn.Embedding(V, D)
+        self.embed = nn.Embedding(V, D, padding_idx=args.paddingId)
+        # pretrained  embedding
         if args.word_Embedding:
-            pretrained_weight = np.array(args.pretrained_weight)
-            self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
+            self.embed.weight.data.copy_(args.pretrained_weight)
 
         # CNN
         self.convs1 = [nn.Conv2d(Ci, Co, (K, D)) for K in Ks]

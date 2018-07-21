@@ -45,20 +45,17 @@ class CNN_MUI(nn.Module):
 
         if args.max_norm is not None:
             print("max_norm = {} ".format(args.max_norm))
-            self.embed_no_static = nn.Embedding(V, D, max_norm=args.max_norm, scale_grad_by_freq=True)
-            self.embed_static = nn.Embedding(V_mui, D, max_norm=args.max_norm, scale_grad_by_freq=True)
+            self.embed_no_static = nn.Embedding(V, D, max_norm=args.max_norm, scale_grad_by_freq=True, padding_idx=args.paddingId)
+            self.embed_static = nn.Embedding(V_mui, D, max_norm=args.max_norm, scale_grad_by_freq=True, padding_idx=args.paddingId_mui)
         else:
             print("max_norm = {} ".format(args.max_norm))
-            self.embed_no_static = nn.Embedding(V, D, scale_grad_by_freq=True)
-            self.embed_static = nn.Embedding(V_mui, D, scale_grad_by_freq=True)
+            self.embed_no_static = nn.Embedding(V, D, scale_grad_by_freq=True, padding_idx=args.paddingId)
+            self.embed_static = nn.Embedding(V_mui, D, scale_grad_by_freq=True, padding_idx=args.paddingId_mui)
         if args.word_Embedding:
-            pretrained_weight = np.array(args.pretrained_weight)
-            self.embed_no_static.weight.data.copy_(torch.from_numpy(pretrained_weight))
-            pretrained_weight_static = np.array(args.pretrained_weight_static)
-            self.embed_static.weight.data.copy_(torch.from_numpy(pretrained_weight_static))
+            self.embed_no_static.weight.data.copy_(args.pretrained_weight)
+            self.embed_static.weight.data.copy_(args.pretrained_weight_static)
             # whether to fixed the word embedding
-            self.embed_no_static.weight.requires_grad = True
-            # self.embed_static.weight.requires_grad = False
+            self.embed_no_static.weight.requires_grad = False
 
         if args.wide_conv is True:
             print("using wide convolution")

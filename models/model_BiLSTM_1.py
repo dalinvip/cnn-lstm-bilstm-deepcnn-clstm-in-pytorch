@@ -33,13 +33,17 @@ class BiLSTM_1(nn.Module):
         self.dropout_embed = nn.Dropout(args.dropout_embed)
         if args.max_norm is not None:
             print("max_norm = {} ".format(args.max_norm))
-            self.embed = nn.Embedding(V, D, max_norm=args.max_norm, scale_grad_by_freq=True)
+            self.embed = nn.Embedding(V, D, max_norm=args.max_norm, scale_grad_by_freq=True, padding_idx=args.paddingId)
+            # pretrained  embedding
+            if args.word_Embedding:
+                self.embed.weight.data.copy_(args.pretrained_weight)
         else:
             print("max_norm = {} |||||".format(args.max_norm))
-            self.embed = nn.Embedding(V, D, scale_grad_by_freq=True)
-        if args.word_Embedding:
-            pretrained_weight = np.array(args.pretrained_weight)
-            self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
+            self.embed = nn.Embedding(V, D, scale_grad_by_freq=True, padding_idx=args.paddingId)
+            # pretrained  embedding
+            if args.word_Embedding:
+                self.embed.weight.data.copy_(args.pretrained_weight)
+
         self.bilstm = nn.LSTM(D, self.hidden_dim, num_layers=self.num_layers, bias=True, bidirectional=True,
                               dropout=self.args.dropout)
         print(self.bilstm)
