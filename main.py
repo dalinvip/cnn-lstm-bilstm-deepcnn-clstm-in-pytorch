@@ -162,10 +162,10 @@ def load_preEmbedding():
         path = config.word_Embedding_Path
         print("loading pretrain embedding......")
         paddingkey = pad
-        pretrain_embed = load_pretrained_emb_Embedding(path=path, text_field_words_dict=config.text_field.vocab.itos,
+        pretrain_embed = load_pretrained_emb_avg(path=path, text_field_words_dict=config.text_field.vocab.itos,
                                                        pad=paddingkey)
         if config.CNN_MUI is True or config.DEEP_CNN_MUI is True:
-            static_pretrain_embed = load_pretrained_emb_Embedding(path=path, text_field_words_dict=config.static_text_field.vocab.itos,
+            static_pretrain_embed = load_pretrained_emb_avg(path=path, text_field_words_dict=config.static_text_field.vocab.itos,
                                                                   pad=paddingkey)
         config.pretrained_weight = pretrain_embed
         if config.CNN_MUI is True or config.DEEP_CNN_MUI is True:

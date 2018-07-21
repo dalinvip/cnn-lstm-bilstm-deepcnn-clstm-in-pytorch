@@ -146,6 +146,7 @@ class MR(TarDataset):
         examples_dev = cls(text_field, label_field, path=path, file=dev, char_data=char_data, **kwargs).examples
         examples_test = cls(text_field, label_field, path=path, file=test,char_data=char_data, **kwargs).examples
         if shuffle:
+            print("shuffle data examples......")
             random.shuffle(examples_train)
             random.shuffle(examples_dev)
             random.shuffle(examples_test)
