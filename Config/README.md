@@ -1,4 +1,4 @@
-## Chinese-NER Task Config ##
+## Config Introduction ##
 
 - Use `ConfigParser` to config parameter  
 	- `from configparser import ConfigParser`  .
@@ -7,59 +7,93 @@
 - Following is `config.cfg` Parameter details.
 
 - [Data]
-	- `pretrained_embed` (True or False) ------ whether to use pretrained embedding.
+	- `word_Embedding ` (True or False) ------ whether to use pretrained embedding.
 
-	- ` pretrained-embed-file` (path)  ------ word embedding file path(`Pretrain_Embedding`).
+	- ` word_Embedding_Path ` (path)  ------ word embedding file path(`Pretrain_Embedding`).
 
-	- `train-file/dev-file/test-file`(path)  ------ train/dev/test data path(`Data`).
+	- `name_trainfile /name_trainfile /name_trainfile `(path)  ------ train/dev/test data path(`Data`).
 
 	- `min_freq` (integer number) ------ The smallest Word frequency when build vocab.
 
 	- `shuffle/epochs-shuffle`(True or False) ------ shuffle data .
 
-- [Save]
-	- `save_direction` (path) ------ save model path.
+	- `FIVE_CLASS_TASK `(True or False) ------ five classification.
 
-	- `rm_model` (True or False) ------ remove model to save space(now not use).
+	-  `TWO_CLASS_TASK `(True or False) ------ two classification.
+
+- [Save]
+	- `snapshot ` (path) ------ snapshot .
+
+	- `predict  ` (path) ------ predict  .
+
+	- `test ` (True or False) ------ test .
+
+	- `save_dir   ` (path) ------ save model and config file.
+
+	- `rm_model` (True or False) ------ remove model to save space.
 
 - [Model]
 
-	- `model-bilstm` (True or False) ------ Bilstm model.
+	- `static ` (True or False) ------ whether to update the weight during train.
 
-	- `lstm-layers` (integer) ------ number layers of lstm.
+	- `wide_conv  ` (True or False) ------ whether to use wide convcolution True : wide False : narrow.
+	
+	- `CNN --- LSTM --- CNN_BiGRU ` (True or False) ------ select model for train.
 
-	- `embed-dim` (integer) ------ embedding dim = pre-trained embedding dim.
+	- `embed_dim ` (integer) ------ embedding dim = pre-trained embedding dim.
 
 	- `embed-finetune` (True or False) ------ word embedding finetune or no-finetune.
 
-	- `lstm-hiddens` (integer) ------numbers of lstm hidden.
+	- `lstm_hidden_dim` (integer) ------number of lstm hidden.
+
+	- `lstm_num_layers ` (integer) ------number of lstm layer.
+
+	- `batch_normalizations ` (True or False) ------ batch_normalizations .
+
+	- `bath_norm_momentum  `(float) ------ batch_normalizations value.
+
+	- `batch_norm_affine  ` (True or False) ------  batch_normalizations option .
 
 	- `dropout-emb/dropout `(float) ------ dropout for prevent overfitting.
+	
+	- `clip_max_norm  `(float) ------  for prevent overfitting.
 
-	- `windows-size` (integer) ------ Context window feature size.
+	- `kernel_num ` (integer) ------ cnn kernel numbers.
+	
+	- `kernel_sizes` ------ cnn kernel sizes.
+	
+	- `init_weight  ` (True or False) ------  initial neural networks weight .
+	
+	- `init_weight_value`(float) ------  initial neural networks weight value.
+	
 
 - [Optimizer]
 
-	- `adam` (True or False) ------ `torch.optim.Adam`
+	- `Adam ` (True or False) ------ `torch.optim.Adam`
 
-	- `sgd` (True or False)  ------ `torch.optim.SGD`
+	- `SGD ` (True or False)  ------ `torch.optim.SGD`
+	
+	- `Adadelta  ` (True or False)  ------ `torch.optim.Adadelta `
 
-	- `learning-rate`(float) ------ learning rate(0.001, 0.01).
+	- `learning_rate `(float) ------ learning rate(0.001, 0.01).
 
-	- ` learning-rate-decay`(float) ------ learning rate decay.
+	- `weight-decay` (float) ------ L2.
 
-	- `weight-decay` (float) ------ 1e-8.
-
-	- `clip-max-norm` (Integer number) ------ 5, 10, 15.
 
 - [Train]
 
 	- `num-threads` (Integer) ------ threads.
 
-	- `use-cuda` (True or False) ------ support `cuda` speed up.
+	- `device ` (Integer) ------ gpu device .
+
+	- `cuda` (True or False) ------ support `cuda` speed up.
 
 	- `epochs` (Integer) ------ train epochs
 
-	- `batch-size/dev-batch-size/test-batch-size` (Integer) ------ number of batch
+	- `batch-size` (Integer) ------ number of batch
 
 	- `log-interval`(Integer) ------ steps of print log.
+
+	- `test-interval`(Integer) ------ eval dev/test.
+
+	- `save-interval`(Integer) ------ save model.
