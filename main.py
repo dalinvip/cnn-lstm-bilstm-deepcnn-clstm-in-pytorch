@@ -72,6 +72,7 @@ def mrs_two(path, train_name, dev_name, test_name, char_data, text_field, label_
     train_data, dev_data, test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name, test_name, char_data, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
     text_field.build_vocab(train_data.text, min_freq=config.min_freq)
+    # text_field.build_vocab(train_data.text, dev_data.text, test_data.text, min_freq=config.min_freq)
     label_field.build_vocab(train_data.label)
     train_iter, dev_iter, test_iter = data.Iterator.splits((train_data, dev_data, test_data),batch_sizes=(config.batch_size, len(dev_data), len(test_data)), **kargs)
     return train_iter, dev_iter, test_iter
@@ -441,7 +442,7 @@ if __name__ == "__main__":
     if config.cuda is True:
         print("Using GPU To Train......")
         # torch.backends.cudnn.enabled = True
-        # torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.deterministic = True
         torch.cuda.manual_seed(seed_num)
         torch.cuda.manual_seed_all(seed_num)
     print("torch.cuda.initial_seed", torch.cuda.initial_seed())
