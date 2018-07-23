@@ -103,7 +103,7 @@ def eval(data_iter, model, args, best_accuracy, epoch, test=False):
 
     size = len(data_iter.dataset)
     avg_loss = loss.data[0]/size
-    accuracy = 100.0 * corrects/size
+    accuracy = 100.0 * float(corrects)/size
     model.train()
     print(' Evaluation - loss: {:.6f}  acc: {:.4f}%({}/{})'.format(avg_loss, accuracy, corrects, size))
     if test is False:
