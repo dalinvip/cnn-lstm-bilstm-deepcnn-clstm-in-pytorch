@@ -1,0 +1,1006 @@
+Process ID 31048, Process Parent ID 31047
+Loaded config file sucessfully.
+word_Embedding : True
+freq_1_unk : False
+word_Embedding_Path : ./word2vec/glove.sentiment.conj.pretrained.txt
+datafile_path : 
+name_trainfile : ./Data/raw.clean.train
+name_devfile : ./Data/raw.clean.dev
+name_testfile : ./Data/raw.clean.test
+min_freq : 1
+word_data : False
+char_data : False
+shuffle : True
+epochs_shuffle : True
+FIVE_CLASS_TASK : False
+TWO_CLASS_TASK : True
+snapshot : None
+predict : None
+test : False
+save_dir : snapshot
+rm_model : True
+static : False
+wide_conv : True
+CNN : False
+HighWay_CNN : False
+CNN_MUI : False
+DEEP_CNN : False
+DEEP_CNN_MUI : False
+LSTM : False
+GRU : False
+BiLSTM : False
+BiLSTM_1 : True
+HighWay_BiLSTM_1 : False
+CNN_LSTM : False
+CNN_BiLSTM : False
+CLSTM : False
+CBiLSTM : False
+CGRU : False
+BiGRU : False
+CNN_BiGRU : False
+embed_dim : 300
+lstm_hidden_dim : 150
+lstm_num_layers : 1
+batch_normalizations : False
+bath_norm_momentum : 0.1
+batch_norm_affine : False
+dropout : 0.5
+dropout_embed : 0.5
+max_norm : None
+clip_max_norm : 10
+kernel_num : 200
+kernel_sizes : 1,2,3,4
+init_weight : True
+init_weight_value : 2.0
+learning_rate : 0.001
+Adam : True
+SGD : False
+Adadelta : False
+optim_momentum_value : 0.9
+weight_decay : 1e-8
+num_threads : 1
+device : -1
+cuda : True
+epochs : 500
+batch_size : 16
+log_interval : 10
+test_interval : 200
+save_interval : 200
+Using GPU To Train......
+torch.cuda.initial_seed 233
+use torchtext to define word dict......
+use torchtext to define word dict finished.
+Executing 2 Classification Task......
+./Data/raw.clean.train
+./Data/raw.clean.dev
+./Data/raw.clean.test
+a 3310 b 3610 
+a 428 b 444 
+a 912 b 909 
+shuffle data examples......
+len(train_data) 6920 
+word_Embedding_Path ./word2vec/glove.sentiment.conj.pretrained.txt 
+loading pretrain embedding......
+loading pre_train embedding by avg......
+The number of wordsDict is 13838 
+The dim of pretrained embedding is 300
+
+
+oov words initial by avg embedding, maybe take a while......
+All Words = 13838, InWords = 13129, OOVWords = 709, OOV Radio=0.051236
+pretrain embedding load finished!
+[1, 2, 3, 4]
+loading BiLSTM_1 model......
+max_norm = None |||||
+LSTM(300, 150, dropout=0.5, bidirectional=True)
+Initing W .......
+BiLSTM_1(
+  (dropout): Dropout(p=0.5)
+  (dropout_embed): Dropout(p=0.5)
+  (embed): Embedding(13838, 300, padding_idx=1, scale_grad_by_freq=True)
+  (bilstm): LSTM(300, 150, dropout=0.5, bidirectional=True)
+  (hidden2label): Linear(in_features=300, out_features=2)
+)
+
+ cpu_count 
+ 12
+BiLSTM_1 training start......
+Adam Training......
+
+## The 1 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.684641  acc: 56.2500%(9/16)
+Batch[20/6920] - loss: 0.649935  acc: 62.5000%(10/16)
+Batch[30/6920] - loss: 0.667645  acc: 56.2500%(9/16)
+Batch[40/6920] - loss: 0.571062  acc: 62.5000%(10/16)
+Batch[50/6920] - loss: 0.571923  acc: 68.7500%(11/16)
+Batch[60/6920] - loss: 0.616180  acc: 68.7500%(11/16)
+Batch[70/6920] - loss: 0.575303  acc: 62.5000%(10/16)
+Batch[80/6920] - loss: 0.479106  acc: 75.0000%(12/16)
+Batch[90/6920] - loss: 0.430722  acc: 87.5000%(14/16)
+Batch[100/6920] - loss: 0.362169  acc: 75.0000%(12/16)
+Batch[110/6920] - loss: 0.488748  acc: 81.2500%(13/16)
+Batch[120/6920] - loss: 0.563583  acc: 75.0000%(12/16)
+Batch[130/6920] - loss: 0.569607  acc: 75.0000%(12/16)
+Batch[140/6920] - loss: 0.528665  acc: 68.7500%(11/16)
+Batch[150/6920] - loss: 0.550140  acc: 81.2500%(13/16)
+Batch[160/6920] - loss: 0.356906  acc: 81.2500%(13/16)
+Batch[170/6920] - loss: 0.674125  acc: 62.5000%(10/16)
+Batch[180/6920] - loss: 0.457196  acc: 68.7500%(11/16)
+Batch[190/6920] - loss: 0.279866  acc: 87.5000%(14/16)
+Batch[200/6920] - loss: 0.489648  acc: 81.2500%(13/16)
+Dev  Accuracy:  Evaluation - loss: 0.467030  acc: 79.9312%(697/872) 
+Test Accuracy:  Evaluation - loss: 0.416990  acc: 81.8781%(1491/1821) 
+The Current Best Dev Accuracy: 79.9312, and Test Accuracy is :81.8781, locate on 1 epoch.
+
+
+Batch[210/6920] - loss: 0.314945  acc: 81.2500%(13/16)
+Batch[220/6920] - loss: 0.358974  acc: 75.0000%(12/16)
+Batch[230/6920] - loss: 0.524461  acc: 68.7500%(11/16)
+Batch[240/6920] - loss: 0.304966  acc: 87.5000%(14/16)
+Batch[250/6920] - loss: 0.290313  acc: 87.5000%(14/16)
+Batch[260/6920] - loss: 0.423234  acc: 81.2500%(13/16)
+Batch[270/6920] - loss: 0.545350  acc: 62.5000%(10/16)
+Batch[280/6920] - loss: 0.257893  acc: 93.7500%(15/16)
+Batch[290/6920] - loss: 0.308052  acc: 81.2500%(13/16)
+Batch[300/6920] - loss: 0.474363  acc: 75.0000%(12/16)
+Batch[310/6920] - loss: 0.436741  acc: 75.0000%(12/16)
+Batch[320/6920] - loss: 0.410821  acc: 81.2500%(13/16)
+Batch[330/6920] - loss: 0.226757  acc: 93.7500%(15/16)
+Batch[340/6920] - loss: 0.493502  acc: 68.7500%(11/16)
+Batch[350/6920] - loss: 0.473145  acc: 81.2500%(13/16)
+Batch[360/6920] - loss: 0.271530  acc: 87.5000%(14/16)
+Batch[370/6920] - loss: 0.465332  acc: 81.2500%(13/16)
+Batch[380/6920] - loss: 0.353602  acc: 87.5000%(14/16)
+Batch[390/6920] - loss: 0.634287  acc: 75.0000%(12/16)
+Batch[400/6920] - loss: 0.369746  acc: 87.5000%(14/16)
+Dev  Accuracy:  Evaluation - loss: 0.398701  acc: 83.3716%(727/872) 
+Test Accuracy:  Evaluation - loss: 0.356013  acc: 84.7886%(1544/1821) 
+The Current Best Dev Accuracy: 83.3716, and Test Accuracy is :84.7886, locate on 1 epoch.
+
+
+Batch[410/6920] - loss: 0.329477  acc: 81.2500%(13/16)
+Batch[420/6920] - loss: 0.431972  acc: 81.2500%(13/16)
+Batch[430/6920] - loss: 0.484522  acc: 75.0000%(12/16)
+## The 2 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.516998  acc: 75.0000%(12/16)
+Batch[20/6920] - loss: 0.403609  acc: 93.7500%(15/16)
+Batch[30/6920] - loss: 0.222764  acc: 93.7500%(15/16)
+Batch[40/6920] - loss: 0.325449  acc: 81.2500%(13/16)
+Batch[50/6920] - loss: 0.109047  acc: 93.7500%(15/16)
+Batch[60/6920] - loss: 0.474642  acc: 62.5000%(10/16)
+Batch[70/6920] - loss: 0.122948  acc: 100.0000%(16/16)
+Batch[80/6920] - loss: 0.167886  acc: 93.7500%(15/16)
+Batch[90/6920] - loss: 0.287444  acc: 93.7500%(15/16)
+Batch[100/6920] - loss: 0.262179  acc: 87.5000%(14/16)
+Batch[110/6920] - loss: 0.319826  acc: 87.5000%(14/16)
+Batch[120/6920] - loss: 0.479501  acc: 75.0000%(12/16)
+Batch[130/6920] - loss: 0.388425  acc: 75.0000%(12/16)
+Batch[140/6920] - loss: 0.146223  acc: 93.7500%(15/16)
+Batch[150/6920] - loss: 0.555159  acc: 75.0000%(12/16)
+Batch[160/6920] - loss: 0.373910  acc: 81.2500%(13/16)
+Batch[170/6920] - loss: 0.190191  acc: 93.7500%(15/16)
+Batch[180/6920] - loss: 0.636062  acc: 62.5000%(10/16)
+Batch[190/6920] - loss: 0.212323  acc: 93.7500%(15/16)
+Batch[200/6920] - loss: 0.122007  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 0.410757  acc: 83.1422%(725/872) 
+Test Accuracy:  Evaluation - loss: 0.347282  acc: 85.1730%(1551/1821) 
+The Current Best Dev Accuracy: 83.3716, and Test Accuracy is :84.7886, locate on 1 epoch.
+
+
+Batch[210/6920] - loss: 0.459048  acc: 81.2500%(13/16)
+Batch[220/6920] - loss: 0.663367  acc: 75.0000%(12/16)
+Batch[230/6920] - loss: 0.258583  acc: 93.7500%(15/16)
+Batch[240/6920] - loss: 0.270164  acc: 93.7500%(15/16)
+Batch[250/6920] - loss: 0.161940  acc: 93.7500%(15/16)
+Batch[260/6920] - loss: 0.610732  acc: 56.2500%(9/16)
+Batch[270/6920] - loss: 0.124170  acc: 100.0000%(16/16)
+Batch[280/6920] - loss: 0.116579  acc: 100.0000%(16/16)
+Batch[290/6920] - loss: 0.277364  acc: 87.5000%(14/16)
+Batch[300/6920] - loss: 0.601665  acc: 75.0000%(12/16)
+Batch[310/6920] - loss: 0.372565  acc: 81.2500%(13/16)
+Batch[320/6920] - loss: 0.318124  acc: 87.5000%(14/16)
+Batch[330/6920] - loss: 0.475537  acc: 75.0000%(12/16)
+Batch[340/6920] - loss: 0.430155  acc: 75.0000%(12/16)
+Batch[350/6920] - loss: 0.273832  acc: 87.5000%(14/16)
+Batch[360/6920] - loss: 0.171137  acc: 100.0000%(16/16)
+Batch[370/6920] - loss: 0.181964  acc: 93.7500%(15/16)
+Batch[380/6920] - loss: 0.544402  acc: 75.0000%(12/16)
+Batch[390/6920] - loss: 0.268663  acc: 87.5000%(14/16)
+Batch[400/6920] - loss: 0.187711  acc: 87.5000%(14/16)
+Dev  Accuracy:  Evaluation - loss: 0.382028  acc: 83.6009%(729/872) 
+Test Accuracy:  Evaluation - loss: 0.320575  acc: 86.4360%(1574/1821) 
+The Current Best Dev Accuracy: 83.6009, and Test Accuracy is :86.4360, locate on 2 epoch.
+
+
+Batch[410/6920] - loss: 0.384297  acc: 87.5000%(14/16)
+Batch[420/6920] - loss: 0.241266  acc: 87.5000%(14/16)
+Batch[430/6920] - loss: 0.301409  acc: 81.2500%(13/16)
+## The 3 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.035586  acc: 100.0000%(16/16)
+Batch[20/6920] - loss: 0.104601  acc: 100.0000%(16/16)
+Batch[30/6920] - loss: 0.254911  acc: 93.7500%(15/16)
+Batch[40/6920] - loss: 0.216248  acc: 93.7500%(15/16)
+Batch[50/6920] - loss: 0.138850  acc: 93.7500%(15/16)
+Batch[60/6920] - loss: 0.128191  acc: 93.7500%(15/16)
+Batch[70/6920] - loss: 0.148160  acc: 93.7500%(15/16)
+Batch[80/6920] - loss: 0.343900  acc: 87.5000%(14/16)
+Batch[90/6920] - loss: 0.333486  acc: 81.2500%(13/16)
+Batch[100/6920] - loss: 0.513210  acc: 81.2500%(13/16)
+Batch[110/6920] - loss: 0.288045  acc: 87.5000%(14/16)
+Batch[120/6920] - loss: 0.079036  acc: 100.0000%(16/16)
+Batch[130/6920] - loss: 0.536868  acc: 75.0000%(12/16)
+Batch[140/6920] - loss: 0.229565  acc: 93.7500%(15/16)
+Batch[150/6920] - loss: 0.107506  acc: 100.0000%(16/16)
+Batch[160/6920] - loss: 0.111034  acc: 93.7500%(15/16)
+Batch[170/6920] - loss: 0.125147  acc: 93.7500%(15/16)
+Batch[180/6920] - loss: 0.198262  acc: 93.7500%(15/16)
+Batch[190/6920] - loss: 0.312099  acc: 87.5000%(14/16)
+Batch[200/6920] - loss: 0.504605  acc: 81.2500%(13/16)
+Dev  Accuracy:  Evaluation - loss: 0.405002  acc: 82.5688%(720/872) 
+Test Accuracy:  Evaluation - loss: 0.346604  acc: 85.6672%(1560/1821) 
+The Current Best Dev Accuracy: 83.6009, and Test Accuracy is :86.4360, locate on 2 epoch.
+
+
+Batch[210/6920] - loss: 0.105400  acc: 100.0000%(16/16)
+Batch[220/6920] - loss: 0.138358  acc: 93.7500%(15/16)
+Batch[230/6920] - loss: 0.248497  acc: 87.5000%(14/16)
+Batch[240/6920] - loss: 0.036440  acc: 100.0000%(16/16)
+Batch[250/6920] - loss: 0.063788  acc: 100.0000%(16/16)
+Batch[260/6920] - loss: 0.438322  acc: 87.5000%(14/16)
+Batch[270/6920] - loss: 0.412084  acc: 87.5000%(14/16)
+Batch[280/6920] - loss: 0.197445  acc: 93.7500%(15/16)
+Batch[290/6920] - loss: 0.305075  acc: 87.5000%(14/16)
+Batch[300/6920] - loss: 0.204809  acc: 93.7500%(15/16)
+Batch[310/6920] - loss: 0.258292  acc: 93.7500%(15/16)
+Batch[320/6920] - loss: 0.339173  acc: 87.5000%(14/16)
+Batch[330/6920] - loss: 0.113473  acc: 93.7500%(15/16)
+Batch[340/6920] - loss: 0.419688  acc: 81.2500%(13/16)
+Batch[350/6920] - loss: 0.138166  acc: 100.0000%(16/16)
+Batch[360/6920] - loss: 0.218445  acc: 81.2500%(13/16)
+Batch[370/6920] - loss: 0.158837  acc: 93.7500%(15/16)
+Batch[380/6920] - loss: 0.062286  acc: 93.7500%(15/16)
+Batch[390/6920] - loss: 0.224557  acc: 81.2500%(13/16)
+Batch[400/6920] - loss: 0.214720  acc: 81.2500%(13/16)
+Dev  Accuracy:  Evaluation - loss: 0.404336  acc: 83.9450%(732/872) 
+Test Accuracy:  Evaluation - loss: 0.337015  acc: 86.8753%(1582/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[410/6920] - loss: 0.080790  acc: 93.7500%(15/16)
+Batch[420/6920] - loss: 0.348851  acc: 87.5000%(14/16)
+Batch[430/6920] - loss: 0.711124  acc: 75.0000%(12/16)
+## The 4 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.159539  acc: 100.0000%(16/16)
+Batch[20/6920] - loss: 0.036327  acc: 100.0000%(16/16)
+Batch[30/6920] - loss: 0.114533  acc: 93.7500%(15/16)
+Batch[40/6920] - loss: 0.299403  acc: 81.2500%(13/16)
+Batch[50/6920] - loss: 0.250230  acc: 81.2500%(13/16)
+Batch[60/6920] - loss: 0.199382  acc: 87.5000%(14/16)
+Batch[70/6920] - loss: 0.039582  acc: 100.0000%(16/16)
+Batch[80/6920] - loss: 0.217330  acc: 93.7500%(15/16)
+Batch[90/6920] - loss: 0.011082  acc: 100.0000%(16/16)
+Batch[100/6920] - loss: 0.428150  acc: 75.0000%(12/16)
+Batch[110/6920] - loss: 0.059311  acc: 93.7500%(15/16)
+Batch[120/6920] - loss: 0.179884  acc: 93.7500%(15/16)
+Batch[130/6920] - loss: 0.029544  acc: 100.0000%(16/16)
+Batch[140/6920] - loss: 0.172131  acc: 93.7500%(15/16)
+Batch[150/6920] - loss: 0.103442  acc: 93.7500%(15/16)
+Batch[160/6920] - loss: 0.110144  acc: 93.7500%(15/16)
+Batch[170/6920] - loss: 0.039739  acc: 100.0000%(16/16)
+Batch[180/6920] - loss: 0.058214  acc: 100.0000%(16/16)
+Batch[190/6920] - loss: 0.010275  acc: 100.0000%(16/16)
+Batch[200/6920] - loss: 0.038468  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 0.483517  acc: 82.4541%(719/872) 
+Test Accuracy:  Evaluation - loss: 0.383769  acc: 85.0082%(1548/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[210/6920] - loss: 0.176362  acc: 87.5000%(14/16)
+Batch[220/6920] - loss: 0.203303  acc: 93.7500%(15/16)
+Batch[230/6920] - loss: 0.277654  acc: 75.0000%(12/16)
+Batch[240/6920] - loss: 0.062977  acc: 100.0000%(16/16)
+Batch[250/6920] - loss: 0.089739  acc: 93.7500%(15/16)
+Batch[260/6920] - loss: 0.075039  acc: 100.0000%(16/16)
+Batch[270/6920] - loss: 0.075478  acc: 100.0000%(16/16)
+Batch[280/6920] - loss: 0.169288  acc: 93.7500%(15/16)
+Batch[290/6920] - loss: 0.343126  acc: 87.5000%(14/16)
+Batch[300/6920] - loss: 0.118995  acc: 93.7500%(15/16)
+Batch[310/6920] - loss: 0.163689  acc: 93.7500%(15/16)
+Batch[320/6920] - loss: 0.041059  acc: 100.0000%(16/16)
+Batch[330/6920] - loss: 0.022926  acc: 100.0000%(16/16)
+Batch[340/6920] - loss: 0.029014  acc: 100.0000%(16/16)
+Batch[350/6920] - loss: 0.055322  acc: 100.0000%(16/16)
+Batch[360/6920] - loss: 0.009762  acc: 100.0000%(16/16)
+Batch[370/6920] - loss: 0.097150  acc: 100.0000%(16/16)
+Batch[380/6920] - loss: 0.242890  acc: 87.5000%(14/16)
+Batch[390/6920] - loss: 0.100925  acc: 100.0000%(16/16)
+Batch[400/6920] - loss: 0.060826  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 0.475902  acc: 82.7982%(722/872) 
+Test Accuracy:  Evaluation - loss: 0.382404  acc: 86.7655%(1580/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[410/6920] - loss: 0.029730  acc: 100.0000%(16/16)
+Batch[420/6920] - loss: 0.158159  acc: 87.5000%(14/16)
+Batch[430/6920] - loss: 0.045702  acc: 100.0000%(16/16)
+## The 5 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.100023  acc: 93.7500%(15/16)
+Batch[20/6920] - loss: 0.027641  acc: 100.0000%(16/16)
+Batch[30/6920] - loss: 0.036810  acc: 100.0000%(16/16)
+Batch[40/6920] - loss: 0.178540  acc: 93.7500%(15/16)
+Batch[50/6920] - loss: 0.023800  acc: 100.0000%(16/16)
+Batch[60/6920] - loss: 0.025099  acc: 100.0000%(16/16)
+Batch[70/6920] - loss: 0.057180  acc: 100.0000%(16/16)
+Batch[80/6920] - loss: 0.175263  acc: 93.7500%(15/16)
+Batch[90/6920] - loss: 0.148552  acc: 93.7500%(15/16)
+Batch[100/6920] - loss: 0.053773  acc: 100.0000%(16/16)
+Batch[110/6920] - loss: 0.109023  acc: 93.7500%(15/16)
+Batch[120/6920] - loss: 0.142260  acc: 87.5000%(14/16)
+Batch[130/6920] - loss: 0.011113  acc: 100.0000%(16/16)
+Batch[140/6920] - loss: 0.041463  acc: 100.0000%(16/16)
+Batch[150/6920] - loss: 0.215101  acc: 87.5000%(14/16)
+Batch[160/6920] - loss: 0.118344  acc: 93.7500%(15/16)
+Batch[170/6920] - loss: 0.035868  acc: 100.0000%(16/16)
+Batch[180/6920] - loss: 0.119721  acc: 93.7500%(15/16)
+Batch[190/6920] - loss: 0.123129  acc: 93.7500%(15/16)
+Batch[200/6920] - loss: 0.009085  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 0.532870  acc: 82.4541%(719/872) 
+Test Accuracy:  Evaluation - loss: 0.442287  acc: 85.6672%(1560/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[210/6920] - loss: 0.179537  acc: 93.7500%(15/16)
+Batch[220/6920] - loss: 0.064854  acc: 100.0000%(16/16)
+Batch[230/6920] - loss: 0.087146  acc: 93.7500%(15/16)
+Batch[240/6920] - loss: 0.120462  acc: 93.7500%(15/16)
+Batch[250/6920] - loss: 0.030768  acc: 100.0000%(16/16)
+Batch[260/6920] - loss: 0.030946  acc: 100.0000%(16/16)
+Batch[270/6920] - loss: 0.004636  acc: 100.0000%(16/16)
+Batch[280/6920] - loss: 0.137535  acc: 87.5000%(14/16)
+Batch[290/6920] - loss: 0.012279  acc: 100.0000%(16/16)
+Batch[300/6920] - loss: 0.096995  acc: 100.0000%(16/16)
+Batch[310/6920] - loss: 0.008724  acc: 100.0000%(16/16)
+Batch[320/6920] - loss: 0.035528  acc: 100.0000%(16/16)
+Batch[330/6920] - loss: 0.251529  acc: 87.5000%(14/16)
+Batch[340/6920] - loss: 0.087073  acc: 93.7500%(15/16)
+Batch[350/6920] - loss: 0.197902  acc: 93.7500%(15/16)
+Batch[360/6920] - loss: 0.039990  acc: 100.0000%(16/16)
+Batch[370/6920] - loss: 0.310245  acc: 75.0000%(12/16)
+Batch[380/6920] - loss: 0.123357  acc: 100.0000%(16/16)
+Batch[390/6920] - loss: 0.402418  acc: 81.2500%(13/16)
+Batch[400/6920] - loss: 0.066805  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 0.559076  acc: 81.7661%(713/872) 
+Test Accuracy:  Evaluation - loss: 0.437508  acc: 85.3926%(1555/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[410/6920] - loss: 0.006749  acc: 100.0000%(16/16)
+Batch[420/6920] - loss: 0.029669  acc: 100.0000%(16/16)
+Batch[430/6920] - loss: 0.011059  acc: 100.0000%(16/16)
+## The 6 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.019837  acc: 100.0000%(16/16)
+Batch[20/6920] - loss: 0.030231  acc: 100.0000%(16/16)
+Batch[30/6920] - loss: 0.004754  acc: 100.0000%(16/16)
+Batch[40/6920] - loss: 0.009465  acc: 100.0000%(16/16)
+Batch[50/6920] - loss: 0.181706  acc: 87.5000%(14/16)
+Batch[60/6920] - loss: 0.044650  acc: 100.0000%(16/16)
+Batch[70/6920] - loss: 0.177966  acc: 93.7500%(15/16)
+Batch[80/6920] - loss: 0.055512  acc: 100.0000%(16/16)
+Batch[90/6920] - loss: 0.022877  acc: 100.0000%(16/16)
+Batch[100/6920] - loss: 0.062235  acc: 93.7500%(15/16)
+Batch[110/6920] - loss: 0.047374  acc: 100.0000%(16/16)
+Batch[120/6920] - loss: 0.004255  acc: 100.0000%(16/16)
+Batch[130/6920] - loss: 0.073287  acc: 93.7500%(15/16)
+Batch[140/6920] - loss: 0.068325  acc: 100.0000%(16/16)
+Batch[150/6920] - loss: 0.006448  acc: 100.0000%(16/16)
+Batch[160/6920] - loss: 0.033758  acc: 100.0000%(16/16)
+Batch[170/6920] - loss: 0.012997  acc: 100.0000%(16/16)
+Batch[180/6920] - loss: 0.010725  acc: 100.0000%(16/16)
+Batch[190/6920] - loss: 0.006845  acc: 100.0000%(16/16)
+Batch[200/6920] - loss: 0.038725  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 0.728162  acc: 81.4220%(710/872) 
+Test Accuracy:  Evaluation - loss: 0.590164  acc: 83.8001%(1526/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[210/6920] - loss: 0.015812  acc: 100.0000%(16/16)
+Batch[220/6920] - loss: 0.049868  acc: 100.0000%(16/16)
+Batch[230/6920] - loss: 0.063656  acc: 93.7500%(15/16)
+Batch[240/6920] - loss: 0.057511  acc: 100.0000%(16/16)
+Batch[250/6920] - loss: 0.040786  acc: 100.0000%(16/16)
+Batch[260/6920] - loss: 0.007271  acc: 100.0000%(16/16)
+Batch[270/6920] - loss: 0.018528  acc: 100.0000%(16/16)
+Batch[280/6920] - loss: 0.029982  acc: 100.0000%(16/16)
+Batch[290/6920] - loss: 0.064533  acc: 93.7500%(15/16)
+Batch[300/6920] - loss: 0.228911  acc: 93.7500%(15/16)
+Batch[310/6920] - loss: 0.208767  acc: 93.7500%(15/16)
+Batch[320/6920] - loss: 0.011715  acc: 100.0000%(16/16)
+Batch[330/6920] - loss: 0.026691  acc: 100.0000%(16/16)
+Batch[340/6920] - loss: 0.033443  acc: 100.0000%(16/16)
+Batch[350/6920] - loss: 0.026444  acc: 100.0000%(16/16)
+Batch[360/6920] - loss: 0.005496  acc: 100.0000%(16/16)
+Batch[370/6920] - loss: 0.007838  acc: 100.0000%(16/16)
+Batch[380/6920] - loss: 0.011788  acc: 100.0000%(16/16)
+Batch[390/6920] - loss: 0.057538  acc: 93.7500%(15/16)
+Batch[400/6920] - loss: 0.003076  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 0.679643  acc: 82.2248%(717/872) 
+Test Accuracy:  Evaluation - loss: 0.553890  acc: 83.9099%(1528/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[410/6920] - loss: 0.242917  acc: 93.7500%(15/16)
+Batch[420/6920] - loss: 0.004972  acc: 100.0000%(16/16)
+Batch[430/6920] - loss: 0.036093  acc: 100.0000%(16/16)
+## The 7 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.007922  acc: 100.0000%(16/16)
+Batch[20/6920] - loss: 0.022598  acc: 100.0000%(16/16)
+Batch[30/6920] - loss: 0.043616  acc: 100.0000%(16/16)
+Batch[40/6920] - loss: 0.010769  acc: 100.0000%(16/16)
+Batch[50/6920] - loss: 0.001780  acc: 100.0000%(16/16)
+Batch[60/6920] - loss: 0.012535  acc: 100.0000%(16/16)
+Batch[70/6920] - loss: 0.003418  acc: 100.0000%(16/16)
+Batch[80/6920] - loss: 0.003823  acc: 100.0000%(16/16)
+Batch[90/6920] - loss: 0.010775  acc: 100.0000%(16/16)
+Batch[100/6920] - loss: 0.004219  acc: 100.0000%(16/16)
+Batch[110/6920] - loss: 0.000845  acc: 100.0000%(16/16)
+Batch[120/6920] - loss: 0.027748  acc: 100.0000%(16/16)
+Batch[130/6920] - loss: 0.075373  acc: 93.7500%(15/16)
+Batch[140/6920] - loss: 0.099598  acc: 93.7500%(15/16)
+Batch[150/6920] - loss: 0.165102  acc: 87.5000%(14/16)
+Batch[160/6920] - loss: 0.016249  acc: 100.0000%(16/16)
+Batch[170/6920] - loss: 0.060844  acc: 100.0000%(16/16)
+Batch[180/6920] - loss: 0.097024  acc: 93.7500%(15/16)
+Batch[190/6920] - loss: 0.019904  acc: 100.0000%(16/16)
+Batch[200/6920] - loss: 0.007233  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 0.794840  acc: 81.0780%(707/872) 
+Test Accuracy:  Evaluation - loss: 0.632638  acc: 84.4591%(1538/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[210/6920] - loss: 0.020008  acc: 100.0000%(16/16)
+Batch[220/6920] - loss: 0.020361  acc: 100.0000%(16/16)
+Batch[230/6920] - loss: 0.004238  acc: 100.0000%(16/16)
+Batch[240/6920] - loss: 0.018921  acc: 100.0000%(16/16)
+Batch[250/6920] - loss: 0.047690  acc: 100.0000%(16/16)
+Batch[260/6920] - loss: 0.054012  acc: 100.0000%(16/16)
+Batch[270/6920] - loss: 0.005664  acc: 100.0000%(16/16)
+Batch[280/6920] - loss: 0.032833  acc: 100.0000%(16/16)
+Batch[290/6920] - loss: 0.002242  acc: 100.0000%(16/16)
+Batch[300/6920] - loss: 0.019553  acc: 100.0000%(16/16)
+Batch[310/6920] - loss: 0.013192  acc: 100.0000%(16/16)
+Batch[320/6920] - loss: 0.026579  acc: 100.0000%(16/16)
+Batch[330/6920] - loss: 0.004604  acc: 100.0000%(16/16)
+Batch[340/6920] - loss: 0.003740  acc: 100.0000%(16/16)
+Batch[350/6920] - loss: 0.070434  acc: 93.7500%(15/16)
+Batch[360/6920] - loss: 0.011976  acc: 100.0000%(16/16)
+Batch[370/6920] - loss: 0.028948  acc: 100.0000%(16/16)
+Batch[380/6920] - loss: 0.002539  acc: 100.0000%(16/16)
+Batch[390/6920] - loss: 0.007483  acc: 100.0000%(16/16)
+Batch[400/6920] - loss: 0.018977  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 0.769738  acc: 81.6514%(712/872) 
+Test Accuracy:  Evaluation - loss: 0.667544  acc: 82.0428%(1494/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[410/6920] - loss: 0.006094  acc: 100.0000%(16/16)
+Batch[420/6920] - loss: 0.042772  acc: 100.0000%(16/16)
+Batch[430/6920] - loss: 0.015904  acc: 100.0000%(16/16)
+## The 8 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.013677  acc: 100.0000%(16/16)
+Batch[20/6920] - loss: 0.005684  acc: 100.0000%(16/16)
+Batch[30/6920] - loss: 0.046560  acc: 100.0000%(16/16)
+Batch[40/6920] - loss: 0.011795  acc: 100.0000%(16/16)
+Batch[50/6920] - loss: 0.086103  acc: 93.7500%(15/16)
+Batch[60/6920] - loss: 0.012442  acc: 100.0000%(16/16)
+Batch[70/6920] - loss: 0.011818  acc: 100.0000%(16/16)
+Batch[80/6920] - loss: 0.135846  acc: 93.7500%(15/16)
+Batch[90/6920] - loss: 0.017400  acc: 100.0000%(16/16)
+Batch[100/6920] - loss: 0.039342  acc: 100.0000%(16/16)
+Batch[110/6920] - loss: 0.230316  acc: 87.5000%(14/16)
+Batch[120/6920] - loss: 0.002289  acc: 100.0000%(16/16)
+Batch[130/6920] - loss: 0.045671  acc: 100.0000%(16/16)
+Batch[140/6920] - loss: 0.000772  acc: 100.0000%(16/16)
+Batch[150/6920] - loss: 0.024125  acc: 100.0000%(16/16)
+Batch[160/6920] - loss: 0.020766  acc: 100.0000%(16/16)
+Batch[170/6920] - loss: 0.008466  acc: 100.0000%(16/16)
+Batch[180/6920] - loss: 0.111822  acc: 93.7500%(15/16)
+Batch[190/6920] - loss: 0.023617  acc: 100.0000%(16/16)
+Batch[200/6920] - loss: 0.037650  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 0.830942  acc: 80.8486%(705/872) 
+Test Accuracy:  Evaluation - loss: 0.691524  acc: 82.6469%(1505/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[210/6920] - loss: 0.002437  acc: 100.0000%(16/16)
+Batch[220/6920] - loss: 0.033699  acc: 100.0000%(16/16)
+Batch[230/6920] - loss: 0.010363  acc: 100.0000%(16/16)
+Batch[240/6920] - loss: 0.111308  acc: 93.7500%(15/16)
+Batch[250/6920] - loss: 0.000454  acc: 100.0000%(16/16)
+Batch[260/6920] - loss: 0.109818  acc: 93.7500%(15/16)
+Batch[270/6920] - loss: 0.054486  acc: 93.7500%(15/16)
+Batch[280/6920] - loss: 0.001030  acc: 100.0000%(16/16)
+Batch[290/6920] - loss: 0.017728  acc: 100.0000%(16/16)
+Batch[300/6920] - loss: 0.001790  acc: 100.0000%(16/16)
+Batch[310/6920] - loss: 0.006646  acc: 100.0000%(16/16)
+Batch[320/6920] - loss: 0.106410  acc: 93.7500%(15/16)
+Batch[330/6920] - loss: 0.006268  acc: 100.0000%(16/16)
+Batch[340/6920] - loss: 0.049976  acc: 100.0000%(16/16)
+Batch[350/6920] - loss: 0.011622  acc: 100.0000%(16/16)
+Batch[360/6920] - loss: 0.025691  acc: 100.0000%(16/16)
+Batch[370/6920] - loss: 0.010534  acc: 100.0000%(16/16)
+Batch[380/6920] - loss: 0.008117  acc: 100.0000%(16/16)
+Batch[390/6920] - loss: 0.001710  acc: 100.0000%(16/16)
+Batch[400/6920] - loss: 0.031228  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 0.802438  acc: 82.5688%(720/872) 
+Test Accuracy:  Evaluation - loss: 0.664679  acc: 83.7452%(1525/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[410/6920] - loss: 0.006602  acc: 100.0000%(16/16)
+Batch[420/6920] - loss: 0.010837  acc: 100.0000%(16/16)
+Batch[430/6920] - loss: 0.005515  acc: 100.0000%(16/16)
+## The 9 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.009960  acc: 100.0000%(16/16)
+Batch[20/6920] - loss: 0.034670  acc: 100.0000%(16/16)
+Batch[30/6920] - loss: 0.013740  acc: 100.0000%(16/16)
+Batch[40/6920] - loss: 0.019106  acc: 100.0000%(16/16)
+Batch[50/6920] - loss: 0.070738  acc: 93.7500%(15/16)
+Batch[60/6920] - loss: 0.135305  acc: 93.7500%(15/16)
+Batch[70/6920] - loss: 0.003935  acc: 100.0000%(16/16)
+Batch[80/6920] - loss: 0.002752  acc: 100.0000%(16/16)
+Batch[90/6920] - loss: 0.007431  acc: 100.0000%(16/16)
+Batch[100/6920] - loss: 0.003147  acc: 100.0000%(16/16)
+Batch[110/6920] - loss: 0.001100  acc: 100.0000%(16/16)
+Batch[120/6920] - loss: 0.004759  acc: 100.0000%(16/16)
+Batch[130/6920] - loss: 0.000118  acc: 100.0000%(16/16)
+Batch[140/6920] - loss: 0.000819  acc: 100.0000%(16/16)
+Batch[150/6920] - loss: 0.000206  acc: 100.0000%(16/16)
+Batch[160/6920] - loss: 0.003576  acc: 100.0000%(16/16)
+Batch[170/6920] - loss: 0.010052  acc: 100.0000%(16/16)
+Batch[180/6920] - loss: 0.015191  acc: 100.0000%(16/16)
+Batch[190/6920] - loss: 0.008122  acc: 100.0000%(16/16)
+Batch[200/6920] - loss: 0.011614  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 0.963871  acc: 80.9633%(706/872) 
+Test Accuracy:  Evaluation - loss: 0.818278  acc: 82.3174%(1499/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[210/6920] - loss: 0.019052  acc: 100.0000%(16/16)
+Batch[220/6920] - loss: 0.026297  acc: 100.0000%(16/16)
+Batch[230/6920] - loss: 0.009834  acc: 100.0000%(16/16)
+Batch[240/6920] - loss: 0.007709  acc: 100.0000%(16/16)
+Batch[250/6920] - loss: 0.007701  acc: 100.0000%(16/16)
+Batch[260/6920] - loss: 0.002446  acc: 100.0000%(16/16)
+Batch[270/6920] - loss: 0.057442  acc: 93.7500%(15/16)
+Batch[280/6920] - loss: 0.004733  acc: 100.0000%(16/16)
+Batch[290/6920] - loss: 0.048283  acc: 93.7500%(15/16)
+Batch[300/6920] - loss: 0.054787  acc: 93.7500%(15/16)
+Batch[310/6920] - loss: 0.026252  acc: 100.0000%(16/16)
+Batch[320/6920] - loss: 0.043066  acc: 100.0000%(16/16)
+Batch[330/6920] - loss: 0.023935  acc: 100.0000%(16/16)
+Batch[340/6920] - loss: 0.000526  acc: 100.0000%(16/16)
+Batch[350/6920] - loss: 0.004974  acc: 100.0000%(16/16)
+Batch[360/6920] - loss: 0.004894  acc: 100.0000%(16/16)
+Batch[370/6920] - loss: 0.080972  acc: 100.0000%(16/16)
+Batch[380/6920] - loss: 0.193363  acc: 93.7500%(15/16)
+Batch[390/6920] - loss: 0.048872  acc: 100.0000%(16/16)
+Batch[400/6920] - loss: 0.005375  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 0.823404  acc: 81.1927%(708/872) 
+Test Accuracy:  Evaluation - loss: 0.661923  acc: 83.6354%(1523/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[410/6920] - loss: 0.013757  acc: 100.0000%(16/16)
+Batch[420/6920] - loss: 0.001282  acc: 100.0000%(16/16)
+Batch[430/6920] - loss: 0.003280  acc: 100.0000%(16/16)
+## The 10 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.004789  acc: 100.0000%(16/16)
+Batch[20/6920] - loss: 0.000896  acc: 100.0000%(16/16)
+Batch[30/6920] - loss: 0.003341  acc: 100.0000%(16/16)
+Batch[40/6920] - loss: 0.000137  acc: 100.0000%(16/16)
+Batch[50/6920] - loss: 0.026070  acc: 100.0000%(16/16)
+Batch[60/6920] - loss: 0.001521  acc: 100.0000%(16/16)
+Batch[70/6920] - loss: 0.000634  acc: 100.0000%(16/16)
+Batch[80/6920] - loss: 0.033774  acc: 100.0000%(16/16)
+Batch[90/6920] - loss: 0.001285  acc: 100.0000%(16/16)
+Batch[100/6920] - loss: 0.000702  acc: 100.0000%(16/16)
+Batch[110/6920] - loss: 0.005799  acc: 100.0000%(16/16)
+Batch[120/6920] - loss: 0.001637  acc: 100.0000%(16/16)
+Batch[130/6920] - loss: 0.018045  acc: 100.0000%(16/16)
+Batch[140/6920] - loss: 0.024850  acc: 100.0000%(16/16)
+Batch[150/6920] - loss: 0.008234  acc: 100.0000%(16/16)
+Batch[160/6920] - loss: 0.005937  acc: 100.0000%(16/16)
+Batch[170/6920] - loss: 0.000864  acc: 100.0000%(16/16)
+Batch[180/6920] - loss: 0.000508  acc: 100.0000%(16/16)
+Batch[190/6920] - loss: 0.014897  acc: 100.0000%(16/16)
+Batch[200/6920] - loss: 0.002039  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 0.964438  acc: 81.7661%(713/872) 
+Test Accuracy:  Evaluation - loss: 0.784124  acc: 83.3059%(1517/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[210/6920] - loss: 0.024509  acc: 100.0000%(16/16)
+Batch[220/6920] - loss: 0.005871  acc: 100.0000%(16/16)
+Batch[230/6920] - loss: 0.005167  acc: 100.0000%(16/16)
+Batch[240/6920] - loss: 0.000947  acc: 100.0000%(16/16)
+Batch[250/6920] - loss: 0.000462  acc: 100.0000%(16/16)
+Batch[260/6920] - loss: 0.000925  acc: 100.0000%(16/16)
+Batch[270/6920] - loss: 0.006828  acc: 100.0000%(16/16)
+Batch[280/6920] - loss: 0.010046  acc: 100.0000%(16/16)
+Batch[290/6920] - loss: 0.010937  acc: 100.0000%(16/16)
+Batch[300/6920] - loss: 0.007905  acc: 100.0000%(16/16)
+Batch[310/6920] - loss: 0.012419  acc: 100.0000%(16/16)
+Batch[320/6920] - loss: 0.015285  acc: 100.0000%(16/16)
+Batch[330/6920] - loss: 0.011777  acc: 100.0000%(16/16)
+Batch[340/6920] - loss: 0.000093  acc: 100.0000%(16/16)
+Batch[350/6920] - loss: 0.008334  acc: 100.0000%(16/16)
+Batch[360/6920] - loss: 0.010759  acc: 100.0000%(16/16)
+Batch[370/6920] - loss: 0.135574  acc: 93.7500%(15/16)
+Batch[380/6920] - loss: 0.003209  acc: 100.0000%(16/16)
+Batch[390/6920] - loss: 0.018600  acc: 100.0000%(16/16)
+Batch[400/6920] - loss: 0.024375  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 0.885902  acc: 81.4220%(710/872) 
+Test Accuracy:  Evaluation - loss: 0.727422  acc: 82.7567%(1507/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[410/6920] - loss: 0.000698  acc: 100.0000%(16/16)
+Batch[420/6920] - loss: 0.002697  acc: 100.0000%(16/16)
+Batch[430/6920] - loss: 0.001822  acc: 100.0000%(16/16)
+## The 11 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.001374  acc: 100.0000%(16/16)
+Batch[20/6920] - loss: 0.004876  acc: 100.0000%(16/16)
+Batch[30/6920] - loss: 0.002137  acc: 100.0000%(16/16)
+Batch[40/6920] - loss: 0.056050  acc: 93.7500%(15/16)
+Batch[50/6920] - loss: 0.017455  acc: 100.0000%(16/16)
+Batch[60/6920] - loss: 0.001801  acc: 100.0000%(16/16)
+Batch[70/6920] - loss: 0.001153  acc: 100.0000%(16/16)
+Batch[80/6920] - loss: 0.044597  acc: 100.0000%(16/16)
+Batch[90/6920] - loss: 0.003332  acc: 100.0000%(16/16)
+Batch[100/6920] - loss: 0.025001  acc: 100.0000%(16/16)
+Batch[110/6920] - loss: 0.000549  acc: 100.0000%(16/16)
+Batch[120/6920] - loss: 0.000124  acc: 100.0000%(16/16)
+Batch[130/6920] - loss: 0.000423  acc: 100.0000%(16/16)
+Batch[140/6920] - loss: 0.077768  acc: 93.7500%(15/16)
+Batch[150/6920] - loss: 0.001505  acc: 100.0000%(16/16)
+Batch[160/6920] - loss: 0.012704  acc: 100.0000%(16/16)
+Batch[170/6920] - loss: 0.007499  acc: 100.0000%(16/16)
+Batch[180/6920] - loss: 0.000639  acc: 100.0000%(16/16)
+Batch[190/6920] - loss: 0.000141  acc: 100.0000%(16/16)
+Batch[200/6920] - loss: 0.000478  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 1.066419  acc: 80.2752%(700/872) 
+Test Accuracy:  Evaluation - loss: 0.928728  acc: 81.1093%(1477/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[210/6920] - loss: 0.004471  acc: 100.0000%(16/16)
+Batch[220/6920] - loss: 0.005109  acc: 100.0000%(16/16)
+Batch[230/6920] - loss: 0.020740  acc: 100.0000%(16/16)
+Batch[240/6920] - loss: 0.011223  acc: 100.0000%(16/16)
+Batch[250/6920] - loss: 0.003760  acc: 100.0000%(16/16)
+Batch[260/6920] - loss: 0.018741  acc: 100.0000%(16/16)
+Batch[270/6920] - loss: 0.017233  acc: 100.0000%(16/16)
+Batch[280/6920] - loss: 0.001466  acc: 100.0000%(16/16)
+Batch[290/6920] - loss: 0.000191  acc: 100.0000%(16/16)
+Batch[300/6920] - loss: 0.013484  acc: 100.0000%(16/16)
+Batch[310/6920] - loss: 0.006703  acc: 100.0000%(16/16)
+Batch[320/6920] - loss: 0.000026  acc: 100.0000%(16/16)
+Batch[330/6920] - loss: 0.005419  acc: 100.0000%(16/16)
+Batch[340/6920] - loss: 0.000424  acc: 100.0000%(16/16)
+Batch[350/6920] - loss: 0.005332  acc: 100.0000%(16/16)
+Batch[360/6920] - loss: 0.000033  acc: 100.0000%(16/16)
+Batch[370/6920] - loss: 0.049903  acc: 93.7500%(15/16)
+Batch[380/6920] - loss: 0.002513  acc: 100.0000%(16/16)
+Batch[390/6920] - loss: 0.001602  acc: 100.0000%(16/16)
+Batch[400/6920] - loss: 0.000851  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 1.072985  acc: 81.4220%(710/872) 
+Test Accuracy:  Evaluation - loss: 0.909402  acc: 81.8232%(1490/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[410/6920] - loss: 0.003500  acc: 100.0000%(16/16)
+Batch[420/6920] - loss: 0.000967  acc: 100.0000%(16/16)
+Batch[430/6920] - loss: 0.016579  acc: 100.0000%(16/16)
+## The 12 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.004937  acc: 100.0000%(16/16)
+Batch[20/6920] - loss: 0.000673  acc: 100.0000%(16/16)
+Batch[30/6920] - loss: 0.096392  acc: 93.7500%(15/16)
+Batch[40/6920] - loss: 0.006601  acc: 100.0000%(16/16)
+Batch[50/6920] - loss: 0.000083  acc: 100.0000%(16/16)
+Batch[60/6920] - loss: 0.003213  acc: 100.0000%(16/16)
+Batch[70/6920] - loss: 0.032371  acc: 100.0000%(16/16)
+Batch[80/6920] - loss: 0.072727  acc: 93.7500%(15/16)
+Batch[90/6920] - loss: 0.000108  acc: 100.0000%(16/16)
+Batch[100/6920] - loss: 0.000620  acc: 100.0000%(16/16)
+Batch[110/6920] - loss: 0.003046  acc: 100.0000%(16/16)
+Batch[120/6920] - loss: 0.091854  acc: 93.7500%(15/16)
+Batch[130/6920] - loss: 0.000335  acc: 100.0000%(16/16)
+Batch[140/6920] - loss: 0.019710  acc: 100.0000%(16/16)
+Batch[150/6920] - loss: 0.000532  acc: 100.0000%(16/16)
+Batch[160/6920] - loss: 0.056627  acc: 93.7500%(15/16)
+Batch[170/6920] - loss: 0.007029  acc: 100.0000%(16/16)
+Batch[180/6920] - loss: 0.016692  acc: 100.0000%(16/16)
+Batch[190/6920] - loss: 0.000075  acc: 100.0000%(16/16)
+Batch[200/6920] - loss: 0.002485  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 1.074670  acc: 80.6193%(703/872) 
+Test Accuracy:  Evaluation - loss: 0.916118  acc: 82.3174%(1499/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[210/6920] - loss: 0.000749  acc: 100.0000%(16/16)
+Batch[220/6920] - loss: 0.000041  acc: 100.0000%(16/16)
+Batch[230/6920] - loss: 0.000494  acc: 100.0000%(16/16)
+Batch[240/6920] - loss: 0.000327  acc: 100.0000%(16/16)
+Batch[250/6920] - loss: 0.011810  acc: 100.0000%(16/16)
+Batch[260/6920] - loss: 0.000444  acc: 100.0000%(16/16)
+Batch[270/6920] - loss: 0.064298  acc: 100.0000%(16/16)
+Batch[280/6920] - loss: 0.003844  acc: 100.0000%(16/16)
+Batch[290/6920] - loss: 0.003830  acc: 100.0000%(16/16)
+Batch[300/6920] - loss: 0.000067  acc: 100.0000%(16/16)
+Batch[310/6920] - loss: 0.000113  acc: 100.0000%(16/16)
+Batch[320/6920] - loss: 0.007462  acc: 100.0000%(16/16)
+Batch[330/6920] - loss: 0.000433  acc: 100.0000%(16/16)
+Batch[340/6920] - loss: 0.000054  acc: 100.0000%(16/16)
+Batch[350/6920] - loss: 0.004344  acc: 100.0000%(16/16)
+Batch[360/6920] - loss: 0.007400  acc: 100.0000%(16/16)
+Batch[370/6920] - loss: 0.001194  acc: 100.0000%(16/16)
+Batch[380/6920] - loss: 0.009565  acc: 100.0000%(16/16)
+Batch[390/6920] - loss: 0.001128  acc: 100.0000%(16/16)
+Batch[400/6920] - loss: 0.002683  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 1.077063  acc: 81.4220%(710/872) 
+Test Accuracy:  Evaluation - loss: 0.928799  acc: 81.8781%(1491/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[410/6920] - loss: 0.000466  acc: 100.0000%(16/16)
+Batch[420/6920] - loss: 0.000094  acc: 100.0000%(16/16)
+Batch[430/6920] - loss: 0.003170  acc: 100.0000%(16/16)
+## The 13 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.000755  acc: 100.0000%(16/16)
+Batch[20/6920] - loss: 0.010439  acc: 100.0000%(16/16)
+Batch[30/6920] - loss: 0.003682  acc: 100.0000%(16/16)
+Batch[40/6920] - loss: 0.015640  acc: 100.0000%(16/16)
+Batch[50/6920] - loss: 0.011050  acc: 100.0000%(16/16)
+Batch[60/6920] - loss: 0.004978  acc: 100.0000%(16/16)
+Batch[70/6920] - loss: 0.006587  acc: 100.0000%(16/16)
+Batch[80/6920] - loss: 0.008924  acc: 100.0000%(16/16)
+Batch[90/6920] - loss: 0.000039  acc: 100.0000%(16/16)
+Batch[100/6920] - loss: 0.000699  acc: 100.0000%(16/16)
+Batch[110/6920] - loss: 0.003574  acc: 100.0000%(16/16)
+Batch[120/6920] - loss: 0.000413  acc: 100.0000%(16/16)
+Batch[130/6920] - loss: 0.000718  acc: 100.0000%(16/16)
+Batch[140/6920] - loss: 0.000133  acc: 100.0000%(16/16)
+Batch[150/6920] - loss: 0.000049  acc: 100.0000%(16/16)
+Batch[160/6920] - loss: 0.008961  acc: 100.0000%(16/16)
+Batch[170/6920] - loss: 0.000381  acc: 100.0000%(16/16)
+Batch[180/6920] - loss: 0.000313  acc: 100.0000%(16/16)
+Batch[190/6920] - loss: 0.232701  acc: 87.5000%(14/16)
+Batch[200/6920] - loss: 0.004317  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 1.091719  acc: 81.5367%(711/872) 
+Test Accuracy:  Evaluation - loss: 0.949709  acc: 83.4706%(1520/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[210/6920] - loss: 0.022279  acc: 100.0000%(16/16)
+Batch[220/6920] - loss: 0.000031  acc: 100.0000%(16/16)
+Batch[230/6920] - loss: 0.001056  acc: 100.0000%(16/16)
+Batch[240/6920] - loss: 0.004004  acc: 100.0000%(16/16)
+Batch[250/6920] - loss: 0.000502  acc: 100.0000%(16/16)
+Batch[260/6920] - loss: 0.001241  acc: 100.0000%(16/16)
+Batch[270/6920] - loss: 0.009228  acc: 100.0000%(16/16)
+Batch[280/6920] - loss: 0.000637  acc: 100.0000%(16/16)
+Batch[290/6920] - loss: 0.000836  acc: 100.0000%(16/16)
+Batch[300/6920] - loss: 0.000140  acc: 100.0000%(16/16)
+Batch[310/6920] - loss: 0.004014  acc: 100.0000%(16/16)
+Batch[320/6920] - loss: 0.000830  acc: 100.0000%(16/16)
+Batch[330/6920] - loss: 0.002351  acc: 100.0000%(16/16)
+Batch[340/6920] - loss: 0.089869  acc: 93.7500%(15/16)
+Batch[350/6920] - loss: 0.000212  acc: 100.0000%(16/16)
+Batch[360/6920] - loss: 0.001970  acc: 100.0000%(16/16)
+Batch[370/6920] - loss: 0.040272  acc: 100.0000%(16/16)
+Batch[380/6920] - loss: 0.013075  acc: 100.0000%(16/16)
+Batch[390/6920] - loss: 0.014563  acc: 100.0000%(16/16)
+Batch[400/6920] - loss: 0.014881  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 1.144264  acc: 81.0780%(707/872) 
+Test Accuracy:  Evaluation - loss: 0.996971  acc: 82.7018%(1506/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[410/6920] - loss: 0.194431  acc: 93.7500%(15/16)
+Batch[420/6920] - loss: 0.000240  acc: 100.0000%(16/16)
+Batch[430/6920] - loss: 0.000896  acc: 100.0000%(16/16)
+## The 14 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.000652  acc: 100.0000%(16/16)
+Batch[20/6920] - loss: 0.000048  acc: 100.0000%(16/16)
+Batch[30/6920] - loss: 0.000271  acc: 100.0000%(16/16)
+Batch[40/6920] - loss: 0.025328  acc: 100.0000%(16/16)
+Batch[50/6920] - loss: 0.020261  acc: 100.0000%(16/16)
+Batch[60/6920] - loss: 0.000204  acc: 100.0000%(16/16)
+Batch[70/6920] - loss: 0.019077  acc: 100.0000%(16/16)
+Batch[80/6920] - loss: 0.000703  acc: 100.0000%(16/16)
+Batch[90/6920] - loss: 0.001243  acc: 100.0000%(16/16)
+Batch[100/6920] - loss: 0.000483  acc: 100.0000%(16/16)
+Batch[110/6920] - loss: 0.000318  acc: 100.0000%(16/16)
+Batch[120/6920] - loss: 0.000240  acc: 100.0000%(16/16)
+Batch[130/6920] - loss: 0.000186  acc: 100.0000%(16/16)
+Batch[140/6920] - loss: 0.000508  acc: 100.0000%(16/16)
+Batch[150/6920] - loss: 0.044867  acc: 93.7500%(15/16)
+Batch[160/6920] - loss: 0.013004  acc: 100.0000%(16/16)
+Batch[170/6920] - loss: 0.000302  acc: 100.0000%(16/16)
+Batch[180/6920] - loss: 0.003301  acc: 100.0000%(16/16)
+Batch[190/6920] - loss: 0.000137  acc: 100.0000%(16/16)
+Batch[200/6920] - loss: 0.000863  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 1.049752  acc: 81.5367%(711/872) 
+Test Accuracy:  Evaluation - loss: 0.917068  acc: 82.8666%(1509/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[210/6920] - loss: 0.004250  acc: 100.0000%(16/16)
+Batch[220/6920] - loss: 0.002760  acc: 100.0000%(16/16)
+Batch[230/6920] - loss: 0.000648  acc: 100.0000%(16/16)
+Batch[240/6920] - loss: 0.000364  acc: 100.0000%(16/16)
+Batch[250/6920] - loss: 0.001659  acc: 100.0000%(16/16)
+Batch[260/6920] - loss: 0.000311  acc: 100.0000%(16/16)
+Batch[270/6920] - loss: 0.002890  acc: 100.0000%(16/16)
+Batch[280/6920] - loss: 0.000088  acc: 100.0000%(16/16)
+Batch[290/6920] - loss: 0.000978  acc: 100.0000%(16/16)
+Batch[300/6920] - loss: 0.005917  acc: 100.0000%(16/16)
+Batch[310/6920] - loss: 0.000826  acc: 100.0000%(16/16)
+Batch[320/6920] - loss: 0.000288  acc: 100.0000%(16/16)
+Batch[330/6920] - loss: 0.125510  acc: 93.7500%(15/16)
+Batch[340/6920] - loss: 0.000030  acc: 100.0000%(16/16)
+Batch[350/6920] - loss: 0.001915  acc: 100.0000%(16/16)
+Batch[360/6920] - loss: 0.000736  acc: 100.0000%(16/16)
+Batch[370/6920] - loss: 0.000217  acc: 100.0000%(16/16)
+Batch[380/6920] - loss: 0.010263  acc: 100.0000%(16/16)
+Batch[390/6920] - loss: 0.002262  acc: 100.0000%(16/16)
+Batch[400/6920] - loss: 0.009949  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 1.111373  acc: 80.9633%(706/872) 
+Test Accuracy:  Evaluation - loss: 0.971699  acc: 83.2510%(1516/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[410/6920] - loss: 0.002167  acc: 100.0000%(16/16)
+Batch[420/6920] - loss: 0.003419  acc: 100.0000%(16/16)
+Batch[430/6920] - loss: 0.005285  acc: 100.0000%(16/16)
+## The 15 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.000233  acc: 100.0000%(16/16)
+Batch[20/6920] - loss: 0.089122  acc: 93.7500%(15/16)
+Batch[30/6920] - loss: 0.000064  acc: 100.0000%(16/16)
+Batch[40/6920] - loss: 0.000147  acc: 100.0000%(16/16)
+Batch[50/6920] - loss: 0.011925  acc: 100.0000%(16/16)
+Batch[60/6920] - loss: 0.001232  acc: 100.0000%(16/16)
+Batch[70/6920] - loss: 0.000556  acc: 100.0000%(16/16)
+Batch[80/6920] - loss: 0.000895  acc: 100.0000%(16/16)
+Batch[90/6920] - loss: 0.000200  acc: 100.0000%(16/16)
+Batch[100/6920] - loss: 0.004685  acc: 100.0000%(16/16)
+Batch[110/6920] - loss: 0.000310  acc: 100.0000%(16/16)
+Batch[120/6920] - loss: 0.070154  acc: 93.7500%(15/16)
+Batch[130/6920] - loss: 0.000706  acc: 100.0000%(16/16)
+Batch[140/6920] - loss: 0.000430  acc: 100.0000%(16/16)
+Batch[150/6920] - loss: 0.002355  acc: 100.0000%(16/16)
+Batch[160/6920] - loss: 0.000079  acc: 100.0000%(16/16)
+Batch[170/6920] - loss: 0.000186  acc: 100.0000%(16/16)
+Batch[180/6920] - loss: 0.000053  acc: 100.0000%(16/16)
+Batch[190/6920] - loss: 0.000040  acc: 100.0000%(16/16)
+Batch[200/6920] - loss: 0.001981  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 1.286659  acc: 81.5367%(711/872) 
+Test Accuracy:  Evaluation - loss: 1.143740  acc: 82.0977%(1495/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[210/6920] - loss: 0.182198  acc: 93.7500%(15/16)
+Batch[220/6920] - loss: 0.000051  acc: 100.0000%(16/16)
+Batch[230/6920] - loss: 0.000001  acc: 100.0000%(16/16)
+Batch[240/6920] - loss: 0.001146  acc: 100.0000%(16/16)
+Batch[250/6920] - loss: 0.008791  acc: 100.0000%(16/16)
+Batch[260/6920] - loss: 0.000037  acc: 100.0000%(16/16)
+Batch[270/6920] - loss: 0.000773  acc: 100.0000%(16/16)
+Batch[280/6920] - loss: 0.000383  acc: 100.0000%(16/16)
+Batch[290/6920] - loss: 0.000053  acc: 100.0000%(16/16)
+Batch[300/6920] - loss: 0.000602  acc: 100.0000%(16/16)
+Batch[310/6920] - loss: 0.000213  acc: 100.0000%(16/16)
+Batch[320/6920] - loss: 0.000080  acc: 100.0000%(16/16)
+Batch[330/6920] - loss: 0.000518  acc: 100.0000%(16/16)
+Batch[340/6920] - loss: 0.002018  acc: 100.0000%(16/16)
+Batch[350/6920] - loss: 0.000049  acc: 100.0000%(16/16)
+Batch[360/6920] - loss: 0.000716  acc: 100.0000%(16/16)
+Batch[370/6920] - loss: 0.000551  acc: 100.0000%(16/16)
+Batch[380/6920] - loss: 0.000202  acc: 100.0000%(16/16)
+Batch[390/6920] - loss: 0.031856  acc: 100.0000%(16/16)
+Batch[400/6920] - loss: 0.000889  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 1.226470  acc: 82.2248%(717/872) 
+Test Accuracy:  Evaluation - loss: 1.056452  acc: 82.9764%(1511/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[410/6920] - loss: 0.346930  acc: 93.7500%(15/16)
+Batch[420/6920] - loss: 0.004368  acc: 100.0000%(16/16)
+Batch[430/6920] - loss: 0.000013  acc: 100.0000%(16/16)
+## The 16 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.006167  acc: 100.0000%(16/16)
+Batch[20/6920] - loss: 0.004401  acc: 100.0000%(16/16)
+Batch[30/6920] - loss: 0.000003  acc: 100.0000%(16/16)
+Batch[40/6920] - loss: 0.008241  acc: 100.0000%(16/16)
+Batch[50/6920] - loss: 0.000030  acc: 100.0000%(16/16)
+Batch[60/6920] - loss: 0.004365  acc: 100.0000%(16/16)
+Batch[70/6920] - loss: 0.001178  acc: 100.0000%(16/16)
+Batch[80/6920] - loss: 0.000034  acc: 100.0000%(16/16)
+Batch[90/6920] - loss: 0.000132  acc: 100.0000%(16/16)
+Batch[100/6920] - loss: 0.005500  acc: 100.0000%(16/16)
+Batch[110/6920] - loss: 0.000055  acc: 100.0000%(16/16)
+Batch[120/6920] - loss: 0.000802  acc: 100.0000%(16/16)
+Batch[130/6920] - loss: 0.000462  acc: 100.0000%(16/16)
+Batch[140/6920] - loss: 0.000372  acc: 100.0000%(16/16)
+Batch[150/6920] - loss: 0.000182  acc: 100.0000%(16/16)
+Batch[160/6920] - loss: 0.000013  acc: 100.0000%(16/16)
+Batch[170/6920] - loss: 0.000159  acc: 100.0000%(16/16)
+Batch[180/6920] - loss: 0.000004  acc: 100.0000%(16/16)
+Batch[190/6920] - loss: 0.000027  acc: 100.0000%(16/16)
+Batch[200/6920] - loss: 0.000306  acc: 100.0000%(16/16)
+Dev  Accuracy:  Evaluation - loss: 1.317973  acc: 81.3073%(709/872) 
+Test Accuracy:  Evaluation - loss: 1.132253  acc: 82.7567%(1507/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[210/6920] - loss: 0.002496  acc: 100.0000%(16/16)
+Batch[220/6920] - loss: 0.001666  acc: 100.0000%(16/16)
+Batch[230/6920] - loss: 0.003715  acc: 100.0000%(16/16)
+Batch[240/6920] - loss: 0.000016  acc: 100.0000%(16/16)
+Batch[250/6920] - loss: 0.000197  acc: 100.0000%(16/16)
+Batch[260/6920] - loss: 0.000021  acc: 100.0000%(16/16)
+Batch[270/6920] - loss: 0.000353  acc: 100.0000%(16/16)
+Batch[280/6920] - loss: 0.000071  acc: 100.0000%(16/16)
+Batch[290/6920] - loss: 0.000006  acc: 100.0000%(16/16)
+Batch[300/6920] - loss: 0.000014  acc: 100.0000%(16/16)
+Batch[310/6920] - loss: 0.001327  acc: 100.0000%(16/16)
+Batch[320/6920] - loss: 0.000031  acc: 100.0000%(16/16)
+Batch[330/6920] - loss: 0.000212  acc: 100.0000%(16/16)
+Batch[340/6920] - loss: 0.000106  acc: 100.0000%(16/16)
+Batch[350/6920] - loss: 0.006233  acc: 100.0000%(16/16)
+Batch[360/6920] - loss: 0.001742  acc: 100.0000%(16/16)
+Batch[370/6920] - loss: 0.000345  acc: 100.0000%(16/16)
+Batch[380/6920] - loss: 0.001762  acc: 100.0000%(16/16)
+Batch[390/6920] - loss: 0.000149  acc: 100.0000%(16/16)
+Batch[400/6920] - loss: 0.072829  acc: 93.7500%(15/16)
+Dev  Accuracy:  Evaluation - loss: 1.253833  acc: 81.1927%(708/872) 
+Test Accuracy:  Evaluation - loss: 1.060441  acc: 83.0313%(1512/1821) 
+The Current Best Dev Accuracy: 83.9450, and Test Accuracy is :86.8753, locate on 3 epoch.
+
+
+Batch[410/6920] - loss: 0.000049  acc: 100.0000%(16/16)
+Batch[420/6920] - loss: 0.000006  acc: 100.0000%(16/16)
+Batch[430/6920] - loss: 0.000803  acc: 100.0000%(16/16)
+## The 17 Epoch, All 500 Epochs ! ##
+
+Batch[10/6920] - loss: 0.000005  acc: 100.0000%(16/16)
+Batch[20/6920] - loss: 0.002549  acc: 100.0000%(16/16)
+Batch[30/6920] - loss: 0.000659  acc: 100.0000%(16/16)
+Batch[40/6920] - loss: 0.000078  acc: 100.0000%(16/16)
+Batch[50/6920] - loss: 0.001146  acc: 100.0000%(16/16)
+Batch[60/6920] - loss: 0.000133  acc: 100.0000%(16/16)
+Batch[70/6920] - loss: 0.002247  acc: 100.0000%(16/16)
+Batch[80/6920] - loss: 0.000323  acc: 100.0000%(16/16)
+Batch[90/6920] - loss: 0.000035  acc: 100.0000%(16/16)
+Batch[100/6920] - loss: 0.000040  acc: 100.0000%(16/16)
+Batch[110/6920] - loss: 0.000205  acc: 100.0000%(16/16)
+Batch[120/6920] - loss: 0.001059  acc: 100.0000%(16/16)
+Batch[130/6920] - loss: 0.044143  acc: 100.0000%(16/16)
+Batch[140/6920] - loss: 0.000182  acc: 100.0000%(16/16)
+Batch[150/6920] - loss: 0.000997  acc: 100.0000%(16/16)
