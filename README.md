@@ -22,16 +22,17 @@ modify the config file, see the Config directory([here](https://github.com/bamte
 
 ## Model ##
 
-- Contains some neural networks implement in pytorch, see the [models](https://github.com/bamtercelboo/cnn-lstm-bilstm-deepcnn-clstm-in-pytorch/tree/master/models) for detail.
+Contains some neural networks implement in pytorch, see the [models](https://github.com/bamtercelboo/cnn-lstm-bilstm-deepcnn-clstm-in-pytorch/tree/master/models) for detail.
 
 ## Data ##
 
-- SST-1 and SST-2.
+SST-1 and SST-2.
 
 ## Result ##
 
-- I haven't adjusted the hyper-parameters seriously, you can also see train log in [here](https://github.com/bamtercelboo/cnn-lstm-bilstm-deepcnn-clstm-in-pytorch/tree/master/result).
-- The following test set accuracy are based on the best dev set accuracy.  
+I haven't adjusted the hyper-parameters seriously, you can also see train log in [here](https://github.com/bamtercelboo/cnn-lstm-bilstm-deepcnn-clstm-in-pytorch/tree/master/result).  
+
+The following test set accuracy are based on the best dev set accuracy.    
 
 | Data/Model | % SSt-1 | % SSt-2 |  
 | ------------ | ------------ | ------------ |  
