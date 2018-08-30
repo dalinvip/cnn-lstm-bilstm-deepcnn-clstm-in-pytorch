@@ -34,7 +34,7 @@ I haven't adjusted the hyper-parameters seriously, you can also see train log in
 
 The following test set accuracy are based on the best dev set accuracy.    
 
-| Data/Model | % SSt-1 | % SSt-2 |  
+| Data/Model | % SST-1 | % SST-2 |  
 | ------------ | ------------ | ------------ |  
 | CNN-Rand | 44.1629 | 82.2076 |  
 | CNN | 45.4751 | 84.3453 |  
