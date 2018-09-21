@@ -445,7 +445,7 @@ if __name__ == "__main__":
         torch.backends.cudnn.deterministic = True
         torch.cuda.manual_seed(seed_num)
         torch.cuda.manual_seed_all(seed_num)
-    print("torch.cuda.initial_seed", torch.cuda.initial_seed())
+        print("torch.cuda.initial_seed", torch.cuda.initial_seed())
     main()
 
 
