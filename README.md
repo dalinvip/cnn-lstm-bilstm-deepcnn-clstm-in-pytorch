@@ -6,6 +6,9 @@
 	* The old version in the branch of [old-version-17](https://github.com/bamtercelboo/cnn-lstm-bilstm-deepcnn-clstm-in-pytorch/tree/old_version_17), It still works directly. 
 	* The newest version in here([master](https://github.com/bamtercelboo/cnn-lstm-bilstm-deepcnn-clstm-in-pytorch)), It also can works directly now.
 
+- This is a version of my own architecture  ---  [pytorch-text-classification](https://github.com/bamtercelboo/pytorch_text_classification)
+.
+
 ## Requirement ##
 
 	pyorch : 0.3.1
