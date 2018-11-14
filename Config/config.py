@@ -277,7 +277,7 @@ class Configurable(myconf):
         return self._config.getboolean("Optimizer", "Adadelta")
 
     @property
-    def optim_momentum_value(self):
+    def momentum_value(self):
         return self._config.getfloat("Optimizer", "optim_momentum_value")
 
     @property
