@@ -185,18 +185,18 @@ def Load_Data():
         print("Executing 5 Classification Task......")
         if config.CNN_MUI is True or config.DEEP_CNN_MUI is True:
             train_iter, dev_iter, test_iter = mrs_five_mui(config.datafile_path, config.name_trainfile, config.name_devfile, config.name_testfile, config.char_data, text_field=config.text_field, label_field=config.label_field,
-                                                           static_text_field=config.static_text_field, static_label_field=config.static_label_field, device=-1, repeat=False, shuffle=config.epochs_shuffle, sort=False)
+                                                           static_text_field=config.static_text_field, static_label_field=config.static_label_field, repeat=False, shuffle=config.epochs_shuffle, sort=False)
         else:
             train_iter, dev_iter, test_iter = mrs_five(config.datafile_path, config.name_trainfile, config.name_devfile, config.name_testfile, config.char_data,
-                                                       config.text_field, config.label_field, device=-1, repeat=False, shuffle=config.epochs_shuffle, sort=False)
+                                                       config.text_field, config.label_field, repeat=False, shuffle=config.epochs_shuffle, sort=False)
     elif config.TWO_CLASS_TASK:
         print("Executing 2 Classification Task......")
         if config.CNN_MUI is True or config.DEEP_CNN_MUI is True:
             train_iter, dev_iter, test_iter = mrs_two_mui(config.datafile_path, config.name_trainfile, config.name_devfile, config.name_testfile, config.char_data, text_field=config.text_field, label_field=config.label_field,
-                                                          static_text_field=config.static_text_field, static_label_field=config.static_label_field, device=-1, repeat=False, shuffle=config.epochs_shuffle, sort=False)
+                                                          static_text_field=config.static_text_field, static_label_field=config.static_label_field, repeat=False, shuffle=config.epochs_shuffle, sort=False)
         else:
             train_iter, dev_iter, test_iter = mrs_two(config.datafile_path, config.name_trainfile, config.name_devfile, config.name_testfile, config.char_data, config.text_field,
-                                                      config.label_field, device=-1, repeat=False, shuffle=config.epochs_shuffle, sort=False)
+                                                      config.label_field, repeat=False, shuffle=config.epochs_shuffle, sort=False)
 
     return train_iter, dev_iter, test_iter
 
