@@ -13,7 +13,7 @@
 	pyorch : 1.0.1
 	python : 3.6
 	torchtext: 0.2.1
-	cuda : 8.0 (support cuda speed up, can chose)
+	cuda : 8.0 (support cuda speed up, can chose, default True)
 
 ## Usage ##
  
@@ -52,6 +52,6 @@ The following test set accuracy are based on the best dev set accuracy.
 
 ## Question ##
 
-- if you have any question, you can open a issue or email `bamtercelboo@{gmail.com, 163.com}`.
+- if you have any question, you can open a issue or email **bamtercelboo@{gmail.com, 163.com}**.
 
 - if you have any good suggestions, you can PR or email me.
