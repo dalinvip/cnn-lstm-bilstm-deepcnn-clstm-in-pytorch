@@ -21,6 +21,7 @@ modify the config file, see the Config directory([here](https://github.com/bamte
 
 	1、python main.py
 	2、python main.py --config_file ./Config/config.cfg 
+	3、sh run.sh
 
 ## Model ##
 
@@ -38,10 +39,9 @@ The following test set accuracy are based on the best dev set accuracy.
 
 | Data/Model | % SST-1 | % SST-2 |  
 | ------------ | ------------ | ------------ |  
-| CNN-Rand | 44.1629 | 82.2076 |  
-| CNN | 45.4751 | 84.3453 |  
-| Bi-LSTM | 48.1448 | 86.8753 |  
-| Bi-GRU | 48.1448 | 87.3696 |  
+| CNN | 46.1086 | 84.2943 |  
+| Bi-LSTM | 47.9186 | 86.3262 |  
+| Bi-GRU | 47.6923 | 86.7655 |  
 
 
 ## Reference ##
