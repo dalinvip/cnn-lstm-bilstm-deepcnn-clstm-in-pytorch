@@ -2,17 +2,16 @@
 
 - A classification task implement in pytorch, contains some neural networks in [models](https://github.com/bamtercelboo/cnn-lstm-bilstm-deepcnn-clstm-in-pytorch/tree/master/models).
 
-* Recenely,  I've readjusted the code structure to make it easier to read. 
-	* The old version in the branch of [old-version-17](https://github.com/bamtercelboo/cnn-lstm-bilstm-deepcnn-clstm-in-pytorch/tree/old_version_17), It still works directly. 
-	* The newest version in here([master](https://github.com/bamtercelboo/cnn-lstm-bilstm-deepcnn-clstm-in-pytorch)), It also can works directly now.
+* Recenely,  I've released the code. 
+	* **old-version-17** release [here](https://github.com/bamtercelboo/cnn-lstm-bilstm-deepcnn-clstm-in-pytorch/releases/tag/pytorch0.3.1-old_version_17)  
+	* **pytorch version == 0.3.1** release on [here](https://github.com/bamtercelboo/cnn-lstm-bilstm-deepcnn-clstm-in-pytorch/releases/tag/pytorch0.3.1)  
 
-- This is a version of my own architecture  ---  [pytorch-text-classification](https://github.com/bamtercelboo/pytorch_text_classification)
-.
+- This is a version of my own architecture  ---  [pytorch-text-classification](https://github.com/bamtercelboo/pytorch_text_classification)  
 
 ## Requirement ##
 
-	pyorch : 0.3.1
-	python : 3.6.1
+	pyorch : 1.0.1
+	python : 3.6
 	torchtext: 0.2.1
 	cuda : 8.0 (support cuda speed up, can chose)
 
