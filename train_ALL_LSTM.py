@@ -53,7 +53,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
             loss = F.cross_entropy(logit, target)
             loss.backward()
             if args.init_clip_max_norm is not None:
-                utils.clip_grad_norm(model.parameters(), max_norm=args.init_clip_max_norm)
+                utils.clip_grad_norm_(model.parameters(), max_norm=args.init_clip_max_norm)
             optimizer.step()
 
             steps += 1
@@ -64,7 +64,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
                 sys.stdout.write(
                     '\rBatch[{}/{}] - loss: {:.6f}  acc: {:.4f}%({}/{})'.format(steps,
                                                                             train_size,
-                                                                             loss.data[0], 
+                                                                             loss.item(),
                                                                              accuracy,
                                                                              corrects,
                                                                              batch.batch_size))
@@ -93,13 +93,13 @@ def eval(data_iter, model, args, best_accuracy, epoch, test=False):
         if args.cuda is True:
             feature, target = feature.cuda(), target.cuda()
         logit = model(feature)
-        loss = F.cross_entropy(logit, target, size_average=False)
+        loss = F.cross_entropy(logit, target)
 
-        avg_loss += loss.data[0]
+        avg_loss += loss.item()
         corrects += (torch.max(logit, 1)[1].view(target.size()).data == target.data).sum()
 
     size = len(data_iter.dataset)
-    avg_loss = loss.data[0]/size
+    avg_loss = loss.item()/size
     accuracy = float(corrects)/size * 100.0
     model.train()
     print(' Evaluation - loss: {:.6f}  acc: {:.4f}%({}/{}) '.format(avg_loss, accuracy, corrects, size))
