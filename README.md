@@ -8,6 +8,9 @@
 
 - This is a version of my own architecture  ---  [pytorch-text-classification](https://github.com/bamtercelboo/pytorch_text_classification)  
 
+- **BERT For Text Classification**  --- [PyTorch_Bert_Text_Classification](https://github.com/bamtercelboo/PyTorch_Bert_Text_Classification)  
+
+
 ## Requirement ##
 
 	pyorch : 1.0.1
