@@ -74,7 +74,7 @@ def mrs_two(path, train_name, dev_name, test_name, char_data, text_field, label_
     text_field.build_vocab(train_data.text, min_freq=config.min_freq)
     # text_field.build_vocab(train_data.text, dev_data.text, test_data.text, min_freq=config.min_freq)
     label_field.build_vocab(train_data.label)
-    train_iter, dev_iter, test_iter = data.Iterator.splits((train_data, dev_data, test_data),batch_sizes=(config.batch_size, len(dev_data), len(test_data)), **kargs)
+    train_iter, dev_iter, test_iter = data.Iterator.splits((train_data, dev_data, test_data),batch_sizes=(config.batch_size, len(dev_data), len(test_data)), device=-1, **kargs)
     return train_iter, dev_iter, test_iter
 
 
@@ -101,7 +101,7 @@ def mrs_two_mui(path, train_name, dev_name, test_name, char_data, text_field, la
     label_field.build_vocab(train_data)
     static_text_field.build_vocab(static_train_data, static_dev_data, static_test_data, min_freq=config.min_freq)
     static_label_field.build_vocab(static_train_data, static_dev_data, static_test_data)
-    train_iter, dev_iter, test_iter = data.Iterator.splits((train_data, dev_data, test_data), batch_sizes=(config.batch_size, len(dev_data), len(test_data)), **kargs)
+    train_iter, dev_iter, test_iter = data.Iterator.splits((train_data, dev_data, test_data), batch_sizes=(config.batch_size, len(dev_data), len(test_data)), device=-1, **kargs)
     return train_iter, dev_iter, test_iter
 
 
@@ -123,7 +123,7 @@ def mrs_five(path, train_name, dev_name, test_name, char_data, text_field, label
     print("len(train_data) {} ".format(len(train_data)))
     text_field.build_vocab(train_data, min_freq=config.min_freq)
     label_field.build_vocab(train_data)
-    train_iter, dev_iter, test_iter = data.Iterator.splits((train_data, dev_data, test_data), batch_sizes=(config.batch_size, len(dev_data), len(test_data)), **kargs)
+    train_iter, dev_iter, test_iter = data.Iterator.splits((train_data, dev_data, test_data), batch_sizes=(config.batch_size, len(dev_data), len(test_data)), device=-1, **kargs)
     return train_iter, dev_iter, test_iter
 
 
@@ -150,7 +150,7 @@ def mrs_five_mui(path, train_name, dev_name, test_name, char_data, text_field, l
     label_field.build_vocab(train_data)
     static_text_field.build_vocab(static_train_data, static_dev_data, static_test_data, min_freq=config.min_freq)
     static_label_field.build_vocab(static_train_data, static_dev_data, static_test_data)
-    train_iter, dev_iter, test_iter = data.Iterator.splits((train_data, dev_data, test_data), batch_sizes=(config.batch_size, len(dev_data), len(test_data)), **kargs)
+    train_iter, dev_iter, test_iter = data.Iterator.splits((train_data, dev_data, test_data), batch_sizes=(config.batch_size, len(dev_data), len(test_data)), device=-1, **kargs)
     return train_iter, dev_iter, test_iter
 
 
