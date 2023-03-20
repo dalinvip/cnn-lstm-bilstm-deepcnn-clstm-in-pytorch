@@ -53,8 +53,3 @@ The following test set accuracy are based on the best dev set accuracy.
 - [Convolutional Neural Networks for Sentence Classification](https://arxiv.org/pdf/1408.5882.pdf)
 -  [Context-Sensitive Lexicon Features for Neural Sentiment Analysis](https://arxiv.org/pdf/1408.5882.pdf)
 
-## Question ##
-
-- if you have any question, you can open a issue or email **bamtercelboo@{gmail.com, 163.com}**.
-
-- if you have any good suggestions, you can PR or email me.
