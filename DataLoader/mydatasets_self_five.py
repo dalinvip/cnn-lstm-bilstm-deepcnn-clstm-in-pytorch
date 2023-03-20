@@ -3,7 +3,6 @@
 # @Datetime : 2018/07/19 22:35
 # @File : mydatasets_self_five.py
 # @Last Modify Time : 2018/07/19 22:35
-# @Contact : bamtercelboo@{gmail.com, 163.com}
 
 import re
 import os
