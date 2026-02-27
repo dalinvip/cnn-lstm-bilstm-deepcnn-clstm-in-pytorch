@@ -1,0 +1,45 @@
+{
+  "config": {
+    "epochs": 15,
+    "batch_size": 64,
+    "lr": 0.001,
+    "dropout": 0.3,
+    "embed_dim": 300,
+    "lstm_hidden_dim": 300,
+    "seed": 233
+  },
+  "results": {
+    "BiLSTM": {
+      "best_dev_accuracy": 83.14220183486239,
+      "best_test_accuracy": 85.22789676002198,
+      "best_epoch": 1,
+      "train_time": 93.64268183708191,
+      "total_params": 4736852,
+      "trainable_params": 4736852
+    },
+    "Transformer": {
+      "best_dev_accuracy": 80.27522935779817,
+      "best_test_accuracy": 81.16419549697969,
+      "best_epoch": 14,
+      "train_time": 891.7480421066284,
+      "total_params": 6364652,
+      "trainable_params": 6364652
+    },
+    "CNN+Transformer": {
+      "best_dev_accuracy": 50.917431192660544,
+      "best_test_accuracy": 49.9176276771005,
+      "best_epoch": 1,
+      "train_time": 291.78292775154114,
+      "total_params": 6454952,
+      "trainable_params": 6454952
+    },
+    "CNN+Transformer_Parallel": {
+      "best_dev_accuracy": 82.33944954128441,
+      "best_test_accuracy": 82.26249313563976,
+      "best_epoch": 7,
+      "train_time": 1350.4456808567047,
+      "total_params": 6500102,
+      "trainable_params": 6500102
+    }
+  }
+}
