@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深度学习模型对比实验平台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>深度学习模型对比实验平台</h1>
+            <p class="subtitle">CNN / LSTM / BiLSTM / GRU / 混合模型 两两对比</p>
+        </header>
+
+        <section class="model-selection">
+            <h2>模型选择</h2>
+            <div class="model-selectors">
+                <div class="model-box model-a">
+                    <h3>原始模型 (Model A)</h3>
+                    <select id="model-a-select" class="model-select">
+                        <option value="">-- 请选择模型 --</option>
+                        {% for key, value in models.items() %}
+                        <option value="{{ key }}" data-type="{{ value.type }}">{{ value.name }} - {{ value.description }}</option>
+                        {% endfor %}
+                    </select>
+                    <div id="model-a-info" class="model-info"></div>
+                </div>
+                
+                <div class="vs-divider">
+                    <span>VS</span>
+                </div>
+                
+                <div class="model-box model-b">
+                    <h3>对比模型 (Model B)</h3>
+                    <select id="model-b-select" class="model-select">
+                        <option value="">-- 请选择模型 --</option>
+                        {% for key, value in models.items() %}
+                        <option value="{{ key }}" data-type="{{ value.type }}">{{ value.name }} - {{ value.description }}</option>
+                        {% endfor %}
+                    </select>
+                    <div id="model-b-info" class="model-info"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="hyperparams-section">
+            <h2>超参数设置</h2>
+            <div class="hyperparams-grid">
+                <div class="param-group">
+                    <label for="learning_rate">
+                        学习率 (Learning Rate)
+                        <span class="param-hint">建议范围: 0.0001 - 0.1</span>
+                    </label>
+                    <input type="number" id="learning_rate" name="learning_rate" 
+                           value="0.001" step="0.0001" min="0.0001" max="0.1">
+                </div>
+                
+                <div class="param-group">
+                    <label for="epochs">
+                        训练轮数
+                        <span class="param-hint">建议范围: 50 - 500</span>
+                    </label>
+                    <input type="number" id="epochs" name="epochs" 
+                           value="100" step="1" min="1" max="1000">
+                </div>
+                
+                <div class="param-group">
+                    <label for="batch_size">
+                        批次大小 (Batch Size)
+                        <span class="param-hint">建议范围: 8 - 64</span>
+                    </label>
+                    <input type="number" id="batch_size" name="batch_size" 
+                           value="16" step="1" min="1" max="128">
+                </div>
+                
+                <div class="param-group">
+                    <label for="dropout">
+                        Dropout率
+                        <span class="param-hint">建议范围: 0.3 - 0.7</span>
+                    </label>
+                    <input type="number" id="dropout" name="dropout" 
+                           value="0.5" step="0.05" min="0.0" max="0.9">
+                </div>
+                
+                <div class="param-group">
+                    <label for="weight_decay">
+                        权重衰减
+                        <span class="param-hint">建议范围: 1e-8 - 1e-4</span>
+                    </label>
+                    <input type="number" id="weight_decay" name="weight_decay" 
+                           value="0.00000001" step="0.00000001" min="0" max="0.01">
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button id="start-btn" class="btn btn-primary" onclick="startTraining()">
+                    开始对比实验
+                </button>
+                <button id="stop-btn" class="btn btn-danger" onclick="stopTraining()" disabled>
+                    停止训练
+                </button>
+            </div>
+        </section>
+
+        <section class="progress-section" id="progress-section" style="display: none;">
+            <h2>训练进度</h2>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <span class="progress-text" id="progress-text">0%</span>
+            </div>
+            <div class="training-info">
+                <span id="current-epoch">当前轮次: 0</span>
+                <span id="training-status">状态: 准备中...</span>
+            </div>
+            
+            <div class="logs-container">
+                <h3>训练日志</h3>
+                <div id="logs-output" class="logs-output"></div>
+            </div>
+        </section>
+
+        <section class="results-section" id="results-section" style="display: none;">
+            <h2>训练结果对比</h2>
+            
+            <div class="metrics-cards">
+                <div class="metric-card">
+                    <h4>最佳验证准确率</h4>
+                    <div class="metric-values">
+                        <div class="metric-a" id="metric-acc-a">
+                            <span class="model-label">Model A</span>
+                            <span class="metric-value">--</span>
+                        </div>
+                        <div class="metric-b" id="metric-acc-b">
+                            <span class="model-label">Model B</span>
+                            <span class="metric-value">--</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <h4>最终测试准确率</h4>
+                    <div class="metric-values">
+                        <div class="metric-a" id="metric-test-a">
+                            <span class="model-label">Model A</span>
+                            <span class="metric-value">--</span>
+                        </div>
+                        <div class="metric-b" id="metric-test-b">
+                            <span class="model-label">Model B</span>
+                            <span class="metric-value">--</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <h4>训练时间 (秒)</h4>
+                    <div class="metric-values">
+                        <div class="metric-a" id="metric-time-a">
+                            <span class="model-label">Model A</span>
+                            <span class="metric-value">--</span>
+                        </div>
+                        <div class="metric-b" id="metric-time-b">
+                            <span class="model-label">Model B</span>
+                            <span class="metric-value">--</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <h4>收敛轮次</h4>
+                    <div class="metric-values">
+                        <div class="metric-a" id="metric-conv-a">
+                            <span class="model-label">Model A</span>
+                            <span class="metric-value">--</span>
+                        </div>
+                        <div class="metric-b" id="metric-conv-b">
+                            <span class="model-label">Model B</span>
+                            <span class="metric-value">--</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <h4>模型参数量</h4>
+                    <div class="metric-values">
+                        <div class="metric-a" id="metric-params-a">
+                            <span class="model-label">Model A</span>
+                            <span class="metric-value">--</span>
+                        </div>
+                        <div class="metric-b" id="metric-params-b">
+                            <span class="model-label">Model B</span>
+                            <span class="metric-value">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="charts-container">
+                <div class="chart-box">
+                    <h3>训练损失曲线</h3>
+                    <canvas id="lossChart"></canvas>
+                </div>
+                
+                <div class="chart-box">
+                    <h3>准确率曲线</h3>
+                    <canvas id="accChart"></canvas>
+                </div>
+                
+                <div class="chart-box">
+                    <h3>验证集准确率对比</h3>
+                    <canvas id="devAccChart"></canvas>
+                </div>
+                
+                <div class="chart-box">
+                    <h3>综合指标雷达图</h3>
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="results-table-container">
+                <h3>详细对比结果</h3>
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>指标</th>
+                            <th>Model A</th>
+                            <th>Model B</th>
+                            <th>优势方</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-tbody">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
