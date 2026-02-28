@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深度学习模型对比平台</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        .model-selector {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .model-box {
+            flex: 1;
+            min-width: 280px;
+            max-width: 400px;
+        }
+        .vs-badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: white;
+        }
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        .hyperparams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .param-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .param-item input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        .param-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .start-btn {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 30px auto 0;
+            padding: 16px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+        .start-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .results-section {
+            display: none;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .result-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .result-card.model1 {
+            border-bottom: 4px solid #36A2EB;
+        }
+        .result-card.model2 {
+            border-bottom: 4px solid #FF6384;
+        }
+        .result-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .result-card.model1 .result-value {
+            color: #36A2EB;
+        }
+        .result-card.model2 .result-value {
+            color: #FF6384;
+        }
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .chart-wrapper {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+        }
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        .winner-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>深度学习模型对比平台</h1>
+        
+        <div class="card">
+            <h2 style="margin-bottom: 20px; color: #333;">📊 选择对比模型</h2>
+            <div class="model-selector">
+                <div class="model-box">
+                    <label>原始模型 (基准)</label>
+                    <select id="model1">
+                        {% for model in models %}
+                        <option value="{{ model }}">{{ model }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="vs-badge">VS</div>
+                <div class="model-box">
+                    <label>对比模型</label>
+                    <select id="model2">
+                        {% for model in models %}
+                        <option value="{{ model }}" {% if loop.index == 2 %}selected{% endif %}>{{ model }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 style="margin-bottom: 20px; color: #333;">⚙️ 超参数设置</h2>
+            <div class="hyperparams-grid" id="hyperparams-grid">
+                {% for key, param in hyperparams.items() %}
+                <div class="param-item">
+                    <label>{{ param.desc }} ({{ key }})</label>
+                    <input type="number" 
+                           id="{{ key }}" 
+                           name="{{ key }}" 
+                           value="{{ param.default }}"
+                           step="{{ param.step }}"
+                           min="{{ param.min }}"
+                           max="{{ param.max }}">
+                    <div class="param-hint">建议范围: {{ param.min }} ~ {{ param.max }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            <button class="start-btn" id="startBtn" onclick="startComparison()">开始对比实验</button>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <h3 style="color: #333;">训练进行中...</h3>
+            <p style="color: #666; margin-top: 10px;">请耐心等待，这可能需要几分钟时间</p>
+        </div>
+        
+        <div class="error-message" id="error"></div>
+        
+        <div class="card results-section" id="results">
+            <h2 style="margin-bottom: 20px; color: #333;">📈 训练结果对比</h2>
+            <div class="results-grid" id="results-summary"></div>
+            <div class="charts-container">
+                <div class="chart-wrapper">
+                    <h3 style="margin-bottom: 15px; color: #333;">准确率曲线</h3>
+                    <canvas id="accuracyChart"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <h3 style="margin-bottom: 15px; color: #333;">损失曲线</h3>
+                    <canvas id="lossChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let accuracyChart = null;
+        let lossChart = null;
+        
+        function getHyperparams() {
+            const params = {};
+            const inputs = document.querySelectorAll('#hyperparams-grid input');
+            inputs.forEach(input => {
+                const value = parseFloat(input.value);
+                params[input.id] = input.step === '1' ? parseInt(value) : value;
+            });
+            return params;
+        }
+        
+        async function startComparison() {
+            const model1 = document.getElementById('model1').value;
+            const model2 = document.getElementById('model2').value;
+            const hyperparams = getHyperparams();
+            
+            if (model1 === model2) {
+                showError('请选择两个不同的模型进行对比！');
+                return;
+            }
+            
+            hideError();
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('startBtn').disabled = true;
+            
+            try {
+                const response = await fetch('/api/compare', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model1, model2, hyperparams })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                pollStatus(data.experiment_id);
+            } catch (error) {
+                showError(error.message);
+                resetUI();
+            }
+        }
+        
+        async function pollStatus(experimentId) {
+            const checkStatus = async () => {
+                try {
+                    const response = await fetch(`/api/status/${experimentId}`);
+                    const data = await response.json();
+                    
+                    if (data.status === 'completed') {
+                        displayResults(data.result);
+                        resetUI();
+                    } else if (data.status === 'failed') {
+                        showError(data.result?.error || '训练失败');
+                        resetUI();
+                    } else {
+                        setTimeout(checkStatus, 2000);
+                    }
+                } catch (error) {
+                    showError('网络错误: ' + error.message);
+                    resetUI();
+                }
+            };
+            checkStatus();
+        }
+        
+        function displayResults(result) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+            
+            const m1 = result.model1;
+            const m2 = result.model2;
+            
+            const m1BestAcc = (m1.data.best_accuracy * 100).toFixed(2);
+            const m2BestAcc = (m2.data.best_accuracy * 100).toFixed(2);
+            const m1BestLoss = m1.data.best_loss.toFixed(4);
+            const m2BestLoss = m2.data.best_loss.toFixed(4);
+            
+            const accWinner = m1.data.best_accuracy > m2.data.best_accuracy ? 1 : 2;
+            const lossWinner = m1.data.best_loss < m2.data.best_loss ? 1 : 2;
+            
+            document.getElementById('results-summary').innerHTML = `
+                <div class="result-card model1">
+                    <h3>${m1.name}</h3>
+                    <div class="result-value">${m1BestAcc}%</div>
+                    <div>最高准确率</div>
+                    ${accWinner === 1 ? '<div class="winner-badge">🏆 更优</div>' : ''}
+                </div>
+                <div class="result-card model2">
+                    <h3>${m2.name}</h3>
+                    <div class="result-value">${m2BestAcc}%</div>
+                    <div>最高准确率</div>
+                    ${accWinner === 2 ? '<div class="winner-badge">🏆 更优</div>' : ''}
+                </div>
+                <div class="result-card model1">
+                    <h3>${m1.name}</h3>
+                    <div class="result-value">${m1BestLoss}</div>
+                    <div>最低损失</div>
+                    ${lossWinner === 1 ? '<div class="winner-badge">🏆 更优</div>' : ''}
+                </div>
+                <div class="result-card model2">
+                    <h3>${m2.name}</h3>
+                    <div class="result-value">${m2BestLoss}</div>
+                    <div>最低损失</div>
+                    ${lossWinner === 2 ? '<div class="winner-badge">🏆 更优</div>' : ''}
+                </div>
+            `;
+            
+            const epochs = m1.data.epoch_data.map(e => e.epoch);
+            const m1Accuracies = m1.data.epoch_data.map(e => e.accuracy * 100);
+            const m2Accuracies = m2.data.epoch_data.map(e => e.accuracy * 100);
+            const m1Losses = m1.data.epoch_data.map(e => e.loss);
+            const m2Losses = m2.data.epoch_data.map(e => e.loss);
+            
+            plotCharts(epochs, m1.name, m2.name, m1Accuracies, m2Accuracies, m1Losses, m2Losses);
+        }
+        
+        function plotCharts(epochs, m1Name, m2Name, m1Acc, m2Acc, m1Loss, m2Loss) {
+            if (accuracyChart) accuracyChart.destroy();
+            if (lossChart) lossChart.destroy();
+            
+            accuracyChart = new Chart(document.getElementById('accuracyChart'), {
+                type: 'line',
+                data: {
+                    labels: epochs,
+                    datasets: [
+                        {
+                            label: m1Name + ' 准确率',
+                            data: m1Acc,
+                            borderColor: '#36A2EB',
+                            backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: m2Name + ' 准确率',
+                            data: m2Acc,
+                            borderColor: '#FF6384',
+                            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: { display: true, text: '准确率 (%)' }
+                        },
+                        x: { title: { display: true, text: 'Epoch' } }
+                    }
+                }
+            });
+            
+            lossChart = new Chart(document.getElementById('lossChart'), {
+                type: 'line',
+                data: {
+                    labels: epochs,
+                    datasets: [
+                        {
+                            label: m1Name + ' 损失',
+                            data: m1Loss,
+                            borderColor: '#36A2EB',
+                            backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: m2Name + ' 损失',
+                            data: m2Loss,
+                            borderColor: '#FF6384',
+                            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: { display: true, text: 'Loss' }
+                        },
+                        x: { title: { display: true, text: 'Epoch' } }
+                    }
+                }
+            });
+        }
+        
+        function showError(msg) {
+            const el = document.getElementById('error');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+        
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
+        }
+        
+        function resetUI() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('startBtn').disabled = false;
+        }
+    </script>
+</body>
+</html>
